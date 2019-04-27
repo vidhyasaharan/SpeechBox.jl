@@ -1,12 +1,10 @@
 module SpeechBox
 
 
-using Reexport
 using DSP
 using FFTW
 using StaticArrays
-
-@reexport using SampledSignals
+using SampledSignals
 
 export framed_signal, extract_frame, specgram, melbankm, melfcc, Float, vad_energy_threshold
 

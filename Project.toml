@@ -1,0 +1,4 @@
+name = "SpeechBox"
+uuid = "5977877c-68b9-11e9-19cb-f954a5ed1fbc"
+authors = ["vidhya <v.sethu@unsw.edu.au>"]
+version = "0.1.0"

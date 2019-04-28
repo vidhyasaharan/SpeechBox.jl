@@ -26,12 +26,13 @@ fs = samplerate(x)
     sig_frames = framed_signal(x,win_dur,win_overlap)
 
     en_thr = 0.05
-    vi = vad_energy_threshold(sig_frames,en_thr)
+    vi  = vad_energy_threshold(sig_frames,en_thr)
 
     energy = zeros(Float,sig_frames.num_frames)
     for i=1:sig_frames.num_frames
         frame = extract_frame(sig_frames,i)
-        energy[i] = rms(frame);
+        energy[i] = sum(abs2,frame)
+        # energy[i] = rms(frame);
     end
     max_energy = maximum(energy)
     energy = energy./max_energy
@@ -45,8 +46,14 @@ fs = samplerate(x)
     end
 end
 
-
+win_dur = 0.03
+win_overlap = 0.01
+sig_frames = framed_signal(x,win_dur,win_overlap)
 vi = vad_energy_threshold(sig_frames,0.05)
+vi2 = vad_energy_fraction(sig_frames,0.3)
+
+en = frame_energy(sig_frames)
 
 scene = lines(vi,color=:blue)
-lines!(scene,en,color=:red)
+lines!(scene,en/50,color=:red)
+lines!(scene,vi2,color=:green)

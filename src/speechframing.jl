@@ -34,13 +34,17 @@ function extract_frame(x::framed_signal,i::Int)
     return frame
 end
 
-#Estimate energy in each frame as sum of squares of samples
-function frame_energy(sig_frames::framed_signal)
+#Estimate energy in each frame as sum of squares of samples (optionally return normalised energy such that max is 1)
+function frame_energy(sig_frames::framed_signal; normalised = false)
     numframes = sig_frames.num_frames
     energy = zeros(Float,numframes) #Initialise array of estimated energy values (one per frames)
     for i=1:numframes
         frame = extract_frame(sig_frames,i) #extract frame from framed signal object
         energy[i] = sum(abs2,frame) #Estimate energy as sum of squares
     end
-    return energy
+    if normalised #if normalised flag is true, normalise energy such that maximum is 1
+        return energy/maximum(energy)
+    else
+        return energy
+    end
 end

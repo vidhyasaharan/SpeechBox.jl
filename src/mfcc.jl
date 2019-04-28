@@ -1,0 +1,48 @@
+function melfcc(x::SampleBuf;ncoef=13,nfilt=17,win_dur=0.02,win_overlap=0.01)
+    frames = framed_signal(x,win_dur,win_overlap)
+    fs = samplerate(x)
+    numframes = frames.num_frames;
+    flen = frames.frame_length;
+    nfft = nextfastfft(flen);
+    win = hamming(flen);
+
+    buf = zeros(nfft);
+    fbuf = zeros(nfilt);
+    rfp = plan_rfft(buf);
+    dcp = plan_dct(fbuf);
+
+    nrfft = length(rfp*buf);
+    fbank = melbankm(fs,nrfft,nfilt=nfilt); #generate mel filterbank filters
+    fbank = fbank.^2; #squaring triangular mel-filters to multiple with power spectrum
+
+    mfcc = zeros(ncoef,numframes);
+
+    for i=1:numframes
+        buf[1:1:flen] = win.*extract_frame(frames,i);
+        #fbuf = dcp*(fbank*(abs.(rfp*buf)));
+        fbuf = fbank*(abs2.(rfp*buf) + eps()*ones(nrfft)); #multiplying with power spectrum (square of mag spectrum) and accumulating
+        fbuf = dcp*(log.(fbuf));
+        mfcc[:,i] = fbuf[1:ncoef];
+    end
+    return mfcc
+end
+
+function melbankm(fs,npts;nfilt=17)
+    mspace = SVector{nfilt}(range(0,stop=frq2mel(fs/2),length = nfilt)) #equally spaced points in mel scale
+    fspace = SVector{nfilt}(mel2frq.(mspace)) #equal mel spaced points mapped back to Hz
+    cindx = SVector{nfilt}(Int.(round.(fspace*(npts-1)/(fs/2))+1)) #Filter centre indices (first at 0, final at Fs/2)
+    fbank = zeros(nfilt,npts);
+    #define triangular filters for 2 to nfilt-1
+    for i=2:nfilt-1
+        fbank[i,cindx[i-1]:cindx[i]] = range(0,stop=1,length=cindx[i]-cindx[i-1]+1) #upward slope of triangle
+        fbank[i,cindx[i]:cindx[i+1]] = range(1,stop=0,length=cindx[i+1]-cindx[i]+1) #downward slope of triangle
+    end
+    #one sided triangular filters for first and last filters
+    fbank[1,cindx[1]:cindx[2]] = range(1,stop=0,length=cindx[2]-cindx[1]+1)
+    fbank[nfilt,cindx[nfilt-1]:cindx[nfilt]] = range(0,stop=1,length=cindx[nfilt]-cindx[nfilt-1]+1)
+    return fbank
+end
+
+frq2mel(frq) = log(1+frq/700)*1127.01048;
+
+mel2frq(mel) = 700*(exp(mel/1127.01048)-1);

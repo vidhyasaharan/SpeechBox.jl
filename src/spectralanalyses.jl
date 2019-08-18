@@ -1,3 +1,21 @@
+function magspec(x::Array{Float,1},fs::Float=1;wtype::String="hanning")
+
+    #Choose window - options are rectangle, hamming or hanning (function default is hanning)
+    flen = length(x)
+    if(wtype=="rect")
+        win = ones(flen)
+    elseif(wtype=="hamming")
+        win = hamming(flen)
+    elseif(wtype=="hanning")
+        win = hanning(flen)
+    else
+        println("Warning: window type not recognised - using Hann window")
+        win = hanning(flen)
+    end
+    return abs.(rfft(x.*win))
+end
+
+
 function specgram(x::SampleBuf;win_dur::Float=0.02,win_overlap::Float=0.01,wtype::String="hanning")
     sig_frames = framed_signal(x,win_dur,win_overlap) #Obtain signal frames object
     flen = sig_frames.frame_length

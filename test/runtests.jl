@@ -29,13 +29,23 @@ fs = samplerate(x)
     @test frames.num_signal_frames >= (nframes(frames.x)-frames.frame_length)/frames.frame_overlap
 end
 
-
 @testset "extract_frame" begin
     frames = framed_signal(x)
     @test typeof(extract_frame(frames,1))<:Array{<:AbstractFloat,1}
     @test length(extract_frame(frames,1)) > 0
     @test length(extract_frame(frames,frames.num_frames)) > 0
     @test maximum(abs.(extract_frame(frames,frames.num_frames))) > 0
+end
+
+@testset "magspec" begin
+    t = 0:0.01:0.99
+    frq = 25
+    xx = cos.(2*pi*frq*t)
+    mspec = magspec(xx,100.0;wtype = "rect")
+    mmag,mfrq = findmax(mspec)
+    @test length(mspec) == 51
+    @test mfrq == frq + 1
+    @test round(mmag) == 50.0
 end
 
 @testset "specgram" begin
@@ -52,4 +62,16 @@ end
     @test size(mb,1) == 22
     @test size(mb,2) == Int(ceil(0.02*fs))
     @test sum(mb,dims=1) == ones(1,Int(ceil(0.02*fs)))
+end
+
+@testset "melfcc" begin
+    ncof = 14
+    nfil = 22
+    win_dr = 0.025
+    win_ovlp = 0.01
+    mfc = melfcc(x;ncoef = ncof, nfilt = nfil, win_dur = win_dr, win_overlap = win_ovlp)
+    frames = framed_signal(x,win_dr,win_ovlp)
+    fx = extract_frame(frames,5)
+    @test size(mfc,1) == ncof
+    @test size(mfc,2) == frames.num_frames
 end

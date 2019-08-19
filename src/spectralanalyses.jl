@@ -1,16 +1,7 @@
 function magspec(x::Array{Float,1},fs::Float=1.0;wtype::String="hanning")
     #Choose window - options are rectangle, hamming or hanning (function default is hanning)
     flen = length(x)
-    if(wtype=="rect")
-        win = ones(flen)
-    elseif(wtype=="hamming")
-        win = hamming(flen)
-    elseif(wtype=="hanning")
-        win = hanning(flen)
-    else
-        println("Warning: window type not recognised - using Hann window")
-        win = hanning(flen)
-    end
+    win = window(flen;wtype=wtype)
     return abs.(rfft(x.*win))
 end
 
@@ -21,16 +12,7 @@ function specgram(sig_frames::framed_signal;wtype::String="hanning")
     nframes = sig_frames.num_signal_frames
 
     #Choose window - options are rectangle, hamming or hanning (function default is hanning)
-    if(wtype=="rect")
-        win = ones(flen)
-    elseif(wtype=="hamming")
-        win = hamming(flen)
-    elseif(wtype=="hanning")
-        win = hanning(flen)
-    else
-        println("Warning: window type not recognised - using Hann window")
-        win = hanning(flen)
-    end
+    win = window(flen;wtype=wtype)
 
     buf = zeros(nfft); #Buffer for operating on one frame (length is equal or larger than frame length)
     rfp = plan_rfft(buf); #Real valued FFT operator (gives only positive frequencies)

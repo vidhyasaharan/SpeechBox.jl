@@ -15,7 +15,7 @@ fs = samplerate(x)
 @testset "framed_signal" begin
     frames = framed_signal(x)
     @test typeof(frames) == framed_signal
-    @test typeof(frames.x) <: AbstractSampleBuf
+    @test typeof(frames.x) <: Array{Float}
     @test nframes(frames.x) > 0
     @test typeof(frames.frame_length) <: Int
     @test typeof(frames.frame_overlap) <: Int

@@ -1,21 +1,31 @@
 #Struct/Object defining framed signal using signal defined as SampleBuf from SampledSignals toolbox
 struct framed_signal
-    x::SampleBuf
+    x::Array{Float}
     frame_length::Int
     frame_overlap::Int
     num_signal_frames::Int
     num_frames::Int
 end
 
-#Constructor function - sets up framed_signal object given an input signal and window parameters
+#Constructor function - sets up framed_signal object given an input signal of type SampleBuf and window parameters
 function framed_signal(x::SampleBuf,win_dur::Float=0.02,win_overlap::Float=0.01)
     fs = samplerate(x)
     frame_length = Int(round(win_dur*fs))
     frame_overlap = Int(round(win_overlap*fs))
     num_signal_frames = Int(floor(1 + (nframes(x)-frame_length)/frame_overlap))
     num_frames = Int(ceil(nframes(x)/frame_overlap))
+    return framed_signal(float(collect(x[:,1])),frame_length,frame_overlap,num_signal_frames,num_frames)
+end
+
+#Constructor function - sets up framed_signal object given an input signal of one dimenionsal float array and window parameters
+function framed_signal(x::Array{AbstractFloat},fs::Float,win_dur::Float=0.02,win_overlap::Float=0.01)
+    frame_length = Int(round(win_dur*fs))
+    frame_overlap = Int(round(win_overlap*fs))
+    num_signal_frames = Int(floor(1 + (nframes(x)-frame_length)/frame_overlap))
+    num_frames = Int(ceil(nframes(x)/frame_overlap))
     return framed_signal(x,frame_length,frame_overlap,num_signal_frames,num_frames)
 end
+
 
 # Function that pulls out one frame as an array from framed_signal object
 function extract_frame(x::framed_signal,i::Int)
@@ -24,12 +34,12 @@ function extract_frame(x::framed_signal,i::Int)
     sindx = (i-1)*frame_overlap + 1 #Identify start index of desired frame
     eindx = sindx + frame_length - 1 #Identify end index of desired frame
     if(i<=x.num_signal_frames) #Checking to see end of frame is within bounds of defined signal
-        frame = float(collect(x.x[sindx:eindx]))
+        frame = collect(x.x[sindx:eindx])
     else #Zero padding to return full frame if signal ends midway through the frame
         frame = zeros(frame_length)
         lindx = nframes(x.x)
         sig_len = lindx - sindx + 1
-        frame[1:sig_len] = float(collect(x.x[sindx:lindx]))
+        frame[1:sig_len] = collect(x.x[sindx:lindx])
     end
     return frame
 end

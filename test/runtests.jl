@@ -13,7 +13,7 @@ x = load(joinpath(testdir,"King.wav"))
 fs = samplerate(x)
 
 @testset "framed_signal" begin
-    frames = framed_signal(x)
+    frames = framed_signal(x) #For SampleBuf input
     @test typeof(frames) == framed_signal
     @test typeof(frames.x) <: Array{Float}
     @test nframes(frames.x) > 0
@@ -27,6 +27,22 @@ fs = samplerate(x)
     @test frames.num_frames > 0
     @test frames.num_frames >= frames.num_signal_frames
     @test frames.num_signal_frames >= (nframes(frames.x)-frames.frame_length)/frames.frame_overlap
+
+    frames = framed_signal(float(collect(x[:,1])),fs) #for Array{Float} input
+    @test typeof(frames) == framed_signal
+    @test typeof(frames.x) <: Array{Float}
+    @test nframes(frames.x) > 0
+    @test typeof(frames.frame_length) <: Int
+    @test typeof(frames.frame_overlap) <: Int
+    @test typeof(frames.num_signal_frames) <: Int
+    @test typeof(frames.num_frames) <: Int
+    @test frames.frame_length > 0
+    @test frames.frame_overlap > 0
+    @test frames.num_signal_frames > 0
+    @test frames.num_frames > 0
+    @test frames.num_frames >= frames.num_signal_frames
+    @test frames.num_signal_frames >= (nframes(frames.x)-frames.frame_length)/frames.frame_overlap
+
 end
 
 @testset "extract_frame" begin

@@ -1,31 +1,28 @@
 #Struct/Object defining framed signal using signal defined as SampleBuf from SampledSignals toolbox
 struct framed_signal
     x::Array{Float}
+    fs::Float
     frame_length::Int
     frame_overlap::Int
     num_signal_frames::Int
     num_frames::Int
 end
 
-#Constructor function - sets up framed_signal object given an input signal of type SampleBuf and window parameters
-function framed_signal(x::SampleBuf,win_dur::Float=0.02,win_overlap::Float=0.01)
-    fs = samplerate(x)
-    frame_length = Int(round(win_dur*fs))
-    frame_overlap = Int(round(win_overlap*fs))
-    num_signal_frames = Int(floor(1 + (nframes(x)-frame_length)/frame_overlap))
-    num_frames = Int(ceil(nframes(x)/frame_overlap))
-    return framed_signal(float(collect(x[:,1])),frame_length,frame_overlap,num_signal_frames,num_frames)
-end
 
 #Constructor function - sets up framed_signal object given an input signal of one dimenionsal float array and window parameters
-function framed_signal(x::Array{<:AbstractFloat},fs::Float,win_dur::Float=0.02,win_overlap::Float=0.01)
+function framed_signal(x::Array{<:AbstractFloat},fs::AbstractFloat,win_dur::AbstractFloat=0.02,win_overlap::AbstractFloat=0.01)
     frame_length = Int(round(win_dur*fs))
     frame_overlap = Int(round(win_overlap*fs))
     num_signal_frames = Int(floor(1 + (nframes(x)-frame_length)/frame_overlap))
     num_frames = Int(ceil(nframes(x)/frame_overlap))
-    return framed_signal(x,frame_length,frame_overlap,num_signal_frames,num_frames)
+    return framed_signal(x,fs,frame_length,frame_overlap,num_signal_frames,num_frames)
 end
 
+#Constructor function wrapper - sets up framed_signal object given an input signal of type SampleBuf and window parameters
+function framed_signal(x::SampleBuf,win_dur::AbstractFloat=0.02,win_overlap::AbstractFloat=0.01)
+    fs = samplerate(x)
+    framed_signal(float(collect(x[:,1])),fs,win_dur,win_overlap)
+end
 
 # Function that pulls out one frame as an array from framed_signal object
 function extract_frame(x::framed_signal,i::Int)

@@ -18,7 +18,7 @@ function framed_signal(x::SampleBuf,win_dur::Float=0.02,win_overlap::Float=0.01)
 end
 
 #Constructor function - sets up framed_signal object given an input signal of one dimenionsal float array and window parameters
-function framed_signal(x::Array{AbstractFloat},fs::Float,win_dur::Float=0.02,win_overlap::Float=0.01)
+function framed_signal(x::Array{<:AbstractFloat},fs::Float,win_dur::Float=0.02,win_overlap::Float=0.01)
     frame_length = Int(round(win_dur*fs))
     frame_overlap = Int(round(win_overlap*fs))
     num_signal_frames = Int(floor(1 + (nframes(x)-frame_length)/frame_overlap))

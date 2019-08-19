@@ -1,5 +1,4 @@
-function magspec(x::Array{Float,1},fs::Float=1;wtype::String="hanning")
-
+function magspec(x::Array{Float,1},fs::Float=1.0;wtype::String="hanning")
     #Choose window - options are rectangle, hamming or hanning (function default is hanning)
     flen = length(x)
     if(wtype=="rect")
@@ -15,9 +14,8 @@ function magspec(x::Array{Float,1},fs::Float=1;wtype::String="hanning")
     return abs.(rfft(x.*win))
 end
 
-
-function specgram(x::SampleBuf;win_dur::Float=0.02,win_overlap::Float=0.01,wtype::String="hanning")
-    sig_frames = framed_signal(x,win_dur,win_overlap) #Obtain signal frames object
+#Spectrogram estimated from framed_signal object input (core method for later verions)
+function specgram(sig_frames::framed_signal;wtype::String="hanning")
     flen = sig_frames.frame_length
     nfft = nextfastfft(flen) #Get optimal number of points (larger than frame length) for FFT
     nframes = sig_frames.num_signal_frames
@@ -44,4 +42,16 @@ function specgram(x::SampleBuf;win_dur::Float=0.02,win_overlap::Float=0.01,wtype
         mspec[:,i] = abs.(rfp*buf); #Magnitude spectrum
     end
     return mspec + (eps()*ones(size(mspec))) #Add a tiny floor to spectrogram to avoid potential zero values - in case log spectrogram is required later.
+end
+
+#Spectrogram wrapper for SampleBuf input
+function specgram(x::SampleBuf;win_dur::Float=0.02,win_overlap::Float=0.01,wtype::String="hanning")
+    sig_frames = framed_signal(x,win_dur,win_overlap) #Obtain signal frames object
+    return specgram(sig_frames;wtype=wtype)
+end
+
+#Spectrogram wrapper for Array{AbstactFloat} input
+function specgram(x::Array{<:AbstractFloat},fs::AbstractFloat;win_dur::Float=0.02,win_overlap::Float=0.01,wtype::String="hanning")
+    sig_frames = framed_signal(x,fs,win_dur,win_overlap) #Obtain signal frames object
+    return specgram(sig_frames;wtype=wtype)
 end

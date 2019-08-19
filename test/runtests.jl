@@ -55,6 +55,21 @@ end
     @test size(msp,2) > 0
     @test maximum(isa.(msp,Complex))==false
     @test minimum(msp) >= eps()
+
+    t = 0:0.01:0.99
+    frq1 = 25
+    frq2 = 30
+    xx = [cos.(2*pi*frq1*t);cos.(2*pi*frq2*t)]
+    msp = specgram(xx,100.0,win_dur = 1.0, win_overlap = 1.0)
+    @test size(msp,1) > 0
+    @test size(msp,2) > 0
+    @test maximum(isa.(msp,Complex))==false
+    @test minimum(msp) >= eps()
+    mmag1,mfrq1 = findmax(msp[:,1])
+    mmag2,mfrq2 = findmax(msp[:,2])
+    @test mfrq1 == frq1 + 1
+    @test mfrq2 == frq2 + 1
+
 end
 
 @testset "melbankm" begin

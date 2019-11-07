@@ -1,6 +1,6 @@
-function melfcc(x::SampleBuf;ncoef=13,nfilt=17,win_dur=0.02,win_overlap=0.01)
-    frames = framed_signal(x,win_dur,win_overlap)
-    fs = samplerate(x)
+function melfcc(frames::framed_signal;ncoef=13,nfilt=17)
+    # frames = framed_signal(x,win_dur,win_overlap)
+    fs = frames.fs
     numframes = frames.num_frames;
     flen = frames.frame_length;
     nfft = nextfastfft(flen);
@@ -27,10 +27,16 @@ function melfcc(x::SampleBuf;ncoef=13,nfilt=17,win_dur=0.02,win_overlap=0.01)
     return mfcc
 end
 
+function melfcc(x::Array{<:AbstractFloat},fs::AbstractFloat;ncoef=13,nfilt=17,win_dur=0.02,win_overlap=0.01)
+    frames = framed_signal(x,fs,win_dur,win_overlap)
+    return melfcc(frames,ncoef=ncoef,nfilt=nfilt)
+end
+
+
 function melbankm(fs,npts;nfilt=17)
     mspace = SVector{nfilt}(range(0,stop=frq2mel(fs/2),length = nfilt)) #equally spaced points in mel scale
     fspace = SVector{nfilt}(mel2frq.(mspace)) #equal mel spaced points mapped back to Hz
-    cindx = SVector{nfilt}(Int.(round.(fspace*(npts-1)/(fs/2))+1)) #Filter centre indices (first at 0, final at Fs/2)
+    cindx = SVector{nfilt}(Int.(round.(fspace*(npts-1)/(fs/2)).+1)) #Filter centre indices (first at 0, final at Fs/2)
     fbank = zeros(nfilt,npts);
     #define triangular filters for 2 to nfilt-1
     for i=2:nfilt-1

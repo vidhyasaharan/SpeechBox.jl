@@ -13,16 +13,16 @@ end
 function framed_signal(x::Array{<:AbstractFloat},fs::AbstractFloat,win_dur::AbstractFloat=0.02,win_overlap::AbstractFloat=0.01)
     frame_length = Int(round(win_dur*fs))
     frame_overlap = Int(round(win_overlap*fs))
-    num_signal_frames = Int(floor(1 + (nframes(x)-frame_length)/frame_overlap))
-    num_frames = Int(ceil(nframes(x)/frame_overlap))
+    num_signal_frames = Int(floor(1 + (length(x)-frame_length)/frame_overlap))
+    num_frames = Int(ceil(length(x)/frame_overlap))
     return framed_signal(x,fs,frame_length,frame_overlap,num_signal_frames,num_frames)
 end
 
 #Constructor function wrapper - sets up framed_signal object given an input signal of type SampleBuf and window parameters
-function framed_signal(x::SampleBuf,win_dur::AbstractFloat=0.02,win_overlap::AbstractFloat=0.01)
-    fs = samplerate(x)
-    framed_signal(float(collect(x[:,1])),fs,win_dur,win_overlap)
-end
+# function framed_signal(x::SampleBuf,win_dur::AbstractFloat=0.02,win_overlap::AbstractFloat=0.01)
+#     fs = samplerate(x)
+#     framed_signal(float(collect(x[:,1])),fs,win_dur,win_overlap)
+# end
 
 # Function that pulls out one frame as an array from framed_signal object
 function extract_frame(x::framed_signal,i::Int)
@@ -34,7 +34,7 @@ function extract_frame(x::framed_signal,i::Int)
         frame = collect(x.x[sindx:eindx])
     else #Zero padding to return full frame if signal ends midway through the frame
         frame = zeros(frame_length)
-        lindx = nframes(x.x)
+        lindx = length(x.x)
         sig_len = lindx - sindx + 1
         frame[1:sig_len] = collect(x.x[sindx:lindx])
     end

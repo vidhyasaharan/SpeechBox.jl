@@ -4,7 +4,7 @@ module SpeechBox
 using DSP
 using FFTW
 using StaticArrays
-using SampledSignals
+# using SampledSignals
 
 export framed_signal, extract_frame, specgram, magspec, melbankm, melfcc, Float, frame_energy, vad
 

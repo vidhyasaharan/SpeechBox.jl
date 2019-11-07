@@ -27,10 +27,10 @@ function specgram(sig_frames::framed_signal;wtype::String="hanning")
 end
 
 #Spectrogram wrapper for SampleBuf input
-function specgram(x::SampleBuf;win_dur::Float=0.02,win_overlap::Float=0.01,wtype::String="hanning")
-    sig_frames = framed_signal(x,win_dur,win_overlap) #Obtain signal frames object
-    return specgram(sig_frames;wtype=wtype)
-end
+# function specgram(x::SampleBuf;win_dur::Float=0.02,win_overlap::Float=0.01,wtype::String="hanning")
+#     sig_frames = framed_signal(x,win_dur,win_overlap) #Obtain signal frames object
+#     return specgram(sig_frames;wtype=wtype)
+# end
 
 #Spectrogram wrapper for Array{AbstactFloat} input
 function specgram(x::Array{<:AbstractFloat},fs::AbstractFloat;win_dur::Float=0.02,win_overlap::Float=0.01,wtype::String="hanning")

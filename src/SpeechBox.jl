@@ -15,6 +15,7 @@ include("speechframing.jl")
 include("spectralanalyses.jl")
 include("mfcc.jl")
 include("vad.jl")
+include("lpc.jl")
 
 
 end # module

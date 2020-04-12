@@ -6,7 +6,7 @@ function dftspec(signal::speech_waveform;wtype::String="hanning")
     win = window(flen;wtype=wtype)
     cmplx_spectrum = rfft(x.*win)
     nfrqs = length(cmplx_spectrum)
-    frqs = range(0, signal.fs, length = nfrqs)
+    frqs = range(0, signal.fs/2, length = nfrqs)
     return spectrum(signal,cmplx_spectrum,frqs,"Complex Fourier Spectrum")
 end
 
@@ -22,7 +22,7 @@ function magspec(signal::speech_waveform;wtype::String="hanning")
     return spectrum(signal,abs.(cspec.components),cspec.frqs,"DFT Magnitude Spectrum")
 end
 
-function magspec(x::Array{Float,1},fs::Float=1.0;wtype::String="hanning")
+function magspec(x::Array{Float,1},fs::Number=1.0;wtype::String="hanning")
     #Choose window - options are rectangle, hamming or hanning (function default is hanning)
     signal = speech_waveform(x,fs)
     return magspec(signal;wtype=wtype)
@@ -65,7 +65,8 @@ function periodogram(x::Array{Float,1},fs::Number,frqs::Array{T,1};wtype::String
     win = window(flen;wtype=wtype)
     proj_matrix = cexp_proj_matrix(frqs,fs,flen)
     proj = proj_matrix*(x.*win)
-    return abs2.(proj)
+    signal = speech_waveform(x,fs)
+    return spectrum(signal,abs2.(proj),frqs,"Periodogram")
 end
 
 

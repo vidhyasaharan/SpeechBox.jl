@@ -9,6 +9,19 @@
     @test round(mmag) == 50.0
 end
 
+@testset "periodogram" begin
+    fs = 8000
+    n = 1:160
+    frq = 1024
+    xx = cos.(2*pi*(frq/fs)*n)
+    pgram = periodogram(xx,8000;fmin=8,fmax=4000)
+    mmag, mfindx = findmax(pgram)
+    frqs = SpeechBox.logfreq_array(;fmin=8,fmax=4000)
+    @test length(pgram) == length(frqs)
+    @test frqs[mfindx] == frq
+end
+
+
 @testset "specgram" begin
     msp = specgram(x, fs;win_dur = 0.03,win_overlap=0.01, wtype = "hamming")
     @test typeof(msp) <: Array{<:AbstractFloat,2}

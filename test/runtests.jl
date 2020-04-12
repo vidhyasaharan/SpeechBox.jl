@@ -1,6 +1,7 @@
 
 using Test
 using SpeechBox
+using LinearAlgebra
 # using LibSndFile
 # using FileIO
 # using SampledSignals
@@ -11,6 +12,7 @@ srcdir = normpath(joinpath(dirname(@__FILE__),"../src/"))
 
 x, fs = wavread(joinpath(testdir,"King.wav"))
 
+include("internal_utilities_tests.jl")
 include("speechframing_tests.jl")
 include("spectralanalyses_tests.jl")
 include("mfcc_tests.jl")

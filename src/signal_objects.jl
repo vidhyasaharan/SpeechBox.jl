@@ -28,26 +28,26 @@ end
 struct framed_signal
     signal::speech_waveform
     frame_length::Int
-    frame_overlap::Int
+    frame_shift::Int
     num_signal_frames::Int
     num_frames::Int
 end
 
 
 #Consutrctor for framed_signal object given input speech_waveform object, window duration and window overlap
-function framed_signal(signal::speech_waveform,win_dur::Number=0.02,win_overlap::Number=0.01)
+function framed_signal(signal::speech_waveform,win_dur::Number=0.02,win_shift::Number=0.01)
     fs = signal.fs
     x = signal.x
     frame_length = Int(round(win_dur*fs))
-    frame_overlap = Int(round(win_overlap*fs))
-    num_signal_frames = Int(floor(1 + (length(x)-frame_length)/frame_overlap))
-    num_frames = Int(ceil(length(x)/frame_overlap))
-    return framed_signal(signal,frame_length,frame_overlap,num_signal_frames,num_frames)
+    frame_shift = Int(round(win_shift*fs))
+    num_signal_frames = Int(floor(1 + (length(x)-frame_length)/frame_shift))
+    num_frames = Int(ceil(length(x)/frame_shift))
+    return framed_signal(signal,frame_length,frame_shift,num_signal_frames,num_frames)
 end
 
 
 #Constructor function - sets up framed_signal object given an input signal of one dimenionsal float array and window parameters
-function framed_signal(x::Array{<:AbstractFloat},fs::Number,win_dur::AbstractFloat=0.02,win_overlap::AbstractFloat=0.01)
+function framed_signal(x::Array{<:AbstractFloat},fs::Number,win_dur::AbstractFloat=0.02,win_shift::AbstractFloat=0.01)
     signal = speech_waveform(x,fs)
-    return framed_signal(signal,win_dur,win_overlap)
+    return framed_signal(signal,win_dur,win_shift)
 end

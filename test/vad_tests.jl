@@ -1,7 +1,7 @@
 @testset "vad_energy" begin
     win_dur = 0.03
-    win_overlap = 0.01
-    sig_frames = framed_signal(x,fs,win_dur,win_overlap)
+    win_shift = 0.01
+    sig_frames = framed_signal(x,fs,win_dur,win_shift)
 
     en_thr = 0.05
     vi = vad(sig_frames,alg = "energy_threshold",energy_threshold = en_thr)

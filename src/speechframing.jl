@@ -1,8 +1,8 @@
 # Function that pulls out one frame as an array from framed_signal object
 function extract_frame(x::framed_signal,i::Int)
     frame_length = x.frame_length
-    frame_overlap = x.frame_overlap
-    sindx = (i-1)*frame_overlap + 1 #Identify start index of desired frame
+    frame_shift = x.frame_shift
+    sindx = (i-1)*frame_shift + 1 #Identify start index of desired frame
     eindx = sindx + frame_length - 1 #Identify end index of desired frame
     if(i<=x.num_signal_frames) #Checking to see end of frame is within bounds of defined signal
         frame = collect(x.signal.x[sindx:eindx])

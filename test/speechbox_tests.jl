@@ -42,8 +42,8 @@ lines!(sc,log.(abs.(fz2)),color=:red)
 
 
 # win_dur = 0.03
-# win_overlap = 0.01
-# sig_frames = framed_signal(x,win_dur,win_overlap)
+# win_shift = 0.01
+# sig_frames = framed_signal(x,win_dur,win_shift)
 # vi1 = vad(sig_frames,alg = "energy_threshold",energy_threshold = 0.1)
 # vi2 = vad(sig_frames,alg = "unvoiced_fraction",unvoiced_fraction = 0.4)
 #

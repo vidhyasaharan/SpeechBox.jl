@@ -4,15 +4,15 @@
     @test typeof(frames.signal.x) <: Array{Float}
     @test length(frames.signal.x) > 0
     @test typeof(frames.frame_length) <: Int
-    @test typeof(frames.frame_overlap) <: Int
+    @test typeof(frames.frame_shift) <: Int
     @test typeof(frames.num_signal_frames) <: Int
     @test typeof(frames.num_frames) <: Int
     @test frames.frame_length > 0
-    @test frames.frame_overlap > 0
+    @test frames.frame_shift > 0
     @test frames.num_signal_frames > 0
     @test frames.num_frames > 0
     @test frames.num_frames >= frames.num_signal_frames
-    @test frames.num_signal_frames >= (length(frames.signal.x)-frames.frame_length)/frames.frame_overlap
+    @test frames.num_signal_frames >= (length(frames.signal.x)-frames.frame_length)/frames.frame_shift
 
 end
 

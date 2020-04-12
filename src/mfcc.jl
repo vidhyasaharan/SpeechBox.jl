@@ -1,5 +1,5 @@
 function melfcc(frames::framed_signal;ncoef=13,nfilt=17)
-    # frames = framed_signal(x,win_dur,win_overlap)
+    # frames = framed_signal(x,win_dur,win_shift)
     fs = frames.signal.fs
     numframes = frames.num_frames;
     flen = frames.frame_length;
@@ -27,13 +27,13 @@ function melfcc(frames::framed_signal;ncoef=13,nfilt=17)
     return mfcc
 end
 
-function melfcc(signal::speech_waveform;ncoef=13,nfilt=17,win_dur=0.02,win_overlap=0.01)
-    frames = framed_signal(signal,win_dur,win_overlap)
+function melfcc(signal::speech_waveform;ncoef=13,nfilt=17,win_dur=0.02,win_shift=0.01)
+    frames = framed_signal(signal,win_dur,win_shift)
     return melfcc(frames,ncoef=ncoef,nfilt=nfilt)
 end
 
-function melfcc(x::Array{<:AbstractFloat},fs::AbstractFloat;ncoef=13,nfilt=17,win_dur=0.02,win_overlap=0.01)
-    frames = framed_signal(x,fs,win_dur,win_overlap)
+function melfcc(x::Array{<:AbstractFloat},fs::AbstractFloat;ncoef=13,nfilt=17,win_dur=0.02,win_shift=0.01)
+    frames = framed_signal(x,fs,win_dur,win_shift)
     return melfcc(frames,ncoef=ncoef,nfilt=nfilt)
 end
 

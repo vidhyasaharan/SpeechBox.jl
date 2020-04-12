@@ -30,7 +30,7 @@ end
 
 
 @testset "specgram" begin
-    msp = specgram(x, fs;win_dur = 0.03,win_overlap=0.01, wtype = "hamming")
+    msp = specgram(x, fs;win_dur = 0.03,win_shift=0.01, wtype = "hamming")
     @test typeof(msp) <: Array{<:AbstractFloat,2}
     @test size(msp,1) > 0
     @test size(msp,2) > 0
@@ -41,7 +41,7 @@ end
     frq1 = 25
     frq2 = 30
     xx = [cos.(2*pi*frq1*t);cos.(2*pi*frq2*t)]
-    msp = specgram(xx,100.0,win_dur = 1.0, win_overlap = 1.0)
+    msp = specgram(xx,100.0,win_dur = 1.0, win_shift = 1.0)
     @test size(msp,1) > 0
     @test size(msp,2) > 0
     @test maximum(isa.(msp,Complex))==false

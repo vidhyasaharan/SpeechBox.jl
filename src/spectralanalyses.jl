@@ -39,12 +39,22 @@ function specgram(x::Array{<:AbstractFloat},fs::AbstractFloat;win_dur::Float=0.0
 end
 
 
-function periodogram(x::Array{Float,1},fs::Number;wtype::String="hanning",fmin::Number=10,fmax::Number=4000)
+
+
+#Periodogram estimated at provided frequncies - estimated by projecting onto complex exponentials and taking the square of the absolute value
+function periodogram(x::Array{Float,1},fs::Number,frqs::Array{T,1};wtype::String="hanning") where T<:Number
     #Choose window - options are rectangle, hamming or hanning (function default is hanning)
     flen = length(x)
     win = window(flen;wtype=wtype)
-    frqs = logfreq_array(;fmin = fmin,fmax = fmax)
     proj_matrix = cexp_proj_matrix(frqs,fs,flen)
     proj = proj_matrix*(x.*win)
     return abs2.(proj)
+end
+
+
+#Wrapper function for periodogram over logarithmically spaced frequencies
+function periodogram(x::Array{Float,1},fs::Number;wtype::String="hanning",fmin::Number=10,fmax::Number=fs/2)
+    #Choose window - options are rectangle, hamming or hanning (function default is hanning)
+    frqs = logfreq_array(;fmin = fmin,fmax = fmax)
+    return periodogram(x,fs,frqs;wtype=wtype)
 end

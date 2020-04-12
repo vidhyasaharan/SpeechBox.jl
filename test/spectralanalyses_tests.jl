@@ -14,7 +14,14 @@ end
     n = 1:160
     frq = 1024
     xx = cos.(2*pi*(frq/fs)*n)
-    pgram = periodogram(xx,8000;fmin=8,fmax=4000)
+
+    tfrqs = [100, 500, 705, 1024, 1800, 2100, 3401, 3700]
+    pgram = periodogram(xx,fs,tfrqs)
+    @test length(pgram) == length(tfrqs)
+    mmag, mfindx = findmax(pgram)
+    @test tfrqs[mfindx] == frq
+
+    pgram = periodogram(xx,fs;fmin=8,fmax=4000)
     mmag, mfindx = findmax(pgram)
     frqs = SpeechBox.logfreq_array(;fmin=8,fmax=4000)
     @test length(pgram) == length(frqs)

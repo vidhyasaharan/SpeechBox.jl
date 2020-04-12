@@ -7,7 +7,7 @@ using StaticArrays
 # using SampledSignals
 
 export speech_waveform, framed_signal, extract_frame, specgram, magspec, melbankm, melfcc,
-                Float, frame_energy, vad, periodogram
+                Float, frame_energy, vad, periodogram, spectrum
 
 const Float = Float64 #Set to Float32 to fore 32bit floating point operations - NOT YET IMPLEMENTED or TESTED
 

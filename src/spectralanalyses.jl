@@ -44,7 +44,7 @@ function periodogram(x::Array{Float,1},fs::Number;wtype::String="hanning",fmin::
     flen = length(x)
     win = window(flen;wtype=wtype)
     frqs = logfreq_array(;fmin = fmin,fmax = fmax)
-    periodogram_basis = periodogram_basis_matrix(frqs,fs,flen)
-    proj = periodogram_basis*(x.*win)
+    proj_matrix = cexp_proj_matrix(frqs,fs,flen)
+    proj = proj_matrix*(x.*win)
     return abs2.(proj)
 end

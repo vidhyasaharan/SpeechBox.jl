@@ -37,3 +37,16 @@ end
     @test length(extract_frame(frames,frames.num_frames)) > 0
     @test maximum(abs.(extract_frame(frames,frames.num_frames))) > 0
 end
+
+
+@testset "spectrum" begin
+    x = rand(Float,220)
+    fs = 220
+    c = rand(Complex{Float},111)
+    f = convert.(Float,collect(1:length(c)))
+    sp = spectrum(speech_waveform(x,fs),c,f)
+    @test typeof(sp.signal) == speech_waveform
+    @test typeof(sp.components) == Array{Complex{Float},1}
+    @test typeof(sp.frqs) == Array{Float,1}
+    @test typeof(sp.title) <: AbstractString
+end

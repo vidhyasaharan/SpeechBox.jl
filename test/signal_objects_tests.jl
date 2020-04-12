@@ -1,5 +1,18 @@
+@testset "speech_waveform" begin
+    x = rand(Float,3,10000)
+    println("Testing multichannel input, message about input being Matrix is expected")
+    signal = speech_waveform(x,1000)
+    @test typeof(signal.x) == Array{Float,1}
+    @test length(signal.x) == 10000
+    @test signal.fs == 1000.0
+    @test typeof(signal.fs) == Float
+end
+
+
 @testset "framed_signal" begin
     frames = framed_signal(x,fs) #for Array{Float} input
+    frames_alt = framed_signal(signal)
+    @test frames == frames_alt
     @test typeof(frames) == framed_signal
     @test typeof(frames.signal.x) <: Array{Float}
     @test length(frames.signal.x) > 0
@@ -13,8 +26,9 @@
     @test frames.num_frames > 0
     @test frames.num_frames >= frames.num_signal_frames
     @test frames.num_signal_frames >= (length(frames.signal.x)-frames.frame_length)/frames.frame_shift
-
 end
+
+
 
 @testset "extract_frame" begin
     frames = framed_signal(x,fs)

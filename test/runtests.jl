@@ -11,6 +11,8 @@ testdir = normpath(joinpath(dirname(@__FILE__),"../test/"))
 srcdir = normpath(joinpath(dirname(@__FILE__),"../src/"))
 
 x, fs = wavread(joinpath(testdir,"King.wav"))
+x = x[:]
+signal = speech_waveform(x,fs)
 
 include("internal_utilities_tests.jl")
 include("signal_objects_tests.jl")

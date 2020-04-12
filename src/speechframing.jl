@@ -1,30 +1,3 @@
-#Struct/Object defining framed signal using signal defined as SampleBuf from SampledSignals toolbox
-struct framed_signal
-    x::Array{Float}
-    fs::Float
-    frame_length::Int
-    frame_overlap::Int
-    num_signal_frames::Int
-    num_frames::Int
-end
-
-
-#Constructor function - sets up framed_signal object given an input signal of one dimenionsal float array and window parameters
-function framed_signal(x::Array{<:AbstractFloat},fs::Number,win_dur::AbstractFloat=0.02,win_overlap::AbstractFloat=0.01)
-    fs = convert(Float,fs)
-    frame_length = Int(round(win_dur*fs))
-    frame_overlap = Int(round(win_overlap*fs))
-    num_signal_frames = Int(floor(1 + (length(x)-frame_length)/frame_overlap))
-    num_frames = Int(ceil(length(x)/frame_overlap))
-    return framed_signal(x,fs,frame_length,frame_overlap,num_signal_frames,num_frames)
-end
-
-#Constructor function wrapper - sets up framed_signal object given an input signal of type SampleBuf and window parameters
-# function framed_signal(x::SampleBuf,win_dur::AbstractFloat=0.02,win_overlap::AbstractFloat=0.01)
-#     fs = samplerate(x)
-#     framed_signal(float(collect(x[:,1])),fs,win_dur,win_overlap)
-# end
-
 # Function that pulls out one frame as an array from framed_signal object
 function extract_frame(x::framed_signal,i::Int)
     frame_length = x.frame_length
@@ -32,12 +5,12 @@ function extract_frame(x::framed_signal,i::Int)
     sindx = (i-1)*frame_overlap + 1 #Identify start index of desired frame
     eindx = sindx + frame_length - 1 #Identify end index of desired frame
     if(i<=x.num_signal_frames) #Checking to see end of frame is within bounds of defined signal
-        frame = collect(x.x[sindx:eindx])
+        frame = collect(x.signal.x[sindx:eindx])
     else #Zero padding to return full frame if signal ends midway through the frame
         frame = zeros(frame_length)
-        lindx = length(x.x)
+        lindx = length(x.signal.x)
         sig_len = lindx - sindx + 1
-        frame[1:sig_len] = collect(x.x[sindx:lindx])
+        frame[1:sig_len] = collect(x.signal.x[sindx:lindx])
     end
     return frame
 end

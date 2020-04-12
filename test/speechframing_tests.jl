@@ -1,8 +1,8 @@
 @testset "framed_signal" begin
     frames = framed_signal(x,fs) #for Array{Float} input
     @test typeof(frames) == framed_signal
-    @test typeof(frames.x) <: Array{Float}
-    @test length(frames.x) > 0
+    @test typeof(frames.signal.x) <: Array{Float}
+    @test length(frames.signal.x) > 0
     @test typeof(frames.frame_length) <: Int
     @test typeof(frames.frame_overlap) <: Int
     @test typeof(frames.num_signal_frames) <: Int
@@ -12,7 +12,7 @@
     @test frames.num_signal_frames > 0
     @test frames.num_frames > 0
     @test frames.num_frames >= frames.num_signal_frames
-    @test frames.num_signal_frames >= (length(frames.x)-frames.frame_length)/frames.frame_overlap
+    @test frames.num_signal_frames >= (length(frames.signal.x)-frames.frame_length)/frames.frame_overlap
 
 end
 

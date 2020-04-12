@@ -13,7 +13,7 @@ srcdir = normpath(joinpath(dirname(@__FILE__),"../src/"))
 x, fs = wavread(joinpath(testdir,"King.wav"))
 
 include("internal_utilities_tests.jl")
-include("speechframing_tests.jl")
+include("signal_objects_tests.jl")
 include("spectralanalyses_tests.jl")
 include("mfcc_tests.jl")
 include("vad_tests.jl")

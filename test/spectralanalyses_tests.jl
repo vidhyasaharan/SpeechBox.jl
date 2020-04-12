@@ -3,7 +3,7 @@
     frq = 25
     xx = cos.(2*pi*frq*t)
     spec = magspec(xx,100.0;wtype = "rect")
-    mspec = spec.spectrum
+    mspec = spec.components
     mmag,mfrq = findmax(mspec)
     @test length(mspec) == 51
     @test mfrq == frq + 1

@@ -19,7 +19,7 @@ end
 function magspec(signal::speech_waveform;wtype::String="hanning")
     #Choose window - options are rectangle, hamming or hanning (function default is hanning)
     cspec = dftspec(signal;wtype=wtype)
-    return spectrum(signal,abs.(cspec.spectrum),cspec.frqs,"DFT Magnitude Spectrum")
+    return spectrum(signal,abs.(cspec.components),cspec.frqs,"DFT Magnitude Spectrum")
 end
 
 function magspec(x::Array{Float,1},fs::Float=1.0;wtype::String="hanning")

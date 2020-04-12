@@ -62,9 +62,9 @@ RorC_Matrix = Union{Array{Float,2},Array{Complex{Float},2}}
 #Spectrum object to hold any form of frequency components of a signal
 struct spectrum
     signal::speech_waveform
-    spectrum::RorC_Vector
+    components::RorC_Vector
     frqs::Array{Float,1}
     title::AbstractString
 end
 
-spectrum(signal::speech_waveform,spectrum::RorC_Vector,frqs::Vector{Float}) = spectrum(signal,spectrum,frqs,[])
+spectrum(signal::speech_waveform,components::RorC_Vector,frqs::Vector{Float}) = spectrum(signal,components,frqs,"")

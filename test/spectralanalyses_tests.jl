@@ -17,12 +17,14 @@ end
     xx = cos.(2*pi*(frq/fs)*n)
 
     tfrqs = [100, 500, 705, 1024, 1800, 2100, 3401, 3700]
-    pgram = periodogram(xx,fs,tfrqs)
+    spec = periodogram(xx,fs,tfrqs)
+    pgram  = spec.components
     @test length(pgram) == length(tfrqs)
     mmag, mfindx = findmax(pgram)
     @test tfrqs[mfindx] == frq
 
-    pgram = periodogram(xx,fs;fmin=8,fmax=4000)
+    spec = periodogram(xx,fs;fmin=8,fmax=4000)
+    pgram = spec.components
     mmag, mfindx = findmax(pgram)
     frqs = SpeechBox.logfreq_array(;fmin=8,fmax=4000)
     @test length(pgram) == length(frqs)

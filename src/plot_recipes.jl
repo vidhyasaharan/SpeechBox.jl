@@ -14,3 +14,19 @@
         spec.components
     end
 end
+
+
+#Plot recipe for plotting time domain waveform
+@recipe function f(sig::speech_waveform)
+    x = sig.x
+    fs = sig.fs
+    t = (0:length(x)-1)/fs
+
+    legend := false
+
+    @series begin
+        seriestype := :line
+        xlabel := "Time (secs)"
+        t,x
+    end
+end

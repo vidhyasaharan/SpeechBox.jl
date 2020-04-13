@@ -46,7 +46,9 @@ function specgram(sig_frames::framed_signal;wtype::String="hanning")
         buf[1:1:flen] = win.*frame; #Apply window and THEN store in buffer
         mspec[:,i] = abs.(rfp*buf); #Magnitude spectrum
     end
-    return mspec + (eps()*ones(size(mspec))) #Add a tiny floor to spectrogram to avoid potential zero values - in case log spectrogram is required later.
+    dithered_mspec = mspec + (eps()*ones(size(mspec))) #Add a tiny floor to spectrogram to avoid potential zero values - in case log spectrogram is required later.
+    frqs = convert.(Float,collect(range(0, sig_frames.signal.fs/2, length = nrfft)))
+    return timefreq(sig_frames,dithered_mspec,frqs)
 end
 
 #Spectrogram wrapper for Array{AbstactFloat} input

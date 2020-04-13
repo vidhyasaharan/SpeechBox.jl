@@ -6,7 +6,5 @@ x, fs = wavread(joinpath(testdir,"King.wav"))
 frames = framed_signal(x,fs,0.09,0.01)
 frame = extract_frame(frames,11)
 
-spec = magspec(frame,fs)
-pspec = periodogram(frame,fs)
-
-splot(pspec)
+mspec = magspec(frame,fs)
+pgram = periodogram(frame,fs)

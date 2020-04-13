@@ -1,9 +1,9 @@
 module SpeechBox
 
-
 using DSP
 using FFTW
 using StaticArrays
+using RecipesBase
 # using SampledSignals
 
 export speech_waveform, framed_signal, extract_frame, specgram, magspec, melbankm, melfcc,
@@ -18,6 +18,7 @@ include("spectralanalyses.jl")
 include("mfcc.jl")
 include("vad.jl")
 include("lpc.jl")
+include("plot_recipes.jl")
 
 
 end # module

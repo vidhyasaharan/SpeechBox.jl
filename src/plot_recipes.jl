@@ -17,7 +17,9 @@ end
         yticks := ytks
         xguide := "Time (sec)"
         yguide := "Frequency (Hz)"
-        # title := msp.title
+        if(~isnothing(msp.title))
+            title := msp.title
+        end
         msp.components
     end
 end
@@ -34,8 +36,8 @@ end
         seriestype := :line
         xticks := xtks
         xguide := "Frequency(Hz)"
-        if(~isnothing(msp.title))
-            title := msp.title
+        if(~isnothing(spec.title))
+            title := spec.title
         end
         spec.components
     end

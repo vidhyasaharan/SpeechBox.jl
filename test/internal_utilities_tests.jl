@@ -84,3 +84,23 @@ end
         @test proj[i,:] == ce
     end
 end
+
+
+@testset "element_op" begin
+    e = SpeechBox.element_op_spectrum("Base.log10")
+    @test typeof(e) == Expr
+    e = SpeechBox.element_op_timefreq("Base.log10")
+    @test typeof(e) == Expr
+    frames = SpeechBox.framed_signal(x,fs,0.09,0.01)
+    frame = SpeechBox.extract_frame(frames,11)
+    mag = SpeechBox.magspec(frame,fs)
+    msp = SpeechBox.specgram(frames)
+    lmag = log(mag)
+    l10mag = log10(mag)
+    lmsp = log(msp)
+    l10msp = log10(msp)
+    @test lmag.components == log.(mag.components)
+    @test l10mag.components == log10.(mag.components)
+    @test lmsp.components == log.(msp.components)
+    @test l10msp.components == log10.(msp.components)
+end

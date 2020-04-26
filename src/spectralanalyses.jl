@@ -78,3 +78,23 @@ function periodogram(x::Array{Float,1},fs::Number;wtype::String="hanning",fmin::
     frqs = logfreq_array(;fmin = fmin,fmax = fmax)
     return periodogram(x,fs,frqs;wtype=wtype)
 end
+
+
+function periodogram(sig_frames::framed_signal,frqs ;wtype::String="hanning")
+    flen = sig_frames.frame_length
+    nframes = sig_frames.num_signal_frames
+    fs = sig_frames.signal.fs
+
+    pspec = zeros(length(frqs),nframes)
+    for i=1:nframes
+        frame = extract_frame(sig_frames,i)
+        temp = periodogram(frame,fs,frqs,wtype=wtype)
+        pspec[:,i] = temp.components
+    end
+    return timefreq(sig_frames,pspec,frqs)
+end
+
+function periodogram(sig_frames::framed_signal; wtype::String="hanning", fmin=10,fmax=sig_frames.signal.fs/2)
+    frqs = logfreq_array(;fmin = fmin,fmax = fmax)
+    return periodogram(sig_frames, frqs, wtype = wtype)
+end

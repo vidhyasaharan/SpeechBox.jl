@@ -34,3 +34,31 @@ function cexp_proj_matrix(frqs::Array{T,1},fs::Number,N::Int) where T<:Number
     end
     return proj_matrix
 end
+
+# function Base.log(tf::timefreq)
+#     return timefreq(tf.signal,tf.frames,log.(tf.components),tf.frqs,tf.time,tf.title)
+# end
+#
+# function Base.log(sp::spectrum)
+#     return spectrum(sp.signal,log.(sp.components),sp.frqs,sp.title)
+# end
+
+function element_op_spectrum(func::AbstractString)
+    me = Expr(:call, :map, Meta.parse(func), :(sp.components))
+    re = :(spectrum(sp.signal,$me,sp.frqs,sp.title))
+    le = Expr(:call, Meta.parse(func), :(sp::SpeechBox.spectrum))
+    return Expr(:(=), le, re)
+end
+
+function element_op_timefreq(func::AbstractString)
+    me = Expr(:call, :map, Meta.parse(func), :(tf.components))
+    re = :(timefreq(tf.signal,tf.frames,$me,tf.frqs,tf.time,tf.title))
+    le = Expr(:call, Meta.parse(func), :(tf::SpeechBox.timefreq))
+    return Expr(:(=), le, re)
+end
+
+eval(element_op_spectrum("Base.log10"))
+eval(element_op_spectrum("Base.log"))
+
+eval(element_op_timefreq("Base.log10"))
+eval(element_op_timefreq("Base.log"))

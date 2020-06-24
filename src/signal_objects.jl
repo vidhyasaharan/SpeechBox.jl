@@ -5,6 +5,12 @@ struct speech_waveform
 end
 
 #Constructor for speech_waveform object, taking a Vector or Matrix and sampling frequency as input
+"""
+    speech_waveform(x,fs)
+
+Store the signal in array 'x' with sampling rate 'fs'as a speech waveform object. If 'x' is a matrix, the longer dimension is chosen as the signal length and the first row or column of that lenght is stored.
+
+"""
 function speech_waveform(x::Array,fs::Number)
     fs = convert(Float,fs)
     if(eltype(x)!=Float)

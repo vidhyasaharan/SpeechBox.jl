@@ -35,13 +35,62 @@ function cexp_proj_matrix(frqs::Array{T,1},fs::Number,N::Int) where T<:Number
     return proj_matrix
 end
 
-# function Base.log(tf::timefreq)
-#     return timefreq(tf.signal,tf.frames,log.(tf.components),tf.frqs,tf.time,tf.title)
-# end
-#
-# function Base.log(sp::spectrum)
-#     return spectrum(sp.signal,log.(sp.components),sp.frqs,sp.title)
-# end
+
+#Generate first order difference of a sequence y[i] = x[i+1] - x[i] (output sequence length is 1 less than input sequence length)
+function Δ(x::Vector)
+    len = length(x)
+    Δx = zeros(typeof(x[1]),len-1)
+    if(len>1)
+        for i=1:len-1
+            Δx[i] = x[i+1]-x[i]
+        end
+    end
+    return Δx
+end
+
+
+#Find local peaks/maximas in a sequence
+function findpeaks(x::Vector; min_dist::Int = 2)
+    ind = Int[]
+    mag = Real[]
+    if x[1]>x[2]
+        push!(ind,1)
+        push!(mag,x[1])
+    end
+    for i=2:length(x)-1
+        if(x[i-1]<x[i]>x[i+1])
+            push!(ind,i)
+            push!(mag,x[i])
+        end
+    end
+    if(x[end]>x[end-1])
+        push!(ind,length(x))
+        push!(mag,x[end])
+    end
+    while(minimum(Δ(ind))<min_dist)
+        ind,mag = remove_nearest_peak(ind,mag)
+    end
+    return ind,mag
+end
+
+
+#Support function for findpeaks() - removes the smaller of the two closest peaks in a set of local peaks
+function remove_nearest_peak(ind::Vector,mag::Vector)
+    npks = length(ind)
+    if(npks>1)
+        dist = Δ(ind)
+        m_i = argmin(dist)
+        if(mag[m_i+1]<mag[m_i])
+            m_i += 1
+        end
+        deleteat!(ind,m_i)
+        deleteat!(mag,m_i)
+    end
+    return ind,mag
+end
+
+
+
 
 function element_op_spectrum(func::AbstractString)
     me = Expr(:call, :map, Meta.parse(func), :(sp.components))
@@ -59,6 +108,10 @@ end
 
 eval(element_op_spectrum("Base.log10"))
 eval(element_op_spectrum("Base.log"))
+eval(element_op_spectrum("DSP.amp2db"))
+eval(element_op_spectrum("DSP.pow2db"))
 
 eval(element_op_timefreq("Base.log10"))
 eval(element_op_timefreq("Base.log"))
+eval(element_op_timefreq("DSP.amp2db"))
+eval(element_op_timefreq("DSP.pow2db"))

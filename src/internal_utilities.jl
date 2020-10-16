@@ -90,6 +90,12 @@ function remove_nearest_peak(ind::Vector,mag::Vector)
 end
 
 
+function resample(signal::speech_waveform, fs_new::Number)
+    rx = DSP.Filters.resample(signal.x, fs_new/signal.fs)
+    fs = convert(Float,fs_new)
+    return speech_waveform(rx,fs)
+end
+
 
 
 function element_op_spectrum(func::AbstractString)

@@ -22,8 +22,8 @@ function logfreq_array(;fmin::Number = 10, fmax::Number = 4000, frq_per_octave::
     return exp2.(lfrq)
 end
 
-#Generate complex exponential sequence
-cexp(f,fs,N) = exp.(2π*im*(f/fs)*(1:N))
+#Generate complex negative exponential sequence with norm = 1
+cexp(f,fs,N) = (1/sqrt(N))*exp.(-2π*im*(f/fs)*(1:N))
 
 #Generate projection matrix for complex exponential signals/vectors
 function cexp_proj_matrix(frqs::Array{T,1},fs::Number,N::Int) where T<:Number
@@ -95,6 +95,12 @@ function resample(signal::speech_waveform, fs_new::Number)
     fs = convert(Float,fs_new)
     return speech_waveform(rx,fs)
 end
+
+#Symmetrically pad a vector
+symmetric_pad(x::Vector, pad_len::Int) = [x[pad_len+1:-1:2]; x; x[end-1:-1:end-(pad_len)]]
+
+#Remove padding from a vector
+unpad_vector(x::Vector, pad_len::Int) = x[pad_len+1:end-pad_len]
 
 
 

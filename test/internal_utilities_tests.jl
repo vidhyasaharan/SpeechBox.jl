@@ -62,11 +62,11 @@ end
 
     for f in frqs
         f = 100
-        ce = SpeechBox.cexp(f,fs,N)
+        ce = sqrt(N)*SpeechBox.cexp(f,fs,N)
         @test ce⋅ce ≈ N
         for i=1:N
-            @test isapprox(real(ce[i]),cs(f,i);atol = 1e-10)
-            @test isapprox(imag(ce[i]),sn(f,i);atol = 1e-10)
+            @test isapprox(real(ce[i]),cs(f,i);atol = 1e-6)
+            @test isapprox(imag(ce[i]),-sn(f,i);atol = 1e-6)
         end
     end
 end

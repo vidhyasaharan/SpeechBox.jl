@@ -7,8 +7,8 @@ using LinearAlgebra
 # using SampledSignals
 using WAV
 
-testdir = normpath(joinpath(dirname(@__FILE__),"../test/"))
-srcdir = normpath(joinpath(dirname(@__FILE__),"../src/"))
+testdir = normpath(joinpath(dirname(pathof(SpeechBox)),"../test/"))
+srcdir = normpath(joinpath(dirname(pathof(SpeechBox)),"../src/"))
 
 x, fs = wavread(joinpath(testdir,"King.wav"))
 x = x[:]

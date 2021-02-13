@@ -5,6 +5,7 @@ using FFTW
 using StaticArrays
 using RecipesBase
 using Interpolations
+# using LinearAlgebra
 # using SampledSignals
 
 export speech_waveform, framed_signal, extract_frame, specgram, magspec, melbankm, melfcc,

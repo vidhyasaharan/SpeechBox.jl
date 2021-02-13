@@ -1,8 +1,8 @@
 using SpeechBox
 using WAV
 
-testdir = normpath(joinpath(dirname(@__FILE__),"../test/"))
-srcdir = normpath(joinpath(dirname(@__FILE__),"../src/"))
+testdir = normpath(joinpath(dirname(pathof(SpeechBox)),"../test/"))
+srcdir = normpath(joinpath(dirname(pathof(SpeechBox)),"../src/"))
 
 x, fs = wavread(joinpath(testdir,"King.wav"))
 x = x[:]
@@ -15,20 +15,26 @@ frqs = SpeechBox.logfreq_array(fmin = 1, fmax = fs/2, frq_per_octave = 1000)
 
 ltass_mag,frqs = SpeechBox.LTASS(fs/2,1000)
 pd = SpeechBox.periodogram(sig_frames,frqs)
-sm = SpeechBox.moving_average(pow2db(pd),time_window = 11, freq_window = 11)
+
 lpd = pow2db(pd)
 
 
-fnum = 55
-tt = lpd.components[:,fnum].*ltass_mag./sm.components[:,fnum]
-plot(tt)
 
-plot(sm)
-plot(lpd)
-
-
-npd = SpeechBox.LTASS_normalise(lpd)
+npd = SpeechBox.LTASS_normalise(pd)
 plot(npd)
 plot(npd.components[:,149])
 
-tt = maximum(lpd.components)
+
+p1 = npd.components[:,52]
+frq_per_octave = 1000
+γ = 1.8
+K = 5
+h,z = SpeechBox.generate_logfrq_pitch_comb(γ,K, frq_per_octave = frq_per_octave)
+padded_pd = zeros(length(p1)+length(h)-1)
+padded_pd[z:z+length(p1)-1] = p1
+y = zeros(size(p1))
+for i=1:length(p1)
+    y[i] = dot(padded_pd[i:i+length(h)-1],h)
+end
+
+tt = SpeechBox.generate_pitch_estimate(sig_frames)

@@ -1,4 +1,12 @@
 #Function to estimate Fourier spectrum of signal using DFT
+
+"""
+    dftspec(signal::speech_waveform[; wtype::String="hanning"])
+    dftspec(x::Array{Float,1},fs::Number=1.0;wtype::String="hanning")
+
+Compute the complex DFT spectrum of speech\\_waveform 'signal' (or signal in array 'x' with sampling rate 'fs') using a window of type 'wtype' (default = hanning window)
+
+"""
 function dftspec(signal::speech_waveform;wtype::String="hanning")
     #Choose window - options are rectangle, hamming or hanning (function default is hanning)
     x = signal.x
@@ -16,6 +24,14 @@ function dftspec(x::Array{Float,1},fs::Number=1.0;wtype::String="hanning")
     return dftspec(signal;wtype=wtype)
 end
 
+
+"""
+    magspec(signal::speech_waveform[; wtype::String="hanning"])
+    magspec(x::Array{Float,1},fs::Number=1.0;wtype::String="hanning")
+
+Compute the DFT magnitude spectrum of speech\\_waveform 'signal' (or signal in array 'x' with sampling rate 'fs') using a window of type 'wtype' (default = hanning window)
+
+"""
 function magspec(signal::speech_waveform;wtype::String="hanning")
     #Choose window - options are rectangle, hamming or hanning (function default is hanning)
     cspec = dftspec(signal;wtype=wtype)
@@ -29,6 +45,13 @@ function magspec(x::Array{Float,1},fs::Number=1.0;wtype::String="hanning")
 end
 
 #Spectrogram estimated from framed_signal object input (core method for later verions)
+"""
+    specgram(frames[; wtype="hanning"])
+    specgram(x, fs[; win_dur=0.02[, win_shift=0.01[, wtype="hanning"]]])
+
+Compute the DFT based spectrogram of signal in framed\\_signal 'frames' (or signal in array 'x' with sampling rate 'fs' using frames of duration 'win\\_dur' and interval between frames 'win\\_shift') using a window of type 'wtype' (default = hanning window). 
+
+"""
 function specgram(sig_frames::framed_signal;wtype::String="hanning")
     flen = sig_frames.frame_length
     nfft = nextfastfft(flen) #Get optimal number of points (larger than frame length) for FFT

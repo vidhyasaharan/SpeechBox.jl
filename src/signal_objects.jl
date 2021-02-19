@@ -44,6 +44,13 @@ end
 
 
 #Consutrctor for framed_signal object given input speech_waveform object, window duration and window overlap
+"""
+    framed_signal(sig::speech_waveform,win_dur::Number=0.02,win_shift::Number=0.01)
+    framed_signal(x::speech_waveform,win_dur::Number=0.02,win_shift::Number=0.01)
+
+Store the signal in a speech\\_waveform object 'sig' (or signal in array 'x' with sampling rate 'fs') as a framed\\_signal object with frame duration 'win\\_dur' (default = 0.02sec) and interval between start of consecutive frames 'win\\_shift' (detault = 0.01sec)
+
+"""
 function framed_signal(signal::speech_waveform,win_dur::Number=0.02,win_shift::Number=0.01)
     fs = signal.fs
     x = signal.x
@@ -77,6 +84,16 @@ spectrum(signal::speech_waveform,components::RorC_Vector,frqs::Vector{Float}) = 
 
 
 #Spectrum object to hold any form of spectro-temporal components of a signal
+"""
+    timefreq(sig, frames, components, frqs, time, title)
+    timefreq(sig, components, frqs, time, title)
+    timefreq(frames, components, frqs, time, title)
+    timefreq(frames, components, frqs, title)
+    timefreq(frames, components, frqs)
+
+Construct a time-frequuency object to hold the time-frequency elements in 'components' corresponding to the speech\\_waveform 'signal' based on framed\\_signal 'frames' with frequency indices 'frqs', time indices 'time' and stores 'title'
+
+"""
 struct timefreq
     signal::speech_waveform
     frames::Union{framed_signal, Nothing}

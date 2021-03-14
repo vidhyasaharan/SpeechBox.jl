@@ -1,8 +1,8 @@
 using WAV
 using Plots
 
-testdir = normpath(joinpath(dirname(@__FILE__),"../test/"))
-x, fs = wavread(joinpath(testdir,"King.wav"))
+testdir = normpath(joinpath(dirname(pathof(SpeechBox)),"../test/"))
+x, fs = wavread(joinpath(testdir,"piano2.wav"))
 
 frames = framed_signal(x,fs,0.09,0.01)
 frame = extract_frame(frames,11)
@@ -13,4 +13,4 @@ msp = specgram(frames)
 
 psp = periodogram(frames)
 
-plot(log(psp))
+plot(log(msp))

@@ -20,7 +20,6 @@ include("spectralanalyses.jl")
 include("mfcc.jl")
 include("vad.jl")
 include("lpc.jl")
-include("pitch_PEFAC.jl")
 include("plot_recipes.jl")
 
 

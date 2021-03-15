@@ -10,7 +10,7 @@ using WAV
 testdir = normpath(joinpath(dirname(pathof(SpeechBox)),"../test/"))
 srcdir = normpath(joinpath(dirname(pathof(SpeechBox)),"../src/"))
 
-x, fs = wavread(joinpath(testdir,"King.wav"))
+x, fs = wavread(joinpath(testdir,"King1.wav"))
 x = x[:]
 signal = speech_waveform(x,fs)
 

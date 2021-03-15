@@ -4,5 +4,7 @@
 
 ![CI](https://github.com/vidhyasaharan/SpeechBox.jl/actions/workflows/CI.yml/badge.svg)
 
+[![](https://img.shields.io/badge/docs-stable-blue.svg)](https://vidhyasaharan.github.io/SpeechBox.jl/stable)
+
 
 SpeechBox is a speech processing toolbox consisting of Julia routines that are maintained by and mostly written by Vidhyasaharan Sethu, Speech and Behavioural Signal Processing Lab, School of EE&T, UNSW Australia.

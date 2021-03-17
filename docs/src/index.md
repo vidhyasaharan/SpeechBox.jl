@@ -1,5 +1,6 @@
 # SpeechBox Documentation
 
-```@docs
-SpeechBox.speech_waveform(x::Array,fs::Number)
+```@autodocs
+Modules = [SpeechBox]
+Pages = ["signal_objects.jl", "speechframing.jl", "spectralanalysis.jl"]
 ```

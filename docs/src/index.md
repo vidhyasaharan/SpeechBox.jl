@@ -1,6 +1,9 @@
 # SpeechBox Documentation
 
-```@autodocs
-Modules = [SpeechBox]
-Pages = ["signal_objects.jl", "speechframing.jl", "spectralanalysis.jl"]
+SpeechBox.jl provides a number of common speech processing routines in Julia. The routines implemented so far are:
+
+```@contents
+Pages = ["signal_objects.md",
+        "speechframing.md",
+]
 ```

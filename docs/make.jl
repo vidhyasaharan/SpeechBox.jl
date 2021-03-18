@@ -9,6 +9,7 @@ makedocs(
             "signal_objects.md",
         "speechframing.md",
         "spectralanalyses.md"
+        ],
     ],
 )
 

@@ -1,4 +1,4 @@
-# 'Speech Framing' - extract a frame and estimate frame energy
+# `Speech Framing` - extract a frame and estimate frame energy
 
 ```@autodocs
 Modules = [SpeechBox]

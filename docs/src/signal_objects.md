@@ -1,4 +1,4 @@
-# 'Signal Objects' - data structures and constructors
+# `Signal Objects` - data structures and constructors
 
 ```@autodocs
 Modules = [SpeechBox]

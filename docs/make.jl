@@ -5,10 +5,10 @@ makedocs(
     authors = "Vidhyasaharan Sethu",
     Pages = [
         "Home" => "index.md",
-        "Library" => [
+        "Contents" => [
             "signal_objects.md",
-        "speechframing.md",
-        "spectralanalyses.md"
+            "speechframing.md",
+            "spectralanalyses.md"
         ],
     ],
 )

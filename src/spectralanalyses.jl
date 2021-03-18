@@ -82,8 +82,15 @@ end
 
 
 
-
 #Periodogram estimated at provided frequncies - estimated by projecting onto complex exponentials and taking the square of the absolute value
+"""
+    periodogram(x::Array{Float,1},fs::Number,frqs::Array{T,1};wtype::String="hanning") where T<:Number
+    periodogram(x::Array{Float,1},fs::Number;wtype::String="hanning",fmin::Number=10,fmax::Number=fs/2)
+    periodogram(sig_frames::framed_signal,frqs ;wtype::String="hanning")
+    periodogram(sig_frames::framed_signal; wtype::String="hanning", fmin=10,fmax=sig_frames.signal.fs/2)
+
+Compute the periodogram of a signal in array 'x' with sampling frequency 'fs' at frequencies specified in 'frqs' or frequencies equally spaced on the log-scale between 'fmin' and 'fmax' as the L2 norm of the inner product between a complex exponential and 'x'. When the input is a framed signal object 'sig_frames', the periodogram for each frame is computed.
+"""
 function periodogram(x::Array{Float,1},fs::Number,frqs::Array{T,1};wtype::String="hanning") where T<:Number
     #Choose window - options are rectangle, hamming or hanning (function default is hanning)
     flen = length(x)

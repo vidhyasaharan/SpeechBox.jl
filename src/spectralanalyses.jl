@@ -1,5 +1,4 @@
 #Function to estimate Fourier spectrum of signal using DFT
-
 """
     dftspec(signal::speech_waveform[; wtype::String="hanning"])
     dftspec(x::Array{Float,1},fs::Number=1.0;wtype::String="hanning")

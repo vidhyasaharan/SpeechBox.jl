@@ -10,15 +10,15 @@ jobs:
       fail-fast: false
       matrix:
         version:
-          - '1.2'
+          #- '1.2'
           - '1.5'
           - 'nightly'
         os:
           - ubuntu-latest
-          - macOS-latest
+          #- macOS-latest
         arch:
           - x64
-          - x86
+          #- x86
         exclude:
           - os: macOS-latest
             arch: x86

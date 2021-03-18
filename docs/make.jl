@@ -6,6 +6,7 @@ makedocs(
         "Library" => "index.md",
         "signal_objects.md",
         "speechframing.md",
+        "spectralanalyses.md"
     ],
 )
 

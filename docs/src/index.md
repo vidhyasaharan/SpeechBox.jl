@@ -5,5 +5,6 @@ SpeechBox.jl provides a number of common speech processing routines in Julia. Th
 ```@contents
 Pages = ["signal_objects.md",
         "speechframing.md",
+        "spectralanalyses.md",
 ]
 ```

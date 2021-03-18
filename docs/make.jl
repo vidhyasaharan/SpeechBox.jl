@@ -1,10 +1,12 @@
 using Documenter, SpeechBox
 
 makedocs(
-    sitename = "My Documentation",
-    Pages = Any[
-        "Library" => "index.md",
-        "signal_objects.md",
+    sitename = "SpeechBox.jl",
+    authors = "Vidhyasaharan Sethu",
+    Pages = [
+        "Home" => "index.md",
+        "Library" => [
+            "signal_objects.md",
         "speechframing.md",
         "spectralanalyses.md"
     ],

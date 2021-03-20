@@ -41,7 +41,7 @@ framed_signal
 ```
 
 ## `spectrum`
-Stores a `speech_waveform`, an array of spectral components (`components`), an array of frequency indices corresponding to each spectral component (`frqs`), and a title string (`title`).
+Stores a `speech_waveform`, an array of spectral components (`components`), a vector of frequency indices corresponding to each spectral component (`frqs`), and a title string (`title`).
 
 ```julia
 struct spectrum
@@ -55,4 +55,23 @@ end
 Two constructors are provided:
 ```@docs
 spectrum
+```
+
+## timefreq
+Stores a `speech_waveform` along with a matrix comprising of spectro-temporal compoenents (`components`) where each column corresponds to a different time and each row to a different frequency , the `framed_signal` used to obtain the spectro-temporal decomposition (if relevant), a vector of frequency indices corresponding to each row (`frqs`), either a vector of time indices, each element corresponding to each column or a vecctor of vector of time indices if time indices are not consistent across spectral components (`time`), and a title string (`title`)
+
+```julia
+struct timefreq
+    signal::speech_waveform
+    frames::Union{framed_signal, Nothing}
+    components::RorC_Matrix
+    frqs::Vector{Float}
+    time::Union{Vector{Float}, Vector{Vector{Float}}}
+    title::Union{AbstractString, Nothing}
+end
+```
+
+Five contructors are provided:
+```@docs
+timefreq
 ```

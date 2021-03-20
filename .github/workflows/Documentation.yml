@@ -1,4 +1,9 @@
-docs:
+name: Docs
+on:
+  - push
+  - pull_request
+jobs:
+  docs:
     name: Documentation
     runs-on: ubuntu-latest
     steps:

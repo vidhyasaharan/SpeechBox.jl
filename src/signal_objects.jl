@@ -36,7 +36,7 @@ end
 #Struct/Object defining framed signal using signal defined as a 1D array
 """
     framed_signal(sig::speech_waveform, win_dur=0.02, win_shift=0.01)
-    framed_signal(x::speech_waveform, fs, win_dur=0.02, win_shift=0.01)
+    framed_signal(x, fs, win_dur=0.02, win_shift=0.01)
 
 Store the signal in a speech\\_waveform object `sig` (or signal in array `x` with sampling rate `fs`) as a framed\\_signal object with frame duration `win_dur` (default = 0.02sec) and interval between start of consecutive frames `win_shift` (detault = 0.01sec)
 

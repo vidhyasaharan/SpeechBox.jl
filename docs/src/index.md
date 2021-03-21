@@ -6,9 +6,9 @@
 
 ## Outline
 Currently SpeechBox.jl implements routines for 
-- Speech Framing
+- [Speech Framing](speechframing)
 - Voice Activity Detection
-- Spectral Analyses
+- [Spectral Analyses](spectralanalyses)
 - LPC Analyses
 - MFCC extraction
 - Plot Recipes

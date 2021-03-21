@@ -1,4 +1,4 @@
-# `Signal Objects`
+# `Data Structures`
 
 SpeechBox.jl defines 4 structs:
  - `speech_waveform` - Speech waveform in vector and sampling rate

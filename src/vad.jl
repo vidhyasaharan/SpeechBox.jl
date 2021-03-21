@@ -15,11 +15,11 @@ function vad_energy_threshold(sig_frames::framed_signal, energy_thr::Float = 0.0
 end
 
 """
-    vad_energy_fraction(sig_frames::framed_signal, unvoiced_fraction=0.1)
+    vad_energy_fraction(sig_frames::framed_signal, unvoiced_fraction=0.2)
 
 Estimates the signal 'energy' in each frame (L2 norm computed using the `frame_energy` function) and assigns a certain fraction of the frames (specified by `unvoiced_fractions`) with the lowest energy as not voiced.
 """
-function vad_energy_fraction(sig_frames::framed_signal, unvoiced_fraction::Float = 0.1)
+function vad_energy_fraction(sig_frames::framed_signal, unvoiced_fraction::Float = 0.2)
     energy = frame_energy(sig_frames)
 
     sorted_energy = sort(energy)

@@ -13,4 +13,4 @@ Currently SpeechBox.jl implements routines for
 - MFCC extraction
 - Plot Recipes
 
-SpeechBox.jl also defines [Data Structures](@ref speech_objects) to hold the inputs and outputs to the speech processing routines
+SpeechBox.jl also defines [Data Structures](speech_objects) to hold the inputs and outputs to the speech processing routines

@@ -57,7 +57,7 @@ Two constructors are provided:
 spectrum
 ```
 
-## timefreq
+## `timefreq`
 Stores a `speech_waveform` along with a matrix comprising of spectro-temporal compoenents (`components`) where each column corresponds to a different time and each row to a different frequency , the `framed_signal` used to obtain the spectro-temporal decomposition (if relevant), a vector of frequency indices corresponding to each row (`frqs`), either a vector of time indices, each element corresponding to each column or a vecctor of vector of time indices if time indices are not consistent across spectral components (`time`), and a title string (`title`)
 
 ```julia

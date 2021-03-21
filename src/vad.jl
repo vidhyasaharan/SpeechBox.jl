@@ -1,4 +1,8 @@
+"""
+    vad_energy_threshold(sig_frames::framed_signal, energy_thr=0.05)
 
+Estimates the signal 'energy' in each frame (L2 norm computed using the `frame_energy` function) and assigns every frame with 'energy' greater than `energy_thr` times the maximum frame energy as voiced.
+"""
 function vad_energy_threshold(sig_frames::framed_signal, energy_thr::Float = 0.05)
     energy = frame_energy(sig_frames)
     max_energy = maximum(energy)
@@ -10,6 +14,11 @@ function vad_energy_threshold(sig_frames::framed_signal, energy_thr::Float = 0.0
     return v_indx
 end
 
+"""
+    vad_energy_fraction(sig_frames::framed_signal, unvoiced_fraction=0.1)
+
+Estimates the signal 'energy' in each frame (L2 norm computed using the `frame_energy` function) and assigns a certain fraction of the frames (specified by `unvoiced_fractions`) with the lowest energy as not voiced.
+"""
 function vad_energy_fraction(sig_frames::framed_signal, unvoiced_fraction::Float = 0.1)
     energy = frame_energy(sig_frames)
 

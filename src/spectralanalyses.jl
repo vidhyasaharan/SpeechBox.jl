@@ -1,9 +1,9 @@
 #Function to estimate Fourier spectrum of signal using DFT
 """
-    dftspec(signal::speech_waveform[; wtype::String="hanning"])
-    dftspec(x::Array{Float,1},fs::Number=1.0;wtype::String="hanning")
+    dftspec(signal::speech_waveform[; wtype="hanning"])
+    dftspec(x, fs=1.0[; wtype="hanning"])
 
-Compute the complex DFT spectrum of speech\\_waveform 'signal' (or signal in array 'x' with sampling rate 'fs') using a window of type 'wtype' (default = hanning window)
+Compute the complex DFT spectrum of speech\\_waveform `signal` (or signal in array `x` with sampling rate `fs`) using a window of type `wtype` (default = hanning window)
 
 """
 function dftspec(signal::speech_waveform;wtype::String="hanning")
@@ -25,10 +25,10 @@ end
 
 
 """
-    magspec(signal::speech_waveform[; wtype::String="hanning"])
-    magspec(x::Array{Float,1},fs::Number=1.0;wtype::String="hanning")
+    magspec(signal::speech_waveform[; wtype="hanning"])
+    magspec(x, fs=1.0[; wtype="hanning"])
 
-Compute the DFT magnitude spectrum of speech\\_waveform 'signal' (or signal in array 'x' with sampling rate 'fs') using a window of type 'wtype' (default = hanning window)
+Compute the DFT magnitude spectrum of speech\\_waveform `signal` (or signal in array `x` with sampling rate `fs`) using a window of type `wtype` (default = hanning window)
 
 """
 function magspec(signal::speech_waveform;wtype::String="hanning")
@@ -48,7 +48,7 @@ end
     specgram(frames[; wtype="hanning"])
     specgram(x, fs[; win_dur=0.02[, win_shift=0.01[, wtype="hanning"]]])
 
-Compute the DFT based spectrogram of signal in framed\\_signal 'frames' (or signal in array 'x' with sampling rate 'fs' using frames of duration 'win\\_dur' and interval between frames 'win\\_shift') using a window of type 'wtype' (default = hanning window). 
+Compute the DFT based spectrogram of signal in framed\\_signal `frames` (or signal in array `x` with sampling rate `fs` using frames of duration `win_dur` and interval between frames `win_shift`) using a window of type `wtype` (default = hanning window). 
 
 """
 function specgram(sig_frames::framed_signal;wtype::String="hanning")
@@ -83,12 +83,12 @@ end
 
 #Periodogram estimated at provided frequncies - estimated by projecting onto complex exponentials and taking the square of the absolute value
 """
-    periodogram(x::Array{Float,1},fs::Number,frqs::Array{T,1};wtype::String="hanning") where T<:Number
-    periodogram(x::Array{Float,1},fs::Number;wtype::String="hanning",fmin::Number=10,fmax::Number=fs/2)
-    periodogram(sig_frames::framed_signal,frqs ;wtype::String="hanning")
-    periodogram(sig_frames::framed_signal; wtype::String="hanning", fmin=10,fmax=sig_frames.signal.fs/2)
+    periodogram(x, fs, frqs[; wtype="hanning"])
+    periodogram(x, fs [;wtype="hanning"[, fmin=10[, fmax=fs/2]]])
+    periodogram(sig_frames::framed_signal, frqs[; wtype="hanning"])
+    periodogram(sig_frames::framed_signal[; wtype="hanning"[, fmin=10[, fmax=sig_frames.signal.fs/2]]])
 
-Compute the periodogram of a signal in array 'x' with sampling frequency 'fs' at frequencies specified in 'frqs' or frequencies equally spaced on the log-scale between 'fmin' and 'fmax' as the L2 norm of the inner product between a complex exponential and 'x'. When the input is a framed signal object 'sig_frames', the periodogram for each frame is computed.
+Compute the periodogram of a signal in array `x` with sampling frequency `fs` at frequencies specified in `frqs` or frequencies equally spaced on the log-scale between `fmin` and `fmax` as the L2 norm of the inner product between a complex exponential and `x`. When the input is a framed signal object `sig_frames`, the periodogram for each frame is computed.
 """
 function periodogram(x::Array{Float,1},fs::Number,frqs::Array{T,1};wtype::String="hanning") where T<:Number
     #Choose window - options are rectangle, hamming or hanning (function default is hanning)

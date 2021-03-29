@@ -5,11 +5,12 @@
 
 
 ## Outline
-The routines implemented so far are:
+Currently SpeechBox.jl implements routines for 
+- [Speech Framing](speechframing)
+- [Voice Activity Detection](vad)
+- [Spectral Analyses](spectralanalyses)
+- LPC Analyses
+- MFCC extraction
+- Plot Recipes
 
-```@contents
-Pages = ["signal_objects.md",
-        "speechframing.md",
-        "spectralanalyses.md",
-]
-```
+SpeechBox.jl also defines [Data Structures](signal_objects) to hold the inputs and outputs to the speech processing routines

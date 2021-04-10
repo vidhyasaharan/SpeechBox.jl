@@ -8,7 +8,7 @@ using Interpolations
 # using LinearAlgebra
 # using SampledSignals
 
-export speech_waveform, framed_signal, extract_frame, specgram, magspec, melbankm, melfcc,
+export speech_waveform, framed_signal, extract_frame, dftspec, specgram, magspec, melbankm, melfcc,
                 Float, frame_energy, vad, periodogram, spectrum, timefreq, amp2db, pow2db
 
 const Float = Float64 #Set to Float32 to for 32bit floating point operations - NOT YET IMPLEMENTED or TESTED

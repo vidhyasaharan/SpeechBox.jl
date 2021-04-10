@@ -1,4 +1,8 @@
+"""
+    vad_energy_threshold(sig_frames::framed_signal, energy_thr=0.05)
 
+Estimates the signal 'energy' in each frame (L2 norm computed using the `frame_energy` function) and assigns every frame with 'energy' greater than `energy_thr` times the maximum frame energy as voiced.
+"""
 function vad_energy_threshold(sig_frames::framed_signal, energy_thr::Float = 0.05)
     energy = frame_energy(sig_frames)
     max_energy = maximum(energy)
@@ -10,7 +14,12 @@ function vad_energy_threshold(sig_frames::framed_signal, energy_thr::Float = 0.0
     return v_indx
 end
 
-function vad_energy_fraction(sig_frames::framed_signal, unvoiced_fraction::Float = 0.1)
+"""
+    vad_energy_fraction(sig_frames::framed_signal, unvoiced_fraction=0.2)
+
+Estimates the signal 'energy' in each frame (L2 norm computed using the `frame_energy` function) and assigns a certain fraction of the frames (specified by `unvoiced_fractions`) with the lowest energy as not voiced.
+"""
+function vad_energy_fraction(sig_frames::framed_signal, unvoiced_fraction::Float = 0.2)
     energy = frame_energy(sig_frames)
 
     sorted_energy = sort(energy)
@@ -24,6 +33,16 @@ function vad_energy_fraction(sig_frames::framed_signal, unvoiced_fraction::Float
     return v_indx
 end
 
+
+"""
+    vad(sig_frames::framed_signal; <keyword arguments>)
+
+Determine if each frame in the framed\\_signal object `sig_frames` corresponds to voiced speech or not
+# Arguments
+- `alg` : the vad algorithm to use. The options are: (i) "energy\\_threshold" [default] which compares normalised frame energy to a fixed threshold (keyword argment); or (ii) "unvoiced_fraction" which sets a certain fraction (keyword argument) of lowest energy frames as not voiced
+- `energy_threshold::Float` : minimum frame energy for a frame to be considered voiced when using `alg = "energy_threshold"`  [Default = 0.05]
+- `unvoiced_fraction::Float` : fraction of frames that will be marked as not voiced with using `slg = "unvoiced_fraction"` [Default = 0.2]
+"""
 function vad(sig_frames::framed_signal;alg = "energy_threshold", params...)
     if alg == "energy_threshold"
         if haskey(params,:energy_threshold)

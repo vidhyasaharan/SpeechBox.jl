@@ -6,6 +6,7 @@ The `vad` function takes a `framed_signal` and generates an array 1s and 0s with
 vad
 ```
 
+## VAD algorithms
 The Voice Activity Detection algorithms currently implemented are:
 
 ```@docs

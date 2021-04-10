@@ -39,7 +39,7 @@ end
 
 Determine if each frame in the framed\\_signal object `sig_frames` corresponds to voiced speech or not
 # Arguments
-- `alg` : the vad algorithm to use. The options are: (i) "energy\\_threshold" [default] which compares normalised frame energy to a fixed threshold (keyword argment); or (ii) "unvoiced_fraction" which sets a certain fraction (keyword argument) of lowest energy frames as not voiced
+- `alg` : the vad algorithm to use. The options are: (i) `energy_threshold` [default] which compares normalised frame energy to a fixed threshold (keyword argment); or (ii) `unvoiced_fraction` which sets a certain fraction (keyword argument) of lowest energy frames as not voiced
 - `energy_threshold::Float` : minimum frame energy for a frame to be considered voiced when using `alg = "energy_threshold"`  [Default = 0.05]
 - `unvoiced_fraction::Float` : fraction of frames that will be marked as not voiced with using `slg = "unvoiced_fraction"` [Default = 0.2]
 """

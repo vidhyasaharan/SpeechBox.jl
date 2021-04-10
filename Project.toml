@@ -1,6 +1,6 @@
 name = "SpeechBox"
 uuid = "5977877c-68b9-11e9-19cb-f954a5ed1fbc"
-authors = ["vidhya <v.sethu@unsw.edu.au>"]
+authors = ["Vidhyasaharan Sethu <v.sethu@unsw.edu.au>"]
 version = "0.2.0"
 
 [deps]
@@ -12,9 +12,9 @@ StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 WAV = "8149f6b0-98f6-5db9-b78f-408fbbb8ef88"
 
 [compat]
-DSP = "0.6"
-FFTW = "1.3"
-Interpolations = "0.13"
-RecipesBase = "1.1"
-StaticArrays = "1.0"
-WAV = "1.1"
+DSP = ">= 0.6"
+FFTW = ">= 1.3"
+Interpolations = ">= 0.13"
+RecipesBase = ">= 1.1"
+StaticArrays = ">= 1.0"
+WAV = ">= 1.1"

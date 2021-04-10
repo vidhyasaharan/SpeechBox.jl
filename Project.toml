@@ -12,4 +12,6 @@ StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 WAV = "8149f6b0-98f6-5db9-b78f-408fbbb8ef88"
 
 [compat]
+Interpolations = "0.13"
 DSP = "0.6"
+

@@ -38,10 +38,14 @@ function rand_allpole(fs::Number = 8000, num_res::Number = 10)
     return ar_filt, frqs, bws
 end
 
+"""
+    lpc(x, N)
 
-function frame_lpc(x::Array{Float,1},order::Int)
-    a = ones(Float,order+1)
-    temp,err = DSP.LPC.lpc(x,order)
+Compute the Linear Predictive Coding (LPC) coefficients of order `N`, of a sequence `x`.
+"""
+function lpc(x::Array{Float,1},N::Int)
+    a = ones(Float,N+1)
+    temp,err = DSP.LPC.lpc(x,N)
     a[2:end] = temp
     filter = DSP.Filters.PolynomialRatio([1],a)
     return filter

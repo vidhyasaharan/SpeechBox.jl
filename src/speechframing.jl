@@ -1,8 +1,8 @@
 # Function that pulls out one frame as an array from framed_signal object
 """
-    extract_frame(x::framed_signal,i::Int)
+    extract_frame(x::framed_signal, i)
 
-Extract frame number 'i' from the the framed\\_signal object 'x'
+Extract frame number `i` from the the framed\\_signal object `x`
 
 """
 function extract_frame(x::framed_signal,i::Int)
@@ -25,7 +25,7 @@ end
 """
     frame_energy(sig_frames::framed_signal[; normalised = false])
 
-Estimate energy in each frame of 'sig_frames' as sum of squares of samples (optionally return normalised energy such that max is 1 if 'normalised = true')
+Estimate energy in each frame of `sig_frames` as sum of squares of samples (optionally return normalised energy such that max is 1 if `normalised = true`)
 
 """
 function frame_energy(sig_frames::framed_signal; normalised = false)

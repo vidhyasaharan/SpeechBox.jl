@@ -1,5 +1,8 @@
 # `Speech Frames`
 
+Two basic functions are provided to manipulate speech frames:
+- `extract_frame` - Extract desired frame from a [`framed_signal`](@ref) object
+- `frame_energy` - Estimate signal 'energy' in each frame
 
 ## `extract_frame`
 The primary specech framing function is [`extract_frame`](@ref) which is used to extract the desired frame from a speech signal.

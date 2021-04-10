@@ -1,6 +1,6 @@
 # SpeechBox Documentation
 
-*A speech processing toolbox for Julia*
+SpeechBox.jl provides a number of basic speech processing and analyses routines in Julia. In addition, plot recipes are provided for speech waveforms, magnitude sprectra and spectrograms. [Data Structures](signal_objects) are defined to hold these objects, which also serve as inputs and outputs to the speech processing routines.
 
 
 
@@ -13,4 +13,4 @@ Currently SpeechBox.jl implements routines for
 - MFCC extraction
 - Plot Recipes
 
-SpeechBox.jl also defines [Data Structures](signal_objects) to hold the inputs and outputs to the speech processing routines
+

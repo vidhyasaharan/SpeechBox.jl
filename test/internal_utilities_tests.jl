@@ -28,9 +28,9 @@
     α₀ = 0.54
     α₁ = 1 - α₀
     N = flen-1
-    wfun(n) = α₀ - α₁*cos(2π*n/N)
+    wfun1(n) = α₀ - α₁*cos(2π*n/N)
     for i=1:flen
-        @test win[i] ≈ wfun(i-1)
+        @test win[i] ≈ wfun1(i-1)
     end
 
 

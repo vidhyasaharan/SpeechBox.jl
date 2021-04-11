@@ -32,7 +32,7 @@ end
 
 
 #Generate complex negative exponential sequence with norm = 1
-cexp(f,fs,N) = (1/sqrt(N))*exp.(-2π*im*(f/fs)*(1:N))
+cexp(f::Number,fs::Number,N::Int) = (1/sqrt(N))*exp.(-2π*im*(f/fs)*(1:N))
 
 #Generate projection matrix for complex exponential signals/vectors
 function cexp_proj_matrix(frqs::Array{T,1},fs::Number,N::Int) where T<:Number

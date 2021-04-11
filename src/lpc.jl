@@ -38,6 +38,12 @@ function rand_allpole(fs::Number = 8000, num_res::Number = 10)
     return ar_filt, frqs, bws
 end
 
+
+#Estimate LPC order from sampling frequency
+lpc_order(fs::Number) = Int(round(fs/1000))+2
+
+
+#Compute LPC/AR coefficients for a discrete-time sequence
 """
     lpc(x, N)
 
@@ -47,6 +53,20 @@ function lpc(x::Array{Float,1},N::Int)
     a = ones(Float,N+1)
     temp,err = DSP.LPC.lpc(x,N)
     a[2:end] = temp
+    # filter = DSP.Filters.PolynomialRatio([1],a)
+    return a
+end
+
+
+#Compute the LPC/AR model magnitude response given a dicrete-time signal
+"""
+    lpc_response(x, fs [, N = round(fs/1000)+2 [; frqs = linfreq_array(0, fs/2, length(x))]])
+
+Compute the magnitude response of the Linear Predictive Coding (LPC) / Autoregressive (AR) filter model (of order `N`) of signal in array `x` with sampling rate `fs` at frequencies specified in `frqs`.
+"""
+function lpc_response(x::Array{Float,1}, fs::Number, N::Int = lpc_order(fs); frqs::Array{T,1} = linfreq_array(fmax = fs/2, nfrqs = length(x))) where T<:Number
+    a = lpc(x,N)
     filter = DSP.Filters.PolynomialRatio([1],a)
-    return filter
+    h = DSP.freqz(filter, frqs, fs)
+    return spectrum(speech_waveform(x,fs),abs.(h),frqs,"LPC/AR Model Magnitude Respose")
 end

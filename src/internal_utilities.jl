@@ -22,6 +22,15 @@ function logfreq_array(;fmin::Number = 10, fmax::Number = 4000, frq_per_octave::
     return exp2.(lfrq)
 end
 
+#Generate array of desired number of equally spaced frequencies (in Hz)
+function linfreq_array(;fmin::Number = 0, fmax::Number = 4000, nfrqs::Number = 80)
+    fres = (fmax-fmin)/(nfrqs-1)
+    frqs = fmin:fres:fmax
+    return collect(frqs)
+end
+
+
+
 #Generate complex negative exponential sequence with norm = 1
 cexp(f,fs,N) = (1/sqrt(N))*exp.(-2π*im*(f/fs)*(1:N))
 

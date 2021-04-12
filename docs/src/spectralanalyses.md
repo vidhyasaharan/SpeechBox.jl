@@ -23,6 +23,4 @@ periodogram
 ```
 
 ## LPC/AR Filter Model Response (Spectral and Spectro-temporal)
-```@docs
-SpeechBox.lpc
-```
+See page on [LPC Analyses](lpc) and in particular [`lpc_response`](@ref).

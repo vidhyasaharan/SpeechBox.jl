@@ -8,7 +8,7 @@ SpeechBox.jl provides a number of basic speech processing and analyses routines 
 Currently SpeechBox.jl implements routines for 
 - [Speech Framing](speechframing)
 - [Voice Activity Detection](vad)
-- [Spectral Analyses](spectral_analyses)
+- [Spectral Analyses](spectralanalyses)
 - [LPC Analyses](lpc)
 - MFCC extraction
 - Plot Recipes

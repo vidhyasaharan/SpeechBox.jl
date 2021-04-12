@@ -9,7 +9,7 @@ makedocs(
             "signal_objects.md",
             "speechframing.md",
             "vad.md",
-            "spectralanalyses.md",
+            "spectral_analyses.md",
             "lpc.md"
         ],
     ],

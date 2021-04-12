@@ -10,6 +10,8 @@ frame = extract_frame(frames,11)
 
 h = SpeechBox.lpc_response(frame,fs)
 
+lpspec = SpeechBox.lpc_response(frames)
+
 # mag = SpeechBox.magspec(frame,fs)
 
 # msp = specgram(frames)

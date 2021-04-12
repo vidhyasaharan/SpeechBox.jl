@@ -8,7 +8,9 @@ makedocs(
         "Contents" => [
             "signal_objects.md",
             "speechframing.md",
-            "spectralanalyses.md"
+            "vad.md",
+            "spectralanalyses.md",
+            "lpc.md"
         ],
     ],
 )

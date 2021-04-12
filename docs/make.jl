@@ -3,7 +3,7 @@ using Documenter, SpeechBox
 makedocs(
     sitename = "SpeechBox.jl",
     authors = "Vidhyasaharan Sethu",
-    Pages = [
+    pages = [
         "Home" => "index.md",
         "Contents" => [
             "signal_objects.md",

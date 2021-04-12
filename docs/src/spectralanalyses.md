@@ -12,7 +12,7 @@ dftspec
 magspec
 ```
 
-## STFT Spectrogram (Spectro-Temporal)spectra analyses docs
+## STFT Spectrogram (Spectro-Temporal)
 ```@docs
 specgram
 ```

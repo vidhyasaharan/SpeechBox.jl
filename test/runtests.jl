@@ -6,7 +6,9 @@ using LinearAlgebra
 # using FileIO
 # using SampledSignals
 using WAV
-using Random
+using DSP: filt
+
+
 
 testdir = normpath(joinpath(dirname(pathof(SpeechBox)),"../test/"))
 srcdir = normpath(joinpath(dirname(pathof(SpeechBox)),"../src/"))

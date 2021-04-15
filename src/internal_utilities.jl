@@ -98,7 +98,7 @@ function remove_nearest_peak(ind::Vector,mag::Vector)
     return ind,mag
 end
 
-
+#Resample signal in speech_waveform object
 function resample(signal::speech_waveform, fs_new::Number)
     rx = DSP.Filters.resample(signal.x, fs_new/signal.fs)
     fs = convert(Float,fs_new)
@@ -113,6 +113,18 @@ symmetric_pad(x::Vector, pad_len::Int) = [x[pad_len+1:-1:2]; x; x[end-1:-1:end-(
 
 #Remove padding from a vector
 unpad_vector(x::Vector, pad_len::Int) = x[pad_len+1:end-pad_len]
+
+#Generate white noise
+white_noise(len::Int) = randn(MersenneTwister(), Float, len)
+white_noise(dur::Number, fs::Number) = white_noise(dur2len(dur,fs))
+
+#Generate AR process noise
+ar_process(a::Vector, len::Int) = DSP.filt([1],a, white_noise(len))
+ar_process(a::Vector, dur::Number, fs::Number) = ar_process(a,dur2len(dur,fs))
+
+#Infer number of samples from duration and sampling rate
+dur2len(dur::Number, fs::Number) = Int(round(dur*fs))
+
 
 
 function element_op_spectrum(func::AbstractString)

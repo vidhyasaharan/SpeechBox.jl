@@ -105,12 +105,14 @@ function resample(signal::speech_waveform, fs_new::Number)
     return speech_waveform(rx,fs)
 end
 
+#Zero pad a vector
+zero_pad(x::Vector, pad_len::Int) = [zeros(pad_len); x; zeros(pad_len)]
+
 #Symmetrically pad a vector
 symmetric_pad(x::Vector, pad_len::Int) = [x[pad_len+1:-1:2]; x; x[end-1:-1:end-(pad_len)]]
 
 #Remove padding from a vector
 unpad_vector(x::Vector, pad_len::Int) = x[pad_len+1:end-pad_len]
-
 
 
 function element_op_spectrum(func::AbstractString)

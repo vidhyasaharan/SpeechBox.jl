@@ -5,6 +5,7 @@ using FFTW
 using StaticArrays
 using RecipesBase
 using Interpolations
+using Random
 # using LinearAlgebra
 # using SampledSignals
 

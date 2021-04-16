@@ -51,6 +51,15 @@ end
     end
 end
 
+@testset "linfreq_array" begin
+    frqs = SpeechBox.linfreq_array(;fmin = 0, fmax = 100, nfrqs = 11)
+    @test frqs[1] == 0.0
+    @test frqs[end] == 100.0
+    for i=2:length(frqs)
+        @test frqs[i] == (i-1)*10
+    end
+end
+
 
 @testset "cexp" begin
     fs = 8000
@@ -85,6 +94,17 @@ end
     end
 end
 
+
+@testset "Δ" begin
+    x = [1,1,2,3,4,5]
+    y = SpeechBox.Δ(x)
+    @test typeof(y) <: AbstractVector
+    @test length(y) == length(x) - 1
+    @test y[1] == 0
+    for i=2:length(y)
+        @test y[i] == 1
+    end
+end
 
 @testset "element_op" begin
     e = SpeechBox.element_op_spectrum("Base.log10")

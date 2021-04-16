@@ -31,17 +31,28 @@ end
 end
 
 
-@testset "lpc_freqz" begin
+@testset "lpc_response" begin
     fs = 16000
     nsam = 10000
-    ar,f,bw = SpeechBox.rand_allpole(fs, 1)
+    f = [1000, 5000]
+    bw = [200, 200]
+    ar = SpeechBox.allpole(f,bw;fs)
     x = filt(ar, SpeechBox.white_noise(nsam))
+
+    freqs = collect(0:100:fs/2)
+    lsp = SpeechBox.lpc_response(x,fs,SpeechBox.lpc_order(fs); frqs = freqs)
+
+    i,m = SpeechBox.findpeaks(lsp.components)
     
-    nfrqs = 10
-    frqs = [f; rand(nfrqs)*(fs/2)]
-    N = 4
-    h = SpeechBox.lpc_freqz(x,fs,N;frqs)
-    for i=2:length(h)
-        @test abs(h[1]) > abs(h[i])
-    end
+    @test typeof(lsp) == SpeechBox.spectrum
+    @test length(lsp.frqs) == length(freqs)
+    @test lsp.frqs[i[1]] == f[1]
+    @test lsp.frqs[i[2]] == f[2]
+
+    frames = framed_signal(signal,0.09,0.01)
+    lspec = lpc_response(frames, SpeechBox.lpc_order(signal.fs); frqs = freqs)
+
+    @test typeof(lspec) == SpeechBox.timefreq
+    @test size(lspec.components,1) == length(freqs)
+    @test size(lspec.components,2) == frames.num_signal_frames
 end

@@ -37,7 +37,11 @@ function melfcc(x::Array{<:AbstractFloat},fs::AbstractFloat;ncoef=13,nfilt=17,wi
     return melfcc(frames,ncoef=ncoef,nfilt=nfilt)
 end
 
+"""
+    melbankm(fs, npts[; nfilt = 17])
 
+Compute a matrix of triangular mel filter responses to multiply with a DFT spectrum given a sampling frequency `fs`, number of DFT points `npts` and optionally the number of equally spaced mel filters `nfilt`
+"""
 function melbankm(fs,npts;nfilt=17)
     mspace = SVector{nfilt}(range(0,stop=frq2mel(fs/2),length = nfilt)) #equally spaced points in mel scale
     fspace = SVector{nfilt}(mel2frq.(mspace)) #equal mel spaced points mapped back to Hz
@@ -54,6 +58,18 @@ function melbankm(fs,npts;nfilt=17)
     return fbank
 end
 
+
+"""
+    frq2mel(f)
+
+Convert frequency `f` from Hz to mel scale
+"""
 frq2mel(frq) = log(1+frq/700)*1127.01048;
 
+
+"""
+    mel2frq(m)
+
+Convert frequency `m` from mel scale to Hz
+"""
 mel2frq(mel) = 700*(exp(mel/1127.01048)-1);

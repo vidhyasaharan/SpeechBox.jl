@@ -13,7 +13,7 @@ function dftspec(signal::speech_waveform;wtype::String="hanning")
     win = window(flen;wtype=wtype)
     cmplx_spectrum = rfft(x.*win)
     nfrqs = length(cmplx_spectrum)
-    frqs = range(0, signal.fs/2, length = nfrqs)
+    frqs = collect(range(0, signal.fs/2, length = nfrqs))
     return spectrum(signal,cmplx_spectrum,frqs,"Complex Fourier Spectrum")
 end
 
@@ -92,6 +92,7 @@ Compute the periodogram of a signal in array `x` with sampling frequency `fs` at
 """
 function periodogram(x::Array{Float,1},fs::Number,frqs::Array{T,1};wtype::String="hanning") where T<:Number
     #Choose window - options are rectangle, hamming or hanning (function default is hanning)
+    frqs = convert(Vector{Float},frqs)
     flen = length(x)
     win = window(flen;wtype=wtype)
     proj_matrix = cexp_proj_matrix(frqs,fs,flen)

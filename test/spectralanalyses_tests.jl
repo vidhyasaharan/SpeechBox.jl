@@ -18,14 +18,14 @@ end
 
     tfrqs = [100, 500, 705, 1024, 1800, 2100, 3401, 3700]
     spec = periodogram(xx,fs,tfrqs)
-    @test typeof(spec) == SpeechBox.spectrum
+    @test typeof(spec) == SpeechBox.spectrum{Float}
     pgram  = spec.components
     @test length(pgram) == length(tfrqs)
     mmag, mfindx = findmax(pgram)
     @test tfrqs[mfindx] == frq
 
     spec = periodogram(xx,fs;fmin=8,fmax=4000)
-    @test typeof(spec) == SpeechBox.spectrum
+    @test typeof(spec) == SpeechBox.spectrum{Float}
     pgram = spec.components
     mmag, mfindx = findmax(pgram)
     frqs = SpeechBox.logfreq_array(;fmin=8,fmax=4000)

@@ -6,12 +6,12 @@ Store the signal in array `x` with sampling rate `fs` as a speech waveform objec
 
 """
 struct speech_waveform
-    x::Array{Float,1}
+    x::Vector{Float}
     fs::Float
 end
 
 #Constructor for speech_waveform object, taking a Vector or Matrix and sampling frequency as input
-function speech_waveform(x::Array{Float},fs::Number)
+function speech_waveform(x::AbstractArray{<:AbstractFloat},fs::Number)
     fs = convert(Float,fs)::Float
     if(eltype(x)!=Float)
         error("Input signal is not Float, check if conversion is required")
@@ -29,6 +29,7 @@ function speech_waveform(x::Array{Float},fs::Number)
     else
         signal = x
     end
+    signal = convert(Vector{Float},signal)
     return speech_waveform(signal,fs)
 end
 
@@ -71,6 +72,7 @@ end
 #Union types for real or complex vector/matrix to denote spectral and spectro-temporal representations
 RorC_Vector = Union{Array{Float,1},Array{Complex{Float},1}}
 RorC_Matrix = Union{Array{Float,2},Array{Complex{Float},2}}
+RorC = Union{Float,Complex{Float}}
 
 #Spectrum object to hold any form of frequency components of a signal
 """
@@ -79,14 +81,14 @@ RorC_Matrix = Union{Array{Float,2},Array{Complex{Float},2}}
 
 Construct a spectrum object to hold the spectral elements in `components` corresponding to the speech\\_waveform `signal` with frequency indices `frqs` and stores `title`
 """
-struct spectrum
+struct spectrum{T<:RorC}
     signal::speech_waveform
-    components::RorC_Vector
-    frqs::Array{Float,1}
+    components::Vector{T}
+    frqs::Vector{Float}
     title::AbstractString
 end
 
-spectrum(signal::speech_waveform,components::RorC_Vector,frqs::Vector{Float}) = spectrum(signal,components,frqs,"")
+spectrum(signal::speech_waveform,components::Vector{<:RorC},frqs::Vector{Float}) = spectrum(signal,components,frqs,"")
 
 
 #Spectrum object to hold any form of spectro-temporal components of a signal

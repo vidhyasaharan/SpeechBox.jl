@@ -1,8 +1,10 @@
 # `Data Structures`
 
-SpeechBox.jl defines 4 structs:
+The speech processing routines in SpeechBox.jl take as input either a speech signal or frames of a speech signal. Two structs are defined for this purpose:
  - `speech_waveform` - Speech waveform in vector and sampling rate
  - `framed_signal` - Speech waveform as a vector with sampling rate and information for framing the signal
+
+The spectral analyses routines compute the spectral components of a signal (or frame) and the following structs are defined to store this information. Plotting recipes are provided for these structs and `plot()` from Plots.jl can be called on these structs to plot the information contained in them.
  - `spectrum` - Speech waveform along with spectral components, frequency indices corresponding to spectral components and a title
  - `timefreq` - Speech waveform with framing information, time-frequency components, frequency and time indices and a title
 
@@ -12,7 +14,7 @@ Stores a time domain waveform in a vector `x` along with the sampling rate `fs`.
 
 ```julia
 struct speech_waveform
-    x::Array{Float,1}
+    x::Vector{Float}
     fs::Float
 end
 ```
@@ -44,10 +46,10 @@ framed_signal
 Stores a `speech_waveform`, an array of spectral components (`components`), a vector of frequency indices corresponding to each spectral component (`frqs`), and a title string (`title`).
 
 ```julia
-struct spectrum
+struct spectrum{T<:RorC}
     signal::speech_waveform
-    components::RorC_Vector
-    frqs::Array{Float,1}
+    components::Vector{T}
+    frqs::Vector{Float}
     title::AbstractString
 end
 ```

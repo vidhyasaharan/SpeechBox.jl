@@ -44,7 +44,7 @@ end
 
     i,m = SpeechBox.findpeaks(lsp.components)
     
-    @test typeof(lsp) == SpeechBox.spectrum
+    @test typeof(lsp) == SpeechBox.spectrum{Float}
     @test length(lsp.frqs) == length(freqs)
     @test lsp.frqs[i[1]] == f[1]
     @test lsp.frqs[i[2]] == f[2]

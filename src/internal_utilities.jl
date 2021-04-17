@@ -34,6 +34,12 @@ end
 #Generate complex negative exponential sequence with norm = 1
 cexp(f::Number,fs::Number,N::Int) = (1/sqrt(N))*exp.(-2π*im*(f/fs)*(1:N))
 
+function cexp1(f::Float64,fs::Float64,N::Int)
+    # f = convert(Float,f)::Float
+    # fs = convert(Float,fs)::Float
+    return (1/sqrt(N))*exp.(-2π*im*(f/fs)*(1:N))
+end
+
 #Generate projection matrix for complex exponential signals/vectors
 function cexp_proj_matrix(frqs::Array{T,1},fs::Number,N::Int) where T<:Number
     nfrqs = length(frqs)

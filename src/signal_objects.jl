@@ -11,8 +11,8 @@ struct speech_waveform
 end
 
 #Constructor for speech_waveform object, taking a Vector or Matrix and sampling frequency as input
-function speech_waveform(x::Array,fs::Number)
-    fs = convert(Float,fs)
+function speech_waveform(x::Array{Float},fs::Number)
+    fs = convert(Float,fs)::Float
     if(eltype(x)!=Float)
         error("Input signal is not Float, check if conversion is required")
     end

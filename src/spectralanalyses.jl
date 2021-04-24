@@ -81,6 +81,65 @@ end
 
 
 
+function periodogram_mul(x::Array{Float,1},fs::Number,frqs::Array{T,1};wtype::String="hanning") where T<:Number
+    #Choose window - options are rectangle, hamming or hanning (function default is hanning)
+    frqs = convert(Vector{Float},frqs)
+    flen = length(x)
+    win = window(flen;wtype=wtype)
+    nfrqs = length(frqs)
+    ip = reshape(x.*win,flen,1)
+    proj_matrix = cexp_proj_matrix(frqs,fs,flen)
+    proj = zeros(Complex{Float},nfrqs,1)
+    A_mul_B!(proj,proj_matrix,ip)
+    signal = speech_waveform(x,fs)
+    return spectrum(signal,abs2.(proj[:]),frqs,"Periodogram")
+end
+
+
+function periodogram_avx(x::Array{Float,1},fs::Number,frqs::Array{T,1};wtype::String="hanning") where T<:Number
+    #Choose window - options are rectangle, hamming or hanning (function default is hanning)
+    frqs = convert(Vector{Float},frqs)
+    flen = length(x)
+    win = window(flen;wtype=wtype)
+    ip = x.*win
+    nfrqs = length(frqs)
+    proj = zeros(Float,nfrqs)
+    for i ∈ eachindex(proj)
+        proj[i] = abs2(dotavx(ip,cexp(frqs[i],fs,flen)))
+    end
+    signal = speech_waveform(x,fs)
+    return spectrum(signal,abs2.(proj),frqs,"Periodogram")
+end
+
+
+function periodogram_avx(x::Array{Float,1},fs::Number;wtype::String="hanning",fmin::Number=10,fmax::Number=fs/2)
+    #Choose window - options are rectangle, hamming or hanning (function default is hanning)
+    frqs = logfreq_array(;fmin = fmin,fmax = fmax)
+    return periodogram_avx(x,fs,frqs;wtype=wtype)
+end
+
+
+function periodogram_avx(sig_frames::framed_signal,frqs ;wtype::String="hanning")
+    flen = sig_frames.frame_length
+    nframes = sig_frames.num_signal_frames
+    fs = sig_frames.signal.fs
+    pspec = zeros(length(frqs),nframes)
+    nfrqs = length(frqs)
+    win = window(flen;wtype=wtype)
+
+    ce_array = collect(transpose(cexp_proj_matrix(frqs,fs,flen)))
+
+    for i in 1:nframes
+        frame = extract_frame(sig_frames,i)
+        ip = frame.*win
+        for j in 1:nfrqs
+            pspec[j,i] = abs2(dotavx(ip,ce_array[:,j]))
+        end
+    end
+    return timefreq(sig_frames,pspec,frqs)
+end
+
+
 #Periodogram estimated at provided frequncies - estimated by projecting onto complex exponentials and taking the square of the absolute value
 """
     periodogram(x, fs, frqs[; wtype="hanning"])

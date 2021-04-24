@@ -6,6 +6,7 @@ using StaticArrays
 using RecipesBase
 using Interpolations
 using Random
+using LoopVectorization
 # using LinearAlgebra
 # using SampledSignals
 

@@ -8,10 +8,7 @@ x, fs = wavread(joinpath(testdir,"King.wav"))
 frames = framed_signal(x,fs,0.09,0.01)
 frame = extract_frame(frames,11)
 
-ce = SpeechBox.cexp(100,fs,length(frame))
 
-@benchmark t1 = abs2(SpeechBox.dot_noavx(frame,ce))
-@benchmark t2 = abs2(SpeechBox.dotavx(frame,ce))
 
 
 fmin = 10

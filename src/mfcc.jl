@@ -43,9 +43,9 @@ end
 Compute a matrix of triangular mel filter responses to multiply with a DFT spectrum given a sampling frequency `fs`, number of DFT points `npts` and optionally the number of equally spaced mel filters `nfilt`
 """
 function melbankm(fs,npts;nfilt=17)
-    mspace = SVector{nfilt}(range(0,stop=frq2mel(fs/2),length = nfilt)) #equally spaced points in mel scale
-    fspace = SVector{nfilt}(mel2frq.(mspace)) #equal mel spaced points mapped back to Hz
-    cindx = SVector{nfilt}(Int.(round.(fspace*(npts-1)/(fs/2)).+1)) #Filter centre indices (first at 0, final at Fs/2)
+    mspace = range(0,stop=frq2mel(fs/2),length = nfilt) #equally spaced points in mel scale
+    fspace = mel2frq.(mspace) #equal mel spaced points mapped back to Hz
+    cindx = Int.(round.(fspace*(npts-1)/(fs/2)).+1) #Filter centre indices (first at 0, final at Fs/2)
     fbank = zeros(nfilt,npts);
     #define triangular filters for 2 to nfilt-1
     for i=2:nfilt-1

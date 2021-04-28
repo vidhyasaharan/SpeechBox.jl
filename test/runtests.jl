@@ -18,6 +18,7 @@ x = x[:]
 signal = speech_waveform(x,fs)
 
 include("internal_utilities_tests.jl")
+include("loopvectorized_utilities_tests.jl")
 include("signal_objects_tests.jl")
 include("spectralanalyses_tests.jl")
 include("mfcc_tests.jl")

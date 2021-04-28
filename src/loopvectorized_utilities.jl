@@ -19,6 +19,18 @@ function dotavx(a::AbstractVector{T}, cb::AbstractVector{Complex{T}}) where {T}
     return Complex(re, im)
 end
 
+#Dot product using LoopVectorization (real ⋅ complex)
+function dotavx(ca::AbstractVector{Complex{T}}, b::AbstractVector{T}) where {T}
+    re = zero(T)
+    im = zero(T)
+    a = reinterpret(reshape, T, ca)
+    @avx for i ∈ eachindex(b)
+        re += a[1,i] * b[i]
+        im += - (a[2,i] * b[i])
+    end
+    return Complex(re, im)
+end
+
 #Dot product using LoopVectorization (complex ⋅ complex)
 function dotavx(ca::AbstractVector{Complex{T}}, cb::AbstractVector{Complex{T}}) where {T}
     re = zero(T)

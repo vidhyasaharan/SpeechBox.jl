@@ -23,6 +23,7 @@ include("spectralanalyses.jl")
 include("mfcc.jl")
 include("vad.jl")
 include("lpc.jl")
+include("spectral_comb.jl")
 include("plot_recipes.jl")
 
 

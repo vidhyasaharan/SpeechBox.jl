@@ -1,6 +1,6 @@
 using WAV
 using Plots; plotly()
-using DSP
+# using DSP
 
 testdir = normpath(joinpath(dirname(pathof(SpeechBox)),"../test/"))
 x, fs = wavread(joinpath(testdir,"King.wav"))
@@ -13,6 +13,8 @@ h = SpeechBox.lpc_response(frame,fs)
 lpspec = SpeechBox.lpc_response(frames)
 
 mag = SpeechBox.magspec(frame,fs)
+
+@btime pe = SpeechBox.generate_pitch_estimate(frame,fs)
 
 # msp = specgram(frames)
 

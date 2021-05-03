@@ -81,22 +81,17 @@ end
 
 
 
-function periodogram_mul(x::Array{Float,1},fs::Number,frqs::Array{T,1};wtype::String="hanning") where T<:Number
-    #Choose window - options are rectangle, hamming or hanning (function default is hanning)
-    frqs = convert(Vector{Float},frqs)
-    flen = length(x)
-    win = window(flen;wtype=wtype)
-    nfrqs = length(frqs)
-    ip = reshape(x.*win,flen,1)
-    proj_matrix = cexp_proj_matrix(frqs,fs,flen)
-    proj = zeros(Complex{Float},nfrqs,1)
-    A_mul_B!(proj,proj_matrix,ip)
-    signal = speech_waveform(x,fs)
-    return spectrum(signal,abs2.(proj[:]),frqs,"Periodogram")
-end
 
+#Periodogram estimated at provided frequncies - estimated by projecting onto complex exponentials and taking the square of the absolute value
+"""
+    periodogram(x, fs, frqs[; wtype="hanning"])
+    periodogram(x, fs [;wtype="hanning"[, fmin=10[, fmax=fs/2]]])
+    periodogram(sig_frames::framed_signal, frqs[; wtype="hanning"])
+    periodogram(sig_frames::framed_signal[; wtype="hanning"[, fmin=10[, fmax=sig_frames.signal.fs/2]]])
 
-function periodogram_avx(x::Array{Float,1},fs::Number,frqs::Array{T,1};wtype::String="hanning") where T<:Number
+Compute the periodogram of a signal in array `x` with sampling frequency `fs` at frequencies specified in `frqs` or frequencies equally spaced on the log-scale between `fmin` and `fmax` as the L2 norm of the inner product between a complex exponential and `x`. When the input is a framed signal object `sig_frames`, the periodogram for each frame is computed.
+"""
+function periodogram(x::Array{Float,1},fs::Number,frqs::Array{T,1};wtype::String="hanning") where T<:Number
     #Choose window - options are rectangle, hamming or hanning (function default is hanning)
     frqs = convert(Vector{Float},frqs)
     flen = length(x)
@@ -112,14 +107,14 @@ function periodogram_avx(x::Array{Float,1},fs::Number,frqs::Array{T,1};wtype::St
 end
 
 
-function periodogram_avx(x::Array{Float,1},fs::Number;wtype::String="hanning",fmin::Number=10,fmax::Number=fs/2)
+function periodogram(x::Array{Float,1},fs::Number;wtype::String="hanning",fmin::Number=10,fmax::Number=fs/2)
     #Choose window - options are rectangle, hamming or hanning (function default is hanning)
     frqs = logfreq_array(;fmin = fmin,fmax = fmax)
-    return periodogram_avx(x,fs,frqs;wtype=wtype)
+    return periodogram(x,fs,frqs;wtype=wtype)
 end
 
 
-function periodogram_avx(sig_frames::framed_signal,frqs ;wtype::String="hanning")
+function periodogram(sig_frames::framed_signal,frqs ;wtype::String="hanning")
     flen = sig_frames.frame_length
     nframes = sig_frames.num_signal_frames
     fs = sig_frames.signal.fs
@@ -139,49 +134,6 @@ function periodogram_avx(sig_frames::framed_signal,frqs ;wtype::String="hanning"
     return timefreq(sig_frames,pspec,frqs)
 end
 
-
-#Periodogram estimated at provided frequncies - estimated by projecting onto complex exponentials and taking the square of the absolute value
-"""
-    periodogram(x, fs, frqs[; wtype="hanning"])
-    periodogram(x, fs [;wtype="hanning"[, fmin=10[, fmax=fs/2]]])
-    periodogram(sig_frames::framed_signal, frqs[; wtype="hanning"])
-    periodogram(sig_frames::framed_signal[; wtype="hanning"[, fmin=10[, fmax=sig_frames.signal.fs/2]]])
-
-Compute the periodogram of a signal in array `x` with sampling frequency `fs` at frequencies specified in `frqs` or frequencies equally spaced on the log-scale between `fmin` and `fmax` as the L2 norm of the inner product between a complex exponential and `x`. When the input is a framed signal object `sig_frames`, the periodogram for each frame is computed.
-"""
-function periodogram(x::Array{Float,1},fs::Number,frqs::Array{T,1};wtype::String="hanning") where T<:Number
-    #Choose window - options are rectangle, hamming or hanning (function default is hanning)
-    frqs = convert(Vector{Float},frqs)
-    flen = length(x)
-    win = window(flen;wtype=wtype)
-    proj_matrix = cexp_proj_matrix(frqs,fs,flen)
-    proj = proj_matrix*(x.*win)
-    signal = speech_waveform(x,fs)
-    return spectrum(signal,abs2.(proj),frqs,"Periodogram")
-end
-
-
-#Wrapper function for periodogram over logarithmically spaced frequencies
-function periodogram(x::Array{Float,1},fs::Number;wtype::String="hanning",fmin::Number=10,fmax::Number=fs/2)
-    #Choose window - options are rectangle, hamming or hanning (function default is hanning)
-    frqs = logfreq_array(;fmin = fmin,fmax = fmax)
-    return periodogram(x,fs,frqs;wtype=wtype)
-end
-
-
-function periodogram(sig_frames::framed_signal,frqs ;wtype::String="hanning")
-    flen = sig_frames.frame_length
-    nframes = sig_frames.num_signal_frames
-    fs = sig_frames.signal.fs
-
-    pspec = zeros(length(frqs),nframes)
-    for i=1:nframes
-        frame = extract_frame(sig_frames,i)
-        temp = periodogram(frame,fs,frqs,wtype=wtype)
-        pspec[:,i] = temp.components
-    end
-    return timefreq(sig_frames,pspec,frqs)
-end
 
 function periodogram(sig_frames::framed_signal; wtype::String="hanning", fmin=10,fmax=sig_frames.signal.fs/2)
     frqs = logfreq_array(;fmin = fmin,fmax = fmax)

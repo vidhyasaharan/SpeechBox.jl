@@ -17,10 +17,22 @@ x, fs = wavread(joinpath(testdir,"King.wav"))
 x = x[:]
 signal = speech_waveform(x,fs)
 
-include("internal_utilities_tests.jl")
-include("loopvectorized_utilities_tests.jl")
-include("signal_objects_tests.jl")
-include("spectralanalyses_tests.jl")
-include("mfcc_tests.jl")
-include("vad_tests.jl")
-include("lpc_tests.jl")
+@testset verbose = true "SpeechBox" begin
+    @testset "utilities" begin 
+        include("internal_utilities_tests.jl")
+        include("loopvectorized_utilities_tests.jl")
+    end
+    @testset "structs" begin
+        include("signal_objects_tests.jl")
+    end
+    @testset "spectrum" begin 
+        include("spectralanalyses_tests.jl")
+        include("lpc_tests.jl")
+    end
+    @testset "vad" begin
+        include("vad_tests.jl")
+    end
+    @testset "MFCC" begin 
+        include("mfcc_tests.jl")
+    end   
+end

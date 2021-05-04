@@ -23,12 +23,13 @@ function generate_pitch_estimate(x::Vector{Float},fs::Number)
     frqs = logfreq_array(fmin = 1, fmax = fs/2, frq_per_octave = frq_per_octave)
     pd = periodogram(x,fs,frqs)
     h,z = generate_logfrq_pitch_comb(;frq_per_octave)
-    padded_pd = zeros(length(pd.components)+length(h)-1)
-    padded_pd[z:z+length(pd.components)-1] = log.(pd.components)
-    y = zeros(size(pd.components))
-    for i ∈ eachindex(y)
-        y[i] = SpeechBox.dotavx(padded_pd[i:i+length(h)-1],h)
-    end
+    y = SpeechBox.xcorr(log.(pd.components),h,z)
+    # padded_pd = zeros(length(pd.components)+length(h)-1)
+    # padded_pd[z:z+length(pd.components)-1] = log.(pd.components)
+    # y = zeros(size(pd.components))
+    # for i ∈ eachindex(y)
+    #     y[i] = SpeechBox.dotavx(padded_pd[i:i+length(h)-1],h)
+    # end
     f₀ = frqs[argmax(y)]
     return f₀
 end
@@ -40,3 +41,6 @@ function generate_logfrq_pitch_comb(frames::framed_signal)
     frqs = logfreq_array(fmin = 1, fmax = fs/2, frq_per_octave = frq_per_octave)
     pd = periodogram(frames,frqs)
 end
+
+
+

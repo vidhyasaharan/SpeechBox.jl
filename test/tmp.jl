@@ -1,5 +1,6 @@
 using WAV
-using Plots; plotly()
+using Plots
+using BenchmarkTools
 # using DSP
 
 testdir = normpath(joinpath(dirname(pathof(SpeechBox)),"../test/"))

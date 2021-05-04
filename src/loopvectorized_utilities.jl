@@ -1,7 +1,7 @@
 #Dot product using LoopVectorization (real ⋅ real)
 function dotavx(a::AbstractVector{T}, b::AbstractVector{T}) where {T}
     s = zero(T)
-    @avx for i ∈ eachindex(a,b)
+    @avx unroll=8 for i ∈ eachindex(a,b)
         s += a[i] * b[i]
     end
     return s
@@ -43,6 +43,23 @@ function dotavx(ca::AbstractVector{Complex{T}}, cb::AbstractVector{Complex{T}}) 
     end
     return Complex(re, im)
 end
+
+#Cross corrleation with zero padding (and using dotavx)
+"""
+    xcorr(x, h[, z=1])
+
+Computes the cross correlation between `x` and `h`, with the optional `z` indicating the position of the zero index of the array `h`. The output is of the same length as `x` and the cross correlation is computed with zero padding.
+"""
+function xcorr(x::Vector{Float},h::Vector{Float},z::Int=1)
+    padded_x = zeros(length(x)+length(h)-1)
+    padded_x[z:z+length(x)-1] = x
+    y = Vector{Float}(undef,length(x))
+    @inbounds for i ∈ eachindex(y)
+        y[i] = dotavx(padded_x[i:i+length(h)-1],h)
+    end
+    return y
+end
+
 
 #Matrix multiplcation (in place for resultnant matrix)
 function A_mul_B!(C::AbstractMatrix{T}, A::AbstractMatrix{T}, B::AbstractMatrix{T}) where {T}

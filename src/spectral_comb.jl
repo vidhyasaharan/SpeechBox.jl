@@ -16,30 +16,31 @@ function generate_logfrq_pitch_comb(;γ::Real = 1.8, K::Int = 5,  frq_per_octave
 end
 
 #Function to generate pitch estimates for one frame by convolving with comb filter in log freq domain
-function generate_pitch_estimate(x::Vector{Float},fs::Number)
-    frq_per_octave = 1000
+function xcorr_spectral_comb(x::Vector{Float},fs::Number)
+    frq_per_octave = 200
     # γ = 1.8
     # K = 5
-    frqs = logfreq_array(fmin = 1, fmax = fs/2, frq_per_octave = frq_per_octave)
+    frqs = logfreq_array(fmin = 10, fmax = fs/2, frq_per_octave = frq_per_octave)
     pd = periodogram(x,fs,frqs)
     h,z = generate_logfrq_pitch_comb(;frq_per_octave)
     y = SpeechBox.xcorr(log.(pd.components),h,z)
-    # padded_pd = zeros(length(pd.components)+length(h)-1)
-    # padded_pd[z:z+length(pd.components)-1] = log.(pd.components)
-    # y = zeros(size(pd.components))
-    # for i ∈ eachindex(y)
-    #     y[i] = SpeechBox.dotavx(padded_pd[i:i+length(h)-1],h)
-    # end
-    f₀ = frqs[argmax(y)]
-    return f₀
+    return y
 end
 
 
 #Function to generate a sequence of pitch estimates, one per frame, using a comb filter in the log freq domain
-function generate_logfrq_pitch_comb(frames::framed_signal)
-    frq_per_octave = 1000
-    frqs = logfreq_array(fmin = 1, fmax = fs/2, frq_per_octave = frq_per_octave)
+function xcorr_spectral_comb(frames::framed_signal)
+    frq_per_octave = 200
+    fs = frames.signal.fs
+    frqs = logfreq_array(fmin = 10, fmax = fs/2, frq_per_octave = frq_per_octave)
+    h,z = generate_logfrq_pitch_comb(;frq_per_octave)
     pd = periodogram(frames,frqs)
+    lpd = log.(pd.components)::Matrix{Float}
+    y = zeros(Float,size(lpd))
+    for i ∈ axes(y,2)
+        y[:,i] = xcorr(lpd[:,i],h,z)
+    end
+    return y
 end
 
 

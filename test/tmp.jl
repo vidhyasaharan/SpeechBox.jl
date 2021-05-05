@@ -15,7 +15,7 @@ lpspec = SpeechBox.lpc_response(frames)
 
 mag = SpeechBox.magspec(frame,fs)
 
-@btime pe = SpeechBox.generate_pitch_estimate(frame,fs)
+@benchmark y = SpeechBox.xcorr_spectral_comb(frames)
 
 # msp = specgram(frames)
 

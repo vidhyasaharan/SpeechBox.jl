@@ -88,8 +88,12 @@ struct spectrum{T<:RorC}
     title::AbstractString
 end
 
-spectrum(signal::speech_waveform,components::Vector{<:RorC},frqs::Vector{Float}) = spectrum(signal,components,frqs,"")
+function spectrum(signal::speech_waveform, components::Vector{<:RorC},frqs::Vector{<:Real},title::AbstractString)
+    frqs = Float.(frqs)
+    return spectrum(signal,components,frqs,title)
+end
 
+spectrum(signal::speech_waveform,components::Vector{<:RorC},frqs::Vector{<:Real}) = spectrum(signal,components,frqs,"")
 
 #Spectrum object to hold any form of spectro-temporal components of a signal
 """

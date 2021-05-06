@@ -93,7 +93,34 @@ Compute the periodogram of a signal in array `x` with sampling frequency `fs` at
 """
 function periodogram(x::Array{Float,1},fs::Number,frqs::Array{T,1};wtype::String="hanning") where T<:Number
     #Choose window - options are rectangle, hamming or hanning (function default is hanning)
-    frqs = convert(Vector{Float},frqs)
+    components = periodogram_components(x,fs,frqs;wtype)
+    signal = speech_waveform(x,fs)
+    return spectrum(signal,components,frqs,"Periodogram")
+end
+
+function periodogram(x::Array{Float,1},fs::Number;wtype::String="hanning",fmin::Number=10,fmax::Number=fs/2)
+    #Choose window - options are rectangle, hamming or hanning (function default is hanning)
+    frqs = logfreq_array(;fmin = fmin,fmax = fmax)
+    return periodogram(x,fs,frqs;wtype=wtype)
+end
+
+function periodogram(sig_frames::framed_signal,frqs ;wtype::String="hanning")
+    pspec = periodogram_components(sig_frames, frqs; wtype)
+    return timefreq(sig_frames,pspec,frqs)
+end
+
+function periodogram(sig_frames::framed_signal; wtype::String="hanning", fmin=10,fmax=sig_frames.signal.fs/2)
+    frqs = logfreq_array(;fmin = fmin,fmax = fmax)
+    return periodogram(sig_frames, frqs, wtype = wtype)
+end
+
+
+
+#Periodogram components estimated at provided frequncies - estimated by projecting onto complex exponentials and taking the square of the absolute value
+function periodogram_components(x::Vector{Float},fs::Real,frqs::Vector{<:Real};wtype::String="hanning")
+    #Choose window - options are rectangle, hamming or hanning (function default is hanning)
+    frqs = Float.(frqs)::Vector{Float}
+    fs = Float(fs)::Float
     flen = length(x)
     win = window(flen;wtype=wtype)
     ip = x.*win
@@ -102,23 +129,21 @@ function periodogram(x::Array{Float,1},fs::Number,frqs::Array{T,1};wtype::String
     for i ∈ eachindex(proj)
         proj[i] = abs2(dotavx(ip,cexp(frqs[i],fs,flen)))
     end
-    signal = speech_waveform(x,fs)
-    return spectrum(signal,abs2.(proj),frqs,"Periodogram")
+    return abs2.(proj)
 end
 
-
-function periodogram(x::Array{Float,1},fs::Number;wtype::String="hanning",fmin::Number=10,fmax::Number=fs/2)
+function periodogram_components(x::Array{Float,1},fs::Real;wtype::String="hanning",fmin::Real=10,fmax::Real=fs/2)
     #Choose window - options are rectangle, hamming or hanning (function default is hanning)
     frqs = logfreq_array(;fmin = fmin,fmax = fmax)
-    return periodogram(x,fs,frqs;wtype=wtype)
+    return periodogram_components(x,fs,frqs;wtype=wtype)
 end
 
-
-function periodogram(sig_frames::framed_signal,frqs ;wtype::String="hanning")
+function periodogram_components(sig_frames::framed_signal, frqs ;wtype::String="hanning")
+    frqs = Float.(frqs)
     flen = sig_frames.frame_length
     nframes = sig_frames.num_signal_frames
     fs = sig_frames.signal.fs
-    pspec = zeros(length(frqs),nframes)
+    pspec = Matrix{Float}(undef,length(frqs),nframes)
     nfrqs = length(frqs)
     win = window(flen;wtype=wtype)
 
@@ -131,11 +156,10 @@ function periodogram(sig_frames::framed_signal,frqs ;wtype::String="hanning")
             pspec[j,i] = abs2(dotavx(ip,ce_array[:,j]))
         end
     end
-    return timefreq(sig_frames,pspec,frqs)
+    return pspec
 end
 
-
-function periodogram(sig_frames::framed_signal; wtype::String="hanning", fmin=10,fmax=sig_frames.signal.fs/2)
+function periodogram_components(sig_frames::framed_signal; wtype::String="hanning", fmin=10,fmax=sig_frames.signal.fs/2)
     frqs = logfreq_array(;fmin = fmin,fmax = fmax)
-    return periodogram(sig_frames, frqs, wtype = wtype)
+    return periodogram_components(sig_frames, frqs, wtype = wtype)
 end

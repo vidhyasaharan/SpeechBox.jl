@@ -24,6 +24,7 @@ include("mfcc.jl")
 include("vad.jl")
 include("lpc.jl")
 include("spectral_comb.jl")
+include("pitch_spectral_comb.jl")
 include("plot_recipes.jl")
 
 

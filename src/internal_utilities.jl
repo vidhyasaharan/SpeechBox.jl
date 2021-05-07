@@ -111,6 +111,18 @@ function resample(signal::speech_waveform, fs_new::Number)
     return speech_waveform(rx,fs)
 end
 
+#Index of closest frequency in an array to a given frequency
+frqindex(f::Float, frqs::Vector{Float}) = argmin(abs.(frqs.-f))
+
+function frqindex(f::Vector{Float}, frqs::Vector{Float})
+    findx = Vector{Int}(undef,length(f))
+    for i in eachindex(f)
+        findx[i] = frqindex(f[i],frqs)
+    end
+    return findx
+end
+
+
 #Zero pad a vector
 zero_pad(x::Vector, pad_len::Int) = [zeros(pad_len); x; zeros(pad_len)]
 

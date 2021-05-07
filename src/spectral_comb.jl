@@ -40,7 +40,7 @@ function xcorr_spectral_comb(frames::framed_signal)
     for i ∈ axes(y,2)
         y[:,i] = xcorr(lpd[:,i],h,z)
     end
-    return y
+    return y, frqs
 end
 
 

@@ -4,6 +4,38 @@ function generate_ticks(label_values::Vector{Float}, nticks::Int)
     return tks
 end
 
+#Plot recipe for plotting pitch
+@recipe function f(p::pitch_timefreq; nxticks = 8, nyticks = 8)
+    msp = p.msp
+    frqs = msp.frqs
+    time = msp.time
+    xtks = generate_ticks(msp.time,nxticks)
+    ytks = generate_ticks(msp.frqs,nyticks)
+
+    @series begin
+        seriestype := :heatmap
+        xticks := xtks
+        yticks := ytks
+        msp.components
+    end
+
+    @series begin
+        seriestype := :line
+        xticks := xtks
+        seriescolor := :green
+        legend := false
+        xguide := "Time (sec)"
+        yguide := "Frequency (Hz)"
+        if(~isnothing(msp.title))
+            title := msp.title
+        end
+        p.pindx
+    end
+
+end
+
+
+
 #Plot recipe for plotting spectrogram
 @recipe function f(msp::SpeechBox.timefreq; nxticks = 8, nyticks = 8)
     frqs = msp.frqs

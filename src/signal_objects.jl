@@ -140,3 +140,27 @@ function timefreq(frames::framed_signal, components::RorC_Matrix, frqs::Vector{F
 end
 
 timefreq(frames::framed_signal, components::RorC_Matrix, frqs::Vector{Float}) =timefreq(frames,components,frqs,nothing)
+
+
+
+#Object to hold pitch contour and spectrogram to allow plotting
+
+struct pitch_timefreq
+    pitch::Vector{Float}
+    pindx::Vector{Float}
+    msp::timefreq
+end
+
+function pitch_timefreq(pitch::Vector{Float}, msp::timefreq)
+    if(length(pitch)==size(msp.components,2))
+        pindex = frqindex(pitch,msp.frqs)
+        return pitch_timefreq(pitch, pindex, msp)
+    end
+end
+
+function pitch_timefreq(pitch::Vector{Float}, frames::framed_signal)
+    if(length(pitch)==frames.num_signal_frames)
+        msp = specgram(frames)
+        return pitch_timefreq(pitch, amp2db(msp))
+    end
+end

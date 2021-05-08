@@ -153,7 +153,13 @@ end
 
 function pitch_timefreq(pitch::Vector{Float}, msp::timefreq)
     if(length(pitch)==size(msp.components,2))
-        pindex = frqindex(pitch,msp.frqs)
+        pindex = Vector{Float}(undef,length(pitch))
+        fill!(pindex,NaN)
+        for i ∈ eachindex(pitch)
+            if(~isnan(pitch[i]))
+                pindex[i] = Float(frqindex(pitch[i],msp.frqs))
+            end
+        end
         return pitch_timefreq(pitch, pindex, msp)
     end
 end

@@ -1,7 +1,7 @@
+using SpeechBox
 using WAV
 using Plots
 using BenchmarkTools
-# using DSP
 
 testdir = normpath(joinpath(dirname(pathof(SpeechBox)),"../test/"))
 x, fs = wavread(joinpath(testdir,"King.wav"))

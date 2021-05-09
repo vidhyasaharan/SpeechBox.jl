@@ -44,6 +44,17 @@ function dotavx(ca::AbstractVector{Complex{T}}, cb::AbstractVector{Complex{T}}) 
     return Complex(re, im)
 end
 
+
+#L2 Norm using LoopVectorization (real)
+function dotavx(a::AbstractVector{T}) where {T}
+    s = zero(T)
+    @avx unroll=8 for i ∈ eachindex(a)
+        s += a[i] * a[i]
+    end
+    return s
+end
+
+
 #Cross corrleation with zero padding (and using dotavx)
 """
     xcorr(x, h[, z=1])

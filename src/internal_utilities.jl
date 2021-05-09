@@ -64,6 +64,18 @@ function Δ(x::Vector)
 end
 
 
+#Local peaks/maximas sorted by magnitude
+function findpeaks_sorted(x::Vector; min_dist::Int = 2, num_peaks::Int = 0)
+    ind, mag = findpeaks(x;min_dist)
+    si = sortperm(mag, rev=true)
+    if((num_peaks>0)&&(num_peaks<length(mag)))
+        si = si[1:num_peaks]
+    end
+    return ind[si], mag[si]
+end
+
+
+
 #Find local peaks/maximas in a sequence
 function findpeaks(x::Vector; min_dist::Int = 2)
     ind = Int[]

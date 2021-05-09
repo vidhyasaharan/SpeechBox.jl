@@ -12,3 +12,11 @@ frame = extract_frame(frames,11)
 msp = SpeechBox.specgram(frames)
 pp = SpeechBox.pitch_spec_comb(frames)
 
+cr, frqs = SpeechBox.xcorr_spectral_comb(frames)
+h,z = SpeechBox.generate_logfrq_pitch_comb(;frq_per_octave=200)
+pd = SpeechBox.periodogram(frames,frqs)
+lpd = log.(pd.components)
+
+ii,mm = SpeechBox.findpeaks_sorted(cr[:,115])
+p = plot(cr[:,115])
+plot!(p,ii,mm, seriestype=:scatter)

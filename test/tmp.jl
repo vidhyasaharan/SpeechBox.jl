@@ -17,6 +17,7 @@ h,z = SpeechBox.generate_logfrq_pitch_comb(;frq_per_octave=200)
 pd = SpeechBox.periodogram(frames,frqs)
 lpd = log.(pd.components)
 
-ii,mm = SpeechBox.findpeaks_sorted(cr[:,115])
-p = plot(cr[:,115])
+fnum = 145
+ii,mm = SpeechBox.findpeaks_sorted(cr[:,fnum])
+p = plot(cr[:,fnum])
 plot!(p,ii,mm, seriestype=:scatter)

@@ -34,5 +34,8 @@ signal = speech_waveform(x,fs)
     end
     @testset "MFCC" begin 
         include("mfcc_tests.jl")
+    end
+    @testset "Spectral Comb" begin
+        include("spectral_comb_tests.jl")
     end   
 end

@@ -155,7 +155,14 @@ ar_process(a::Vector, dur::Number, fs::Number) = ar_process(a,dur2len(dur,fs))
 #Infer number of samples from duration and sampling rate
 dur2len(dur::Number, fs::Number) = Int(round(dur*fs))
 
+#Generate impulse train
+function impulse_train(period::Int, len::Int)
+    x = zeros(Float,len)
+    x[1:period:end] .= 1
+    return x
+end
 
+impulse_train(f₀::Real, dur::Real, fs::Real) = impulse_train(Int(round(fs/f₀)), Int(round(dur*fs)))
 
 function element_op_spectrum(func::AbstractString)
     me = Expr(:call, :map, Meta.parse(func), :(sp.components))

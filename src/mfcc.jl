@@ -1,3 +1,21 @@
+"""
+    melfcc(frames; nfilt=17, ncoeff=13)
+    melfcc(signal; nfilt=17, ncoeff=13, wind_dur=0.02, win_shift=0.01)
+    melfcc(x, fs; nfilt=17, ncoeff=13, wind_dur=0.02, win_shift=0.01)
+
+Compute a vector of mel frequency cepstral coefficients for each frame of the input signal
+# Arguments
+- `frames`: a `framed_signal` object that holds the input signal and details of frames
+- `signal`: a `speech_waveform` object holding the input speech waveform
+- `x`: an array holding input speech signal
+- `fs`: sampling rate
+- `nfilt`: number of triangular mel filters used in the MFCC extraction [default=17]
+- `ncoeff`: number of desired MFCC coefficients (must be less than `nfilt`) including ``C\\_0`` [default=13]
+- `win_dur`: duration of speech frame in secs [default=0.02]
+- `win_shift`: time interval between consecutive windows in secs [default=0.01]
+"""
+
+
 function melfcc(frames::framed_signal;ncoef=13,nfilt=17)
     # frames = framed_signal(x,win_dur,win_shift)
     fs = frames.signal.fs

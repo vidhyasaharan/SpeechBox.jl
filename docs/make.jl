@@ -10,7 +10,8 @@ makedocs(
             "speechframing.md",
             "vad.md",
             "spectralanalyses.md",
-            "lpc.md"
+            "lpc.md",
+            "mfcc.md"
         ],
     ],
 )

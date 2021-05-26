@@ -21,7 +21,7 @@ end
 function lpc_freqz(x::Array{Float,1}, fs::Number, N::Int = lpc_order(fs); frqs::Array{T,1} = linfreq_array(fmax = fs/2, nfrqs = length(x))) where T<:Number
     a = lpc(x,N)
     filter = DSP.Filters.PolynomialRatio([1],a)
-    h = DSP.freqz(filter, frqs, fs)
+    h = DSP.freqresp(filter, frqs * ((2pi) / fs))
     return h
 end
 

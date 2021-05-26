@@ -27,8 +27,8 @@ end
 
 #Compute the LPC/AR model magnitude response given a dicrete-time signal and store in spectrum object
 """
-    lpc_response(x, fs [, N = round(fs/1000)+2 [; frqs = linfreq_array(0, fs/2, length(x))]])
-    lpc_response(frames [, N = round(fs/1000)+2 [; frqs = linfreq_array(0, fs/2, length(x))]])
+    lpc_response(x, fs[, N = round(fs/1000)+2 ]; frqs = linfreq_array(0, fs/2, length(x)))
+    lpc_response(frames[, N = round(fs/1000)+2 ]; frqs = linfreq_array(0, fs/2, length(x)))
 
 Compute the magnitude response of the Linear Predictive Coding (LPC) / Autoregressive (AR) filter model (of order `N`) of signal in array `x` with sampling rate `fs` at frequencies specified in `frqs`.
 When the input is a framed signal `frames`, the magnitude response of the LPC/AR filter model in each frame is computed and concatenated to form an LPC spectrogram.

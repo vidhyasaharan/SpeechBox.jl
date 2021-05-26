@@ -1,4 +1,4 @@
-# `Spectral Analyses`
+# Spectral Analyses
 
 Both spectral and Spectro-temporal analyses routines are included and listed below based on analyses techniques:
 - *Fourier Spectrum* - Spectral analyses based on DFT (Discrete Fourier Transform)

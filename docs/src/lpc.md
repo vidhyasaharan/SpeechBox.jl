@@ -1,4 +1,4 @@
-# `LPC Analyses`
+# LPC Analyses
 
 Linear Predictive Coding (LPC) is based on the linear all-pole vocal tract filter model. It assumes short frames of speech can be modelled as an autoregressive (AR) process. The coefficients of the corresponding all-pole model (AR model parameters) are inferred using the Burg method. The following functions are provided:
 

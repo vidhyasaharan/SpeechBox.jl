@@ -1,4 +1,4 @@
-# `Data Structures`
+# Data Structures
 
 The speech processing routines in SpeechBox.jl take as input either a speech signal or frames of a speech signal. Two structs are defined for this purpose:
  - `speech_waveform` - Speech waveform in vector and sampling rate

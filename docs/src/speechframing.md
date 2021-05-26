@@ -1,4 +1,4 @@
-# `Speech Frames`
+# Speech Frames
 
 Two basic functions are provided to manipulate speech frames:
 - `extract_frame` - Extract desired frame from a [`framed_signal`](@ref) object

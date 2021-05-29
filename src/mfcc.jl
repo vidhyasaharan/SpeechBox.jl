@@ -14,8 +14,6 @@ Compute a vector of mel frequency cepstral coefficients for each frame of the in
 - `win_dur`: duration of speech frame in secs [default=0.02]
 - `win_shift`: time interval between consecutive windows in secs [default=0.01]
 """
-
-
 function melfcc(frames::framed_signal;ncoef=13,nfilt=17)
     # frames = framed_signal(x,win_dur,win_shift)
     fs = frames.signal.fs

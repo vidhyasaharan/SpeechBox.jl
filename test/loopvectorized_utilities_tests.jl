@@ -21,5 +21,5 @@ end
     @test typeof(y) == Vector{Float}
     @test length(y) == length(x)
     @test argmax(y) == hstart + z - 1
-    @test maximum(y) == SpeechBox.dotavx(h)
+    @test maximum(y) ≈ SpeechBox.dotavx(h)
 end

@@ -1,7 +1,7 @@
 #Dot product using LoopVectorization (real ⋅ real)
 function dotavx(a::AbstractVector{T}, b::AbstractVector{T}) where {T}
     s = zero(T)
-    @avx unroll=8 for i ∈ eachindex(a,b)
+    @turbo for i ∈ eachindex(a,b)
         s += a[i] * b[i]
     end
     return s
@@ -12,7 +12,7 @@ function dotavx(a::AbstractVector{T}, cb::AbstractVector{Complex{T}}) where {T}
     re = zero(T)
     im = zero(T)
     b = reinterpret(reshape, T, cb)
-    @avx for i ∈ eachindex(a)
+    @turbo for i ∈ eachindex(a)
         re += a[i] * b[1,i]
         im += a[i] * b[2,i]
     end
@@ -24,7 +24,7 @@ function dotavx(ca::AbstractVector{Complex{T}}, b::AbstractVector{T}) where {T}
     re = zero(T)
     im = zero(T)
     a = reinterpret(reshape, T, ca)
-    @avx for i ∈ eachindex(b)
+    @turbo for i ∈ eachindex(b)
         re += a[1,i] * b[i]
         im += - (a[2,i] * b[i])
     end
@@ -37,7 +37,7 @@ function dotavx(ca::AbstractVector{Complex{T}}, cb::AbstractVector{Complex{T}}) 
     im = zero(T)
     a = reinterpret(reshape, T, ca)
     b = reinterpret(reshape, T, cb)
-    @avx for i ∈ axes(a,2) #Conjugate(a) × b
+    @turbo for i ∈ axes(a,2) #Conjugate(a) × b
         re += (a[1,i] * b[1,i]) + (a[2,i] * b[2,i])
         im += (a[1,i] * b[2,i]) - (a[2,i] * b[1,i])
     end
@@ -48,7 +48,7 @@ end
 #L2 Norm using LoopVectorization (real)
 function dotavx(a::AbstractVector{T}) where {T}
     s = zero(T)
-    @avx unroll=8 for i ∈ eachindex(a)
+    @turbo for i ∈ eachindex(a)
         s += a[i] * a[i]
     end
     return s
@@ -74,7 +74,7 @@ end
 
 #Matrix multiplcation (in place for resultnant matrix)
 function A_mul_B!(C::AbstractMatrix{T}, A::AbstractMatrix{T}, B::AbstractMatrix{T}) where {T}
-    @avx for n ∈ indices((C,B), 2), m ∈ indices((C,A), 1)
+    @turbo for n ∈ indices((C,B), 2), m ∈ indices((C,A), 1)
         Cmn = zero(eltype(C))
         for k ∈ indices((A,B), (2,1))
             Cmn += A[m,k] * B[k,n]
@@ -85,7 +85,7 @@ end
 
 function A_mul_B!(cC::AbstractMatrix{Complex{T}}, cA::AbstractMatrix{Complex{T}}, B::AbstractMatrix{T}) where {T}
     A = reinterpret(reshape, T, cA)
-    @avx for n ∈ indices((cC,B), 2), m ∈ indices((cC,cA), 1)
+    @turbo for n ∈ indices((cC,B), 2), m ∈ indices((cC,cA), 1)
         re = zero(T)
         im = zero(T)
         for k ∈ indices((cA,B), (2,1))

@@ -129,7 +129,7 @@ function periodogram_components(x::Vector{Float},fs::Real,frqs::Vector{<:Real};w
     for i ∈ eachindex(proj)
         proj[i] = abs2(dotavx(ip,cexp(frqs[i],fs,flen)))
     end
-    return abs2.(proj)
+    return proj
 end
 
 function periodogram_components(x::Array{Float,1},fs::Real;wtype::String="hanning",fmin::Real=10,fmax::Real=fs/2)

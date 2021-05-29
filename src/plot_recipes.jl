@@ -9,8 +9,8 @@ end
     msp = p.msp
     frqs = msp.frqs
     time = msp.time
-    xtks = generate_ticks(msp.time,nxticks)
-    ytks = generate_ticks(msp.frqs,nyticks)
+    xtks = generate_ticks(time,nxticks)
+    ytks = generate_ticks(frqs,nyticks)
 
     @series begin
         seriestype := :heatmap
@@ -40,8 +40,8 @@ end
 @recipe function f(msp::SpeechBox.timefreq; nxticks = 8, nyticks = 8)
     frqs = msp.frqs
     time = msp.time
-    xtks = generate_ticks(msp.time,nxticks)
-    ytks = generate_ticks(msp.frqs,nyticks)
+    xtks = generate_ticks(time,nxticks)
+    ytks = generate_ticks(frqs,nyticks)
 
     @series begin
         seriestype := :heatmap

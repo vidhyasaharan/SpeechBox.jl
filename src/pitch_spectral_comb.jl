@@ -26,15 +26,17 @@ function prob_voiced(frames::framed_signal)
     p1 = exp.(-1.0./(v1*peak_diff))
     p2 = exp.(-v2.*peak_dist)
     p = p1.*p2
+    return p
 end
 
 
 
 function comb_resp_peak_diff(frames::framed_signal)
-    comb_resp, frqs = xcorr_spectral_comb(frames)
+    comb_resp, _ = xcorr_spectral_comb(frames)
     peak_diff = Vector{Float}(undef,frames.num_signal_frames)
     for i ∈ eachindex(peak_diff)
-        ind, mag = findpeaks_sorted(comb_resp[:,i]; num_peaks = 2)
+        peaks = findpeaks_sorted(comb_resp[:,i]; num_peaks = 2)
+        mag = peaks[2]
         peak_diff[i] = (mag[1] - mag[2])/mag[1]
     end
     return peak_diff
@@ -66,7 +68,7 @@ end
 
 
 function comb_resp_Δ(frames::framed_signal)
-    comb_resp, frqs = xcorr_spectral_comb(frames)
+    comb_resp, _ = xcorr_spectral_comb(frames)
     Δ = Vector{Float}(undef,frames.num_signal_frames-1)
     for i ∈ eachindex(Δ)
         Δ[i] = comb_resp_dist(comb_resp[:,i],comb_resp[:,i+1])

@@ -11,6 +11,5 @@ Currently SpeechBox.jl implements routines for
 - [Spectral Analyses](spectralanalyses)
 - [LPC Analyses](lpc)
 - [MFCC extraction](mfcc)
-- Plot Recipes
 
 

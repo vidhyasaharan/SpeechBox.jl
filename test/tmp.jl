@@ -2,13 +2,13 @@ using SpeechBox
 using WAV
 using Plots
 using BenchmarkTools
-using TIMITutilities
+# using TIMITutilities
 
 testdir = normpath(joinpath(dirname(pathof(SpeechBox)),"../test/"))
 x, fs = wavread(joinpath(testdir,"SA1.wav"))
 
-utt = TIMITutilities.uttlist(TRAIN)
-x, fs = TIMITutilities.readriff(utt[2])
+# utt = TIMITutilities.uttlist(TRAIN)
+# x, fs = TIMITutilities.readriff(utt[2])
 
 frames = framed_signal(x,fs,0.05,0.01)
 frame = extract_frame(frames,11)

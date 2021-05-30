@@ -47,3 +47,18 @@ end
 nccf(s::speech_waveform, i::Int, k::AbstractVector{Int}; win_size::Int) = map(x->nccf(s,i,x;win_size),k)
 
 nccf(s::speech_waveform, t::Real, lags::AbstractVector{<:Real}; win_dur::Real) = map(x->nccf(s,t,x;win_dur),lags)
+
+
+function nccf(s::speech_waveform; min_lag::Int, max_lag::Int, win_size::Int, win_shift::Int)
+    lags = min_lag:max_lag
+    nlags = length(lags)
+    nframes = 1 + Int(round((length(s.x) - (win_size+max_lag-1))/win_shift))
+    cf = Matrix{Float}(undef,nlags,nframes)
+    for j = 1:nframes
+        for i ∈ eachindex(lags)
+            sindx = (j-1)*win_shift + 1
+            cf[i,j] = nccf(s, sindx, lags[i]; win_size)
+        end
+    end
+    return cf
+end

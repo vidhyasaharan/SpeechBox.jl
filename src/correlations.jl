@@ -22,15 +22,28 @@ acf(s::speech_waveform, t::Real, lags::AbstractVector{<:Real}; win_dur::Real) = 
 
 
 #Cross correlation function at time index `i` and lag `k`
-ccf(s::speech_waveform, i::Int, k::Int; win_size::Int) = dotavx(s.x[i:i+win_size-1], s.x[i+k:i+k+win_size-1])
+"""
+    nccf(sig, i, k; win_size)
+    nccf(sig, t, lags; win_dur)
 
-function ccf(s::speech_waveform, t::Real, lag::Real; win_dur::Real)
+Computes the normalised cross correlation function (with a delayed version) of input signal `sig` provided as a `speech_waveform` object at sample `i` (or at time `t` in secs) at one of more lag index/indices `k` (or at time lags `lags` in secs) given a window size of `win_size` samples (or a window duration `win_dur` given in seconds)
+"""
+function nccf(s::speech_waveform, i::Int, k::Int; win_size::Int)
+    s1 = s.x[i:i+win_size-1]
+    s2 = s.x[i+k:i+k+win_size-1]
+    e1 = dotavx(s1)
+    e2 = dotavx(s2)
+    ccf = dotavx(s1, s2)
+    return ccf/(sqrt(e1*e2))
+end
+
+function nccf(s::speech_waveform, t::Real, lag::Real; win_dur::Real)
     i = timeindex(t, s.fs)
     k = timeindex(lag, s.fs)
     win_size = timeindex(win_dur, s.fs)
-    return ccf(s,i,k;win_size)
+    return nccf(s,i,k;win_size)
 end
 
-ccf(s::speech_waveform, i::Int, k::AbstractVector{Int}; win_size::Int) = map(x->ccf(s,i,x;win_size),k)
+nccf(s::speech_waveform, i::Int, k::AbstractVector{Int}; win_size::Int) = map(x->nccf(s,i,x;win_size),k)
 
-ccf(s::speech_waveform, t::Real, lags::AbstractVector{<:Real}; win_dur::Real) = map(x->ccf(s,t,x;win_dur),lags)
+nccf(s::speech_waveform, t::Real, lags::AbstractVector{<:Real}; win_dur::Real) = map(x->nccf(s,t,x;win_dur),lags)

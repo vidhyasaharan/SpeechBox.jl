@@ -164,6 +164,8 @@ end
 
 impulse_train(f₀::Real, dur::Real, fs::Real) = impulse_train(Int(round(fs/f₀)), Int(round(dur*fs)))
 
+
+#Elementwise operations on spectrum and timefreq components
 function element_op_spectrum(func::AbstractString)
     me = Expr(:call, :map, Meta.parse(func), :(sp.components))
     re = :(spectrum(sp.signal,$me,sp.frqs,sp.title))

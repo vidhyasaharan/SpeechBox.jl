@@ -134,6 +134,9 @@ function frqindex(f::Vector{Float}, frqs::Vector{Float})
     return findx
 end
 
+#Sample index closest in time to a given time (in secs) based on sampling frequency
+timeindex(t::Real, fs::Real) = Int(round(t*fs))
+
 
 #Zero pad a vector
 zero_pad(x::Vector, pad_len::Int) = [zeros(pad_len); x; zeros(pad_len)]

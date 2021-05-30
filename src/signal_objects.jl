@@ -20,11 +20,15 @@ function speech_waveform(x::AbstractArray{<:AbstractFloat},fs::Number)
         error("Signal has more than 2 dimensions, interpretation is not known")
     end
     if(ndims(x)==2)
-        println("Input is a Matrix, assuming more than one channel and taking the first one")
-        if(size(x,1)>size(x,2))
-            signal = x[:,1]
+        if((size(x,1)==1)||(size(x,2)==1))
+            signal = x[:]
         else
-            signal = x[1,:]
+            println("Input is a Matrix, assuming more than one channel and taking the first one")
+            if(size(x,1)>size(x,2))
+                signal = x[:,1]
+            else
+                signal = x[1,:]
+            end
         end
     else
         signal = x

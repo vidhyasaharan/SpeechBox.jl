@@ -21,7 +21,17 @@ function extract_frame(x::framed_signal,i::Int)
     return frame
 end
 
-#Estimate energy in each frame as sum of squares of samples (optionally return normalised energy such that max is 1)
+
+#Compute the number of complete frames in signal (without zero padding) given frame size and frame shift
+number_signal_frames(s::speech_waveform, frame_size::Int, frame_shift::Int) = 1+ Int(floor((length(s.x)-frame_size)/frame_shift))
+
+function number_signal_frames(s::speech_waveform, frame_dur::Float, frame_shift_dur::Float)
+    frame_size = timeindex(frame_dur,s.fs)
+    frame_shift = timeindex(frame_shift_dur,s.fs)
+    return number_signal_frames(s, frame_size, frame_shift)
+end
+
+
 """
     frame_energy(sig_frames::framed_signal[; normalised = false])
 

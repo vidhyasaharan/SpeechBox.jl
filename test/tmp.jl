@@ -10,6 +10,8 @@ x, fs = wavread(joinpath(testdir,"SA1.wav"))
 # utt = TIMITutilities.uttlist(TRAIN)
 # x, fs = TIMITutilities.readriff(utt[2])
 
+s = speech_waveform(x,fs)
+
 frames = framed_signal(x,fs,0.05,0.01)
 frame = extract_frame(frames,11)
 

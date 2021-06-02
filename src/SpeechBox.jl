@@ -27,6 +27,7 @@ include("lpc.jl")
 include("spectral_comb.jl")
 include("pitch_spectral_comb.jl")
 include("correlations.jl")
+include("pitch_RAPT.jl")
 include("plot_recipes.jl")
 
 

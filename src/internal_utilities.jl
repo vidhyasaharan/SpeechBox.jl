@@ -52,11 +52,11 @@ end
 
 
 #Generate first order difference of a sequence y[i] = x[i+1] - x[i] (output sequence length is 1 less than input sequence length)
-function Δ(x::Vector)
+function Δ(x::AbstractVector)
     len = length(x)
     Δx = zeros(typeof(x[1]),len-1)
     if(len>1)
-        for i=1:len-1
+        @views for i=1:len-1
             Δx[i] = x[i+1]-x[i]
         end
     end

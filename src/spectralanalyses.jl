@@ -150,9 +150,9 @@ function periodogram_components(sig_frames::framed_signal, frqs ;wtype::String="
     ce_array = collect(transpose(cexp_proj_matrix(frqs,fs,flen)))
 
     for i in 1:nframes
-        frame = extract_frame(sig_frames,i)
-        ip = frame.*win
-        for j in 1:nfrqs
+        ip = extract_frame(sig_frames,i)
+        mulavx!(ip,win)
+        @views for j in 1:nfrqs
             pspec[j,i] = abs2(dotavx(ip,ce_array[:,j]))
         end
     end

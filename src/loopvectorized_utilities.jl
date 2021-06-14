@@ -61,7 +61,7 @@ end
 
 Computes the cross correlation between `x` and `h`, with the optional `z` indicating the position of the zero index of the array `h`. The output is of the same length as `x` and the cross correlation is computed with zero padding.
 """
-function xcorr(x::Vector{Float},h::Vector{Float},z::Int=1)
+function xcorr(x::AbstractVector{Float},h::AbstractVector{Float},z::Int=1)
     padded_x = zeros(length(x)+length(h)-1)
     padded_x[z:z+length(x)-1] = x
     y = Vector{Float}(undef,length(x))
@@ -69,6 +69,14 @@ function xcorr(x::Vector{Float},h::Vector{Float},z::Int=1)
         y[i] = dotavx(padded_x[i:i+length(h)-1],h)
     end
     return y
+end
+
+
+#Vector Multiplication (in place)
+function mulavx!(a::AbstractVector{T}, b::AbstractVector{T}) where {T}
+    @turbo for i ∈ eachindex(a,b)
+        a[i] *= b[i]
+    end
 end
 
 

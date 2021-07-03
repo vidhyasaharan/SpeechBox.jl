@@ -163,6 +163,31 @@ end
 end
 
 
+@testset "resample" begin
+
+    fs = 8000
+    n = 1:2*fs
+    frq = 1000
+    xx = cos.(2*pi*(frq/fs)*n)
+
+    s = SpeechBox.speech_waveform(xx,fs)
+    rs = SpeechBox.resample(s,2*fs)
+    @test typeof(rs) == SpeechBox.speech_waveform
+    @test abs(length(rs.x) - length(s.x)*2) <= 1
+    @test rs.fs == s.fs*2
+
+    mag = magspec(s)
+    rmag = magspec(rs)
+
+    ind = argmax(mag.components)
+    rind = argmax(rmag.components)
+
+    @test abs(mag.frqs[ind] - rmag.frqs[rind]) < abs(mag.frqs[ind] - rmag.frqs[rind-1])
+    @test abs(mag.frqs[ind] - rmag.frqs[rind]) < abs(mag.frqs[ind] - rmag.frqs[rind+1])
+
+end
+
+
 @testset "element_op" begin
     e = SpeechBox.element_op_spectrum("Base.log10")
     @test typeof(e) == Expr

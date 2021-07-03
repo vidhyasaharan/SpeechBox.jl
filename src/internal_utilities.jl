@@ -119,7 +119,7 @@ function remove_nearest_peak!(ind::Vector,mag::Vector)
     # return ind,mag
 end
 
-#Resample signal in speech_waveform object
+#Resample signal in speech_waveform object (wrapper for resample from DSP.jl)
 function resample(signal::speech_waveform, fs_new::Number)
     rx = DSP.Filters.resample(signal.x, fs_new/signal.fs)
     fs = convert(Float,fs_new)

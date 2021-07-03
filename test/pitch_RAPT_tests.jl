@@ -1,0 +1,24 @@
+@testset "RAPT_candidates" begin
+    fs = 16000
+    ncands = 10
+    rcands = rand(Float,ncands)
+    time = 0.04
+    indx = Int(round(time*fs))
+    cands = SpeechBox.RAPT_candidates(length(rcands), rcands, indx, time)
+    @test typeof(cands) == SpeechBox.RAPT_candidates
+    @test typeof(cands.num_cands) == Int
+    @test typeof(cands.cands) == Vector{Float}
+    @test typeof(cands.index) == Int
+    @test typeof(cands.time)<:Real
+    @test length(cands.cands) == cands.num_cands
+end
+
+
+@testset "RAPT_pitch_candidates_index" begin
+    indx = Int(round((10*SpeechBox.frame_step*signal.fs) + 1))
+    cands = SpeechBox.RAPT_pitch_candidates(signal, indx)
+    @test typeof(cands) == SpeechBox.RAPT_candidates
+    @test cands.num_cands == length(cands.cands)
+    @test cands.index == indx
+    @test cands.time == indx/signal.fs
+end

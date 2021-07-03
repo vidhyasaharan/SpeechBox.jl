@@ -97,7 +97,7 @@ function RAPT_pitch_candidates(s::speech_waveform, indx::Int; win_dur::Real = nc
     min_lag = time2nsamples(1/F0max,fs)
     max_lag = time2nsamples(1/F0min,fs)
     k = min_lag:max_lag
-    cf = nccf(s, indx, k; win_size)
+    cf = nccf(s, indx, k; win_size, nconst = A_FACT)
     inds, mags = findpeaks_sorted(cf)
     thr = CAND_TR*mags[1]
     num_cands = min(sum(mags.>thr), ncands)
@@ -134,5 +134,19 @@ end
 
 
 function RAPT_cands_local_costs(carray::Vector{RAPT_candidates})
-    return 0
+    narrays = length(carray)
+    ncands = RAPT_maxcands(carray)
+    lcosts = Matrix{Float}(undef,ncands,narrays)
+    fill!(lcosts,Inf)
+    return lcosts
+end
+
+
+function RAPT_nccf(s::speech_waveform; win_dur::Real = nccf_win_size, win_step::Real = frame_step, nconst::Real = A_FACT)
+    fs = s.fs
+    win_size = time2nsamples(win_dur,fs)
+    win_shift = time2nsamples(win_step,fs)
+    min_lag = time2nsamples(1/F0max,fs)
+    max_lag = time2nsamples(1/F0min,fs)
+    nccf(s;min_lag, max_lag, win_size, win_shift, nconst)
 end

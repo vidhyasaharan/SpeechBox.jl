@@ -40,10 +40,12 @@ function cand_tuples(rtf::RAPT_timefreq)
         ntuples += cand.num_cands
     end
     ptuples = Vector{Tuple{Int, Int}}(undef,ntuples)
+    # ptuples = Vector{Tuple{Int, Float}}(undef,ntuples)
     i::Int = 1
     for indx ∈ eachindex(rtf.candarray)
         for j in rtf.candarray[indx].cands
             ptuples[i] = (indx, frqindex(j,rtf.pd.frqs))
+            # ptuples[i] = (indx, j)
             i+=1
         end
     end
@@ -64,12 +66,18 @@ end
         seriestype := :heatmap
         xticks := xtks
         yticks := ytks
+        # xguide := "Time (sec)"
+        # yguide := "Frequency (Hz)"
+        # if(~isnothing(msp.title))
+        #     title := msp.title
+        # end
         msp.components
     end
 
     @series begin
         seriestype := :scatter
         xticks := xtks
+        yticks := ytks
         seriescolor := :green
         legend := false
         xguide := "Time (sec)"
@@ -82,14 +90,14 @@ end
 end
 
 
-
-function RAPT_pitch_candidates(s::speech_waveform, i::Int; win_dur::Real = nccf_win_size, ncands::Int = N_CANDS)
+# Estimate pitch candidates from signal at given sample index
+function RAPT_pitch_candidates(s::speech_waveform, indx::Int; win_dur::Real = nccf_win_size, ncands::Int = N_CANDS)
     fs = s.fs
     win_size = timeindex(win_dur,fs)
     min_lag = timeindex(1/F0max,fs)
     max_lag = timeindex(1/F0min,fs)
     k = min_lag:max_lag
-    cf = nccf(s, i, k; win_size)
+    cf = nccf(s, indx, k; win_size)
     inds, mags = findpeaks_sorted(cf)
     thr = CAND_TR*mags[1]
     num_cands = min(sum(mags.>thr), ncands)
@@ -97,9 +105,10 @@ function RAPT_pitch_candidates(s::speech_waveform, i::Int; win_dur::Real = nccf_
     for i ∈ eachindex(cands)
         cands[i] = fs/(min_lag - 1 + inds[i])
     end
-    return RAPT_candidates(num_cands,cands,i,i/fs)
+    return RAPT_candidates(num_cands,cands,indx,indx/fs)
 end
 
+#Estimate pitch candidates of a signal at every window step (win_step)
 function RAPT_pitch_candidates(s::speech_waveform; win_dur::Real = nccf_win_size, win_step::Real = frame_step, ncands::Int = N_CANDS)
     fs = s.fs
     win_size = timeindex(win_dur,fs)
@@ -112,4 +121,18 @@ function RAPT_pitch_candidates(s::speech_waveform; win_dur::Real = nccf_win_size
         cand_array[i] = RAPT_pitch_candidates(s, indx; win_dur, ncands)
     end
     return cand_array
+end
+
+
+function RAPT_maxcands(ca::Vector{RAPT_candidates})
+    maxcands::Int = 0
+    for array in ca
+        maxcands = max(array.num_cands, maxcands)
+    end
+    return maxcands
+end
+
+
+function RAPT_cands_local_costs(carray::Vector{RAPT_candidates})
+    return 0
 end

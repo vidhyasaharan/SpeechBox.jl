@@ -27,3 +27,14 @@ end
     cand_array = SpeechBox.RAPT_pitch_candidates(signal)
     @test typeof(cand_array) == Vector{SpeechBox.RAPT_candidates}
 end
+
+@testset "RAPT_maxcands" begin
+    cand_array = SpeechBox.RAPT_pitch_candidates(signal)
+    mxcands = SpeechBox.RAPT_maxcands(cand_array)
+    @test typeof(mxcands) == Int
+    @test mxcands == SpeechBox.N_CANDS
+
+    cand_array = SpeechBox.RAPT_pitch_candidates(signal; ncands = 10)
+    mxcands = SpeechBox.RAPT_maxcands(cand_array)
+    @test mxcands == 10
+end

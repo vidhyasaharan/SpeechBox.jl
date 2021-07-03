@@ -64,22 +64,10 @@ function Δ(x::AbstractVector)
 end
 
 
-#Local peaks/maximas sorted by magnitude
-function findpeaks_sorted(x::Vector; min_dist::Int = 2, num_peaks::Int = 0)
-    ind, mag = findpeaks(x;min_dist)
-    si = sortperm(mag, rev=true)
-    if((num_peaks>0)&&(num_peaks<length(mag)))
-        si = si[1:num_peaks]
-    end
-    return ind[si], mag[si]
-end
-
-
-
 #Find local peaks/maximas in a sequence
 function findpeaks(x::Vector; min_dist::Int = 2)
     ind = Int[]
-    mag = Real[]
+    mag = eltype(x)[]
     if x[1]>x[2]
         push!(ind,1)
         push!(mag,x[1])
@@ -94,15 +82,30 @@ function findpeaks(x::Vector; min_dist::Int = 2)
         push!(ind,length(x))
         push!(mag,x[end])
     end
-    while(minimum(Δ(ind))<min_dist)
-        ind,mag = remove_nearest_peak(ind,mag)
+    if(length(ind)>1)
+        while(minimum(Δ(ind))<min_dist)
+            remove_nearest_peak!(ind,mag)
+        end
     end
     return ind,mag
 end
 
 
+
+#Local peaks/maximas sorted by magnitude
+function findpeaks_sorted(x::Vector; min_dist::Int = 2, num_peaks::Int = 0)
+    ind, mag = findpeaks(x;min_dist)
+    si = sortperm(mag, rev=true)
+    if((num_peaks>0)&&(num_peaks<length(mag)))
+        si = si[1:num_peaks]
+    end
+    return ind[si], mag[si]
+end
+
+
+
 #Support function for findpeaks() - removes the smaller of the two closest peaks in a set of local peaks
-function remove_nearest_peak(ind::Vector,mag::Vector)
+function remove_nearest_peak!(ind::Vector,mag::Vector)
     npks = length(ind)
     if(npks>1)
         dist = Δ(ind)
@@ -113,7 +116,7 @@ function remove_nearest_peak(ind::Vector,mag::Vector)
         deleteat!(ind,m_i)
         deleteat!(mag,m_i)
     end
-    return ind,mag
+    # return ind,mag
 end
 
 #Resample signal in speech_waveform object

@@ -23,6 +23,12 @@ end
 
 
 #Compute the number of complete frames in signal (without zero padding) given frame size and frame shift
+"""
+    number_signal_frames(s::speech_waveform, frame_size, frame_shift)
+    number_signal_frames(s::speech_waveform, frame_dur, frame_shift_dur)
+
+Compute the number of frames without zero padding or extension of speech waveform `s` given `frame_size` and `frame_shift` in number of samples or `frame_dur` and `frame_shift_dur` in seconds
+"""
 number_signal_frames(s::speech_waveform, frame_size::Int, frame_shift::Int) = 1+ Int(floor((length(s.x)-frame_size)/frame_shift))
 
 function number_signal_frames(s::speech_waveform, frame_dur::Float, frame_shift_dur::Float)

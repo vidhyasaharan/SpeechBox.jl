@@ -8,6 +8,7 @@
     @test a⋅cb ≈ SpeechBox.dotavx(a,cb)
     @test ca⋅b ≈ SpeechBox.dotavx(ca,b)
     @test ca⋅cb ≈ SpeechBox.dotavx(ca,cb)
+    @test a⋅a ≈ SpeechBox.dotavx(a)
 end
 
 @testset "xcorr" begin
@@ -22,4 +23,14 @@ end
     @test length(y) == length(x)
     @test argmax(y) == hstart + z - 1
     @test maximum(y) ≈ SpeechBox.dotavx(h)
+end
+
+
+@testset "mulavx!" begin
+    ndim = 10
+    a = rand(Float,ndim)
+    b = rand(Float,ndim)
+    c = a.*b
+    SpeechBox.mulavx!(a,b)
+    @test c == a
 end

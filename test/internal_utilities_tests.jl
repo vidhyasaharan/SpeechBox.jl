@@ -188,6 +188,23 @@ end
 end
 
 
+@testset "frqindex" begin
+    frqs = 0.0:10.0:1000.0
+    f = 30.0
+    fin = SpeechBox.frqindex(f,frqs)
+    @test typeof(fin) == Int
+    @test fin == 4
+
+    fv = [21.0, 41.5, 59.0]
+    fvin = SpeechBox.frqindex(fv,frqs)
+    @test typeof(fvin) == Vector{Int}
+    @test length(fvin) == length(fv)
+    @test fvin[1] == 3
+    @test fvin[2] == 5
+    @test fvin[3] == 7
+end
+
+
 @testset "element_op" begin
     e = SpeechBox.element_op_spectrum("Base.log10")
     @test typeof(e) == Expr

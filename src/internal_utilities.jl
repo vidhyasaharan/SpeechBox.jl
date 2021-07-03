@@ -127,9 +127,9 @@ function resample(signal::speech_waveform, fs_new::Number)
 end
 
 #Index of closest frequency in an array to a given frequency
-frqindex(f::Float, frqs::Vector{Float}) = argmin(abs.(frqs.-f))
+frqindex(f::Float, frqs::AbstractVector{Float}) = argmin(abs.(frqs.-f))
 
-function frqindex(f::Vector{Float}, frqs::Vector{Float})
+function frqindex(f::AbstractVector{Float}, frqs::AbstractVector{Float})
     findx = Vector{Int}(undef,length(f))
     for i in eachindex(f)
         findx[i] = frqindex(f[i],frqs)

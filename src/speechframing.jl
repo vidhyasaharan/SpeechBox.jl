@@ -26,8 +26,8 @@ end
 number_signal_frames(s::speech_waveform, frame_size::Int, frame_shift::Int) = 1+ Int(floor((length(s.x)-frame_size)/frame_shift))
 
 function number_signal_frames(s::speech_waveform, frame_dur::Float, frame_shift_dur::Float)
-    frame_size = timeindex(frame_dur,s.fs)
-    frame_shift = timeindex(frame_shift_dur,s.fs)
+    frame_size = time2nsamples(frame_dur,s.fs)
+    frame_shift = time2nsamples(frame_shift_dur,s.fs)
     return number_signal_frames(s, frame_size, frame_shift)
 end
 

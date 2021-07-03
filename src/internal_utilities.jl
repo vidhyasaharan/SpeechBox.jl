@@ -137,9 +137,6 @@ function frqindex(f::AbstractVector{Float}, frqs::AbstractVector{Float})
     return findx
 end
 
-#Sample index closest in time to a given time (in secs) based on sampling frequency
-timeindex(t::Real, fs::Real) = Int(round(t*fs))
-
 
 #Zero pad a vector
 zero_pad(x::Vector, pad_len::Int) = [zeros(pad_len); x; zeros(pad_len)]
@@ -152,14 +149,14 @@ unpad_vector(x::Vector, pad_len::Int) = x[pad_len+1:end-pad_len]
 
 #Generate white noise
 white_noise(len::Int) = randn(MersenneTwister(), Float, len)
-white_noise(dur::Number, fs::Number) = white_noise(dur2len(dur,fs))
+white_noise(dur::Real, fs::Real) = white_noise(time2nsamples(dur,fs))
 
 #Generate AR process noise
 ar_process(a::Vector, len::Int) = DSP.filt([1],a, white_noise(len))
-ar_process(a::Vector, dur::Number, fs::Number) = ar_process(a,dur2len(dur,fs))
+ar_process(a::Vector, dur::Real, fs::Real) = ar_process(a,time2nsamples(dur,fs))
 
 #Infer number of samples from duration and sampling rate
-dur2len(dur::Number, fs::Number) = Int(round(dur*fs))
+time2nsamples(dur::Real, fs::Real) = Int(round(dur*fs))
 
 #Generate impulse train
 function impulse_train(period::Int, len::Int)

@@ -9,9 +9,9 @@ Computes the autocorrelation function of input signal `sig` provided as a `speec
 acf(s::speech_waveform, i::Int, k::Int; win_size::Int) = dotavx(s.x[i:i+win_size-k-1], s.x[i+k:i+win_size-1])
 
 function acf(s::speech_waveform, t::Real, lag::Real; win_dur::Real)
-    i = timeindex(t,s.fs)
-    k = timeindex(lag,s.fs)
-    win_size = timeindex(win_dur,s.fs)
+    i = time2nsamples(t,s.fs)
+    k = time2nsamples(lag,s.fs)
+    win_size = time2nsamples(win_dur,s.fs)
     return acf(s,i,k;win_size)
 end
 
@@ -38,9 +38,9 @@ function nccf(s::speech_waveform, i::Int, k::Int; win_size::Int)
 end
 
 function nccf(s::speech_waveform, t::Real, lag::Real; win_dur::Real)
-    i = timeindex(t, s.fs)
-    k = timeindex(lag, s.fs)
-    win_size = timeindex(win_dur, s.fs)
+    i = time2nsamples(t, s.fs)
+    k = time2nsamples(lag, s.fs)
+    win_size = time2nsamples(win_dur, s.fs)
     return nccf(s,i,k;win_size)
 end
 

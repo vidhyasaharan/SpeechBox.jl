@@ -22,3 +22,8 @@ end
     @test cands.index == indx
     @test cands.time == indx/signal.fs
 end
+
+@testset "RAPT_pitch_candidates" begin
+    cand_array = SpeechBox.RAPT_pitch_candidates(signal)
+    @test typeof(cand_array) == Vector{SpeechBox.RAPT_candidates}
+end

@@ -93,9 +93,9 @@ end
 # Estimate pitch candidates from signal at given sample index
 function RAPT_pitch_candidates(s::speech_waveform, indx::Int; win_dur::Real = nccf_win_size, ncands::Int = N_CANDS)
     fs = s.fs
-    win_size = timeindex(win_dur,fs)
-    min_lag = timeindex(1/F0max,fs)
-    max_lag = timeindex(1/F0min,fs)
+    win_size = time2nsamples(win_dur,fs)
+    min_lag = time2nsamples(1/F0max,fs)
+    max_lag = time2nsamples(1/F0min,fs)
     k = min_lag:max_lag
     cf = nccf(s, indx, k; win_size)
     inds, mags = findpeaks_sorted(cf)
@@ -111,9 +111,9 @@ end
 #Estimate pitch candidates of a signal at every window step (win_step)
 function RAPT_pitch_candidates(s::speech_waveform; win_dur::Real = nccf_win_size, win_step::Real = frame_step, ncands::Int = N_CANDS)
     fs = s.fs
-    win_size = timeindex(win_dur,fs)
-    win_shift = timeindex(win_step,fs)
-    max_lag = timeindex(1/F0min,fs)
+    win_size = time2nsamples(win_dur,fs)
+    win_shift = time2nsamples(win_step,fs)
+    max_lag = time2nsamples(1/F0min,fs)
     nframes = number_signal_frames(s,win_size+max_lag-1,win_shift)
     cand_array = Vector{RAPT_candidates}(undef,nframes)
     for i ∈ eachindex(cand_array)

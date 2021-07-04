@@ -2,15 +2,18 @@
     fs = 16000
     ncands = 10
     rcands = rand(Float,ncands)
+    mags = rand(Float,ncands)
     time = 0.04
     indx = Int(round(time*fs))
-    cands = SpeechBox.RAPT_candidates(length(rcands), rcands, indx, time)
+    cands = SpeechBox.RAPT_candidates(length(rcands), rcands, mags, indx, time, fs)
     @test typeof(cands) == SpeechBox.RAPT_candidates
     @test typeof(cands.num_cands) == Int
     @test typeof(cands.cands) == Vector{Float}
+    @test typeof(cands.Φ) == Vector{Float}
     @test typeof(cands.index) == Int
     @test typeof(cands.time)<:Real
     @test length(cands.cands) == cands.num_cands
+    @test length(cands.Φ) == cands.num_cands
 end
 
 

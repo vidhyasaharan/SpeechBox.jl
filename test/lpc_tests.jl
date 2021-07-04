@@ -33,7 +33,7 @@ end
 
 @testset "lpc_response" begin
     fs = 16000
-    nsam = 10000
+    nsam = 2*fs
     f = [1000, 5000]
     bw = [200, 200]
     ar = SpeechBox.allpole(f,bw;fs)

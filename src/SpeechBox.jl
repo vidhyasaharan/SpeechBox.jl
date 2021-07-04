@@ -1,5 +1,6 @@
 module SpeechBox
 
+using StaticArrays: maximum
 using DSP
 using FFTW
 using StaticArrays

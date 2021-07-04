@@ -47,20 +47,24 @@ end
 
 function cand_tuples(rtf::RAPT_timefreq)
     ntuples::Int = 0
+    lc = RAPT_cands_local_costs(rtf.candarray)
     for cand in rtf.candarray
         ntuples += cand.num_cands
     end
     ptuples = Vector{Tuple{Int, Int}}(undef,ntuples)
+    util = Vector{Float}(undef,ntuples)
     # ptuples = Vector{Tuple{Int, Float}}(undef,ntuples)
     i::Int = 1
     for indx ∈ eachindex(rtf.candarray)
-        for j in rtf.candarray[indx].cands
-            ptuples[i] = (indx, frqindex(j,rtf.pd.frqs))
+        for j in eachindex(rtf.candarray[indx].cands)
+            cand = rtf.candarray[indx].cands[j]
+            ptuples[i] = (indx, frqindex(cand, rtf.pd.frqs))
+            util[i] = lc[j+1,indx]
             # ptuples[i] = (indx, j)
             i+=1
         end
     end
-    return ptuples
+    return ptuples, util
 end
 
 
@@ -71,7 +75,7 @@ end
     time = msp.time
     xtks = generate_ticks(time,nxticks)
     ytks = generate_ticks(frqs,nyticks)
-    ptuples = cand_tuples(p)
+    ptuples, util = cand_tuples(p)
 
     @series begin
         seriestype := :heatmap
@@ -89,6 +93,7 @@ end
         seriestype := :scatter
         xticks := xtks
         yticks := ytks
+        markersize := util
         seriescolor := :green
         legend := false
         xguide := "Time (sec)"

@@ -12,14 +12,25 @@ const VTR_A_C = 0.5
 const VTR_S_C = 0.5
 const VO_BIAS = 0.0
 const DOUBL_C = 0.35
-const A_FACT = 10000.0
+# const A_FACT = 10000.0
+# const A_FACT = 0.0
 const N_CANDS = 20
 
 struct RAPT_candidates
     num_cands::Int
     cands::Vector{Float}
+    Φ::Vector{Float}
     index::Int
-    time::Real
+    time::Float
+    fs::Float
+end
+
+function RAPT_candidates(num_cands::Int, cands::Vector{<:Real}, Φ::Vector{<:Real}, index::Int, time::Real, fs::Real)
+    cands_f = convert(Vector{Float}, cands)
+    Φ_f = convert(Vector{Float}, Φ)
+    time_f = convert(Float, time)
+    fs_f = convert(Float, fs)
+    return RAPT_candidates(num_cands, cands_f, Φ_f, index, time_f, fs_f)
 end
 
 struct RAPT_timefreq
@@ -92,6 +103,7 @@ end
 
 # Estimate pitch candidates from signal at given sample index
 function RAPT_pitch_candidates(s::speech_waveform, indx::Int; win_dur::Real = nccf_win_size, ncands::Int = N_CANDS)
+    A_FACT = 0.0
     fs = s.fs
     win_size = time2nsamples(win_dur,fs)
     min_lag = time2nsamples(1/F0max,fs)
@@ -105,7 +117,7 @@ function RAPT_pitch_candidates(s::speech_waveform, indx::Int; win_dur::Real = nc
     for i ∈ eachindex(cands)
         cands[i] = fs/(min_lag - 1 + inds[i])
     end
-    return RAPT_candidates(num_cands,cands,indx,indx/fs)
+    return RAPT_candidates(num_cands,cands,mags[1:num_cands],indx,indx/fs,fs)
 end
 
 #Estimate pitch candidates of a signal at every window step (win_step)
@@ -134,12 +146,29 @@ end
 
 
 function RAPT_cands_local_costs(carray::Vector{RAPT_candidates})
+    fs = carray[1].fs
+    β = LAG_WT/(fs/F0min)
+
     narrays = length(carray)
     ncands = RAPT_maxcands(carray)
-    lcosts = Matrix{Float}(undef,ncands,narrays)
+    lcosts = Matrix{Float}(undef,ncands+1,narrays)
     fill!(lcosts,Inf)
+
+    for i ∈ 1:narrays
+        lcosts[1,i] = VO_BIAS + maximum(carray[i].Φ)
+        for j ∈ 1:carray[i].num_cands
+            Cⱼ = carray[i].Φ[j]
+            βLⱼ = β/carray[i].cands[j]
+            lcosts[j+1,i] = 1 - (Cⱼ*(1-βLⱼ))
+        end
+    end
+
     return lcosts
 end
+
+
+
+
 
 
 function RAPT_nccf(s::speech_waveform; win_dur::Real = nccf_win_size, win_step::Real = frame_step, nconst::Real = A_FACT)

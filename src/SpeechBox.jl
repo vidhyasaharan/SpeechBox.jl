@@ -32,5 +32,7 @@ include("correlations.jl")
 include("pitch_RAPT.jl")
 include("plot_recipes.jl")
 include("levinson_durbin.jl")
+include("distortion_measures.jl")
+
 
 end # module

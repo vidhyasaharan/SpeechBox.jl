@@ -1,6 +1,7 @@
 module SpeechBox
 
-using StaticArrays: maximum
+# using LoopVectorization: include
+# using StaticArrays: maximum
 using DSP
 using FFTW
 using StaticArrays
@@ -30,6 +31,6 @@ include("pitch_spectral_comb.jl")
 include("correlations.jl")
 include("pitch_RAPT.jl")
 include("plot_recipes.jl")
-
+include("levinson_durbin.jl")
 
 end # module

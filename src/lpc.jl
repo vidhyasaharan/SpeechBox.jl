@@ -10,7 +10,7 @@ Compute the Linear Predictive Coding (LPC) coefficients of order `N`, of a seque
 """
 function lpc(x::Array{Float,1},N::Int)
     a = ones(Float,N+1)
-    temp = DSP.LPC.lpc(x,N)
+    temp = DSP.LPC.lpc(x,N, LPCLevinson())
     a[2:end] = temp[1]
     # filter = DSP.Filters.PolynomialRatio([1],a)
     return a

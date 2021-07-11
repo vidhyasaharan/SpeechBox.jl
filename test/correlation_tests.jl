@@ -26,5 +26,5 @@ end
     @test length(rx) == p
     @test rxx == rx
     @test argmax(rx) == 1
-    @test maximum(rx) == SpeechBox.dotavx(x)/len
+    @test maximum(rx) ≈ SpeechBox.dotavx(x)/len
 end

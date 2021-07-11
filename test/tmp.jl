@@ -15,6 +15,18 @@ s = speech_waveform(x,fs)
 frames = framed_signal(x,fs,0.05,0.01)
 frame = extract_frame(frames,11)
 
+dd = zeros(Float64,frames.num_signal_frames-1)
+
+for i ∈ eachindex(dd)
+    f1 = extract_frame(frames,i)
+    f2 = extract_frame(frames,i+1)
+    p = SpeechBox.lpc_order(frames.signal.fs)
+    dd[i] = SpeechBox.distis_mat(f1,f2,p)
+end
+
+
+
+
 ptf = SpeechBox.RAPT_timefreq(s)
 ca = SpeechBox.RAPT_pitch_candidates(s)
 lc = SpeechBox.RAPT_cands_local_costs(ca)

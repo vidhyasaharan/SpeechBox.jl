@@ -1,6 +1,5 @@
 
 #Levinson-Durbin Recursion to estimate LPC from 
-
 function levinson_durbin(rxx::AbstractVector{Float})
     p = length(rxx) - 1
     α = Vector{Float}(undef,p)

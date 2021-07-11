@@ -45,7 +45,7 @@ function dotavx(ca::AbstractVector{Complex{T}}, cb::AbstractVector{Complex{T}}) 
 end
 
 
-#L2 Norm using LoopVectorization (real)
+#L2 Norm square using LoopVectorization (real)
 function dotavx(a::AbstractVector{T}) where {T}
     s = zero(T)
     @turbo for i ∈ eachindex(a)

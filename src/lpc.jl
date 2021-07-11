@@ -5,11 +5,16 @@ lpc_order(fs::Real) = Int(round(fs/1000))+2
 #Compute LPC/AR coefficients for a discrete-time sequence
 """
     lpc(x, N)
+    lpc(Rxx)
 
-Compute the Linear Predictive Coding (LPC) coefficients of order `N`, of a sequence `x`. Uses Levinson-Durbin recursion on autocorrelation.
+Compute the Linear Predictive Coding (LPC) coefficients of order `N`, from a sequence `x` or directly from autocorrelation sequence `Rxx` (order is `length(Rxx)-1`). Uses Levinson-Durbin recursion on autocorrelation.
 """
 function lpc(x::AbstractVector{Float}, p::Int)
     rxx = acorr(x, p+1)
+    return lpc(rxx)
+end
+
+function lpc(rxx::AbstractVector{Float})
     α = levinson_durbin(rxx)
     return [1;-α[end:-1:1]]
 end

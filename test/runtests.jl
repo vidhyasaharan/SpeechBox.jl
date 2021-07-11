@@ -1,4 +1,5 @@
 
+
 using Test
 using SpeechBox
 using LinearAlgebra
@@ -21,6 +22,9 @@ signal = speech_waveform(x,fs)
     @testset "utilities" begin 
         include("internal_utilities_tests.jl")
         include("loopvectorized_utilities_tests.jl")
+    end
+    @testset "correlations" begin
+        include("correlation_tests.jl")
     end
     @testset "structs" begin
         include("signal_objects_tests.jl")

@@ -1,18 +1,5 @@
 
-function acorr!(rxx::AbstractVector{Float}, x::AbstractVector{Float})
-    len = length(x)
-    @inbounds @views for i ∈ eachindex(rxx)
-        δ = i-1
-        N = len - δ
-        rxx[i] = (1/N)*dotavx(x[1:end-δ],x[1+δ:end])
-    end
-end
 
-function acorr(x::AbstractVector{Float}, p::Int)
-    rxx = Vector{Float}(undef,p)
-    acorr!(rxx,x)
-    return rxx
-end
 
 
 function lpc_LD(x::AbstractVector{Float}, p::Int)

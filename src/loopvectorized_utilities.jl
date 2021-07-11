@@ -61,15 +61,25 @@ end
 
 Computes the cross correlation between `x` and `h`, with the optional `z` indicating the position of the zero index of the array `h`. The output is of the same length as `x` and the cross correlation is computed with zero padding.
 """
-function xcorr(x::AbstractVector{Float},h::AbstractVector{Float},z::Int=1)
-    padded_x = zeros(length(x)+length(h)-1)
-    padded_x[z:z+length(x)-1] = x
+function xcorr(x::AbstractVector{Float}, h::AbstractVector{Float}, z::Int=1)
     y = Vector{Float}(undef,length(x))
-    @inbounds for i ∈ eachindex(y)
-        y[i] = dotavx(padded_x[i:i+length(h)-1],h)
-    end
+    xcorr!(y, x, h, z)
     return y
 end
+
+"""
+    xcorr!(y, x, h[, z=1])
+
+Computes the cross correlation between `x` and `h`, with the optional `z` indicating the position of the zero index of the array `h` and stores the result in `y`. The number of sample lags at which cross correlation is computed is equal to the length of `y` and the cross correlation is computed with zero padding.
+"""
+function xcorr!(y::AbstractVector{Float}, x::AbstractVector{Float}, h::AbstractVector{Float}, z::Int=1)
+    padded_x = zeros(length(x)+length(h)-1)
+    padded_x[z:z+length(x)-1] = x
+    @views @inbounds for i ∈ eachindex(y)
+        y[i] = dotavx(padded_x[i:i+length(h)-1],h)
+    end
+end
+
 
 
 #Vector Multiplication (in place)

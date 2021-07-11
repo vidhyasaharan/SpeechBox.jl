@@ -1,19 +1,11 @@
 
+#Levinson-Durbin Recursion to estimate LPC from 
 
-
-
-function lpc_LD(x::AbstractVector{Float}, p::Int)
+function levinson_durbin(rxx::AbstractVector{Float})
+    p = length(rxx) - 1
     α = Vector{Float}(undef,p)
-    lpc_LD!(α,x)
-    return [1;-α[end:-1:1]]
-end
-
-
-function lpc_LD!(α::AbstractVector{Float}, x::AbstractVector{Float})
-    p = length(α)
-    rxx = acorr(x, p+1)
-    E = Vector{Float}(undef,p+1)
     k = Vector{Float}(undef,p)
+    E = Vector{Float}(undef,p+1)
     @views E[1] = rxx[1]
     @views k[1] = rxx[2]/rxx[1]
     @views α[p] = k[1]
@@ -23,7 +15,9 @@ function lpc_LD!(α::AbstractVector{Float}, x::AbstractVector{Float})
         update_α!(α, k, i)
         update_E!(E, k, i)
     end
+    return α
 end
+
 
 function update_E!(E::AbstractVector{Float}, k::AbstractVector{Float}, iter::Int)
     @views E[iter+1] = (1-(k[iter]^2))*E[iter]

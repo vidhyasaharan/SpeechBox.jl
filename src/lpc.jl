@@ -6,19 +6,24 @@ lpc_order(fs::Real) = Int(round(fs/1000))+2
 """
     lpc(x, N)
 
-Compute the Linear Predictive Coding (LPC) coefficients of order `N`, of a sequence `x`.
+Compute the Linear Predictive Coding (LPC) coefficients of order `N`, of a sequence `x`. Uses Levinson-Durbin recursion on autocorrelation.
 """
-function lpc(x::Array{Float,1},N::Int)
-    a = ones(Float,N+1)
-    temp = DSP.LPC.lpc(x,N, LPCLevinson())
-    a[2:end] = temp[1]
-    # filter = DSP.Filters.PolynomialRatio([1],a)
-    return a
+function lpc(x::AbstractVector{Float}, p::Int)
+    rxx = acorr(x, p+1)
+    α = levinson_durbin(rxx)
+    return [1;-α[end:-1:1]]
 end
+
+# function lpc(x::Array{Float,1},N::Int)
+#     a = ones(Float,N+1)
+#     temp = DSP.LPC.lpc(x,N, LPCLevinson())
+#     a[2:end] = temp[1]
+#     return a
+# end
 
 
 #Compute the LPC/AR model magnitude response given a dicrete-time signal
-function lpc_freqz(x::Array{Float,1}, fs::Real, N::Int = lpc_order(fs); frqs::Array{T,1} = linfreq_array(fmax = fs/2, nfrqs = length(x))) where T<:Real
+function lpc_freqz(x::Array{Float,1}, fs::Real, N::Int = lpc_order(fs); frqs::Array{<:Real,1} = linfreq_array(fmax = fs/2, nfrqs = length(x)))
     a = lpc(x,N)
     filter = DSP.Filters.PolynomialRatio([1],a)
     h = DSP.freqresp(filter, frqs * ((2pi) / fs))

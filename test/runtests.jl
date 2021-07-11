@@ -23,7 +23,7 @@ signal = speech_waveform(x,fs)
         include("internal_utilities_tests.jl")
         include("loopvectorized_utilities_tests.jl")
     end
-    @testset "correlations" begin
+    @testset "correlation" begin
         include("correlation_tests.jl")
     end
     @testset "structs" begin

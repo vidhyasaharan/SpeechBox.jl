@@ -1,3 +1,56 @@
+#Cross corrleation sequence with zero padding (and using dotavx)
+"""
+    xcorr(x, h[, z=1])
+
+Compute the cross correlation between `x` and `h`, with the optional `z` indicating the position of the zero index of the array `h`. The output is of the same length as `x` and the cross correlation is computed with zero padding.
+"""
+function xcorr(x::AbstractVector{Float}, h::AbstractVector{Float}, z::Int=1)
+    y = Vector{Float}(undef,length(x))
+    xcorr!(y, x, h, z)
+    return y
+end
+
+"""
+    xcorr!(y, x, h[, z=1])
+
+Compute the cross correlation between `x` and `h`, with the optional `z` indicating the position of the zero index of the array `h` and stores the result in `y`. The number of sample lags at which cross correlation is computed is equal to the length of `y` and the cross correlation is computed with zero padding.
+"""
+function xcorr!(y::AbstractVector{Float}, x::AbstractVector{Float}, h::AbstractVector{Float}, z::Int=1)
+    padded_x = zeros(length(x)+length(h)-1)
+    @views padded_x[z:z+length(x)-1] = x
+    @views @inbounds for i ∈ eachindex(y)
+        y[i] = dotavx(padded_x[i:i+length(h)-1],h)
+    end
+end
+
+#Autocorrleation sequence without zero padding (and using dotavx)
+"""
+    acorr!(rxx, x)
+
+Compute the autocorrelation sequence `rxx` of sequence `x`, with the number of sample lags determined by length of `rxx`. Autocorrelation value at each lag is normalised by length of correlation window (reduces at edges).
+"""
+function acorr!(rxx::AbstractVector{Float}, x::AbstractVector{Float})
+    len = length(x)
+    @inbounds @views for i ∈ eachindex(rxx)
+        δ = i-1
+        N = len - δ
+        rxx[i] = (1/N)*dotavx(x[1:end-δ],x[1+δ:end])
+    end
+end
+
+
+"""
+    acorr(x, p)
+
+Compute the autocorrelation sequence of `x`, with the number of sample lags given by `p`. Autocorrelation value at each lag is normalised by length of correlation window (reduces at edges).
+"""
+function acorr(x::AbstractVector{Float}, p::Int)
+    rxx = Vector{Float}(undef,p)
+    acorr!(rxx,x)
+    return rxx
+end
+
+
 
 #Autocorrelation function at time index `i` and lag `k` (in terms of samples)
 """

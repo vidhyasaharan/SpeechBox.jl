@@ -1,7 +1,6 @@
 module SpeechBox
 
-# using LoopVectorization: include
-# using StaticArrays: maximum
+
 using DSP
 using FFTW
 using StaticArrays
@@ -21,6 +20,7 @@ const Float = Float64 #Set to Float32 to for 32bit floating point operations - N
 include("signal_objects.jl")
 include("internal_utilities.jl")
 include("loopvectorized_utilities.jl")
+include("dsp_utilities.jl")
 include("speechframing.jl")
 include("spectralanalyses.jl")
 include("mfcc.jl")

@@ -15,7 +15,7 @@ function lpc(x::AbstractVector{Float}, p::Int)
 end
 
 function lpc(rxx::AbstractVector{Float})
-    α = levinson_durbin(rxx)
+    α,_ = levinson_durbin(rxx)
     return [1;-α[end:-1:1]]
 end
 

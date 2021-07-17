@@ -14,7 +14,7 @@ function levinson_durbin(rxx::AbstractVector{Float})
         update_α!(α, k, i)
         update_E!(E, k, i)
     end
-    return α
+    return α, E[end], k
 end
 
 

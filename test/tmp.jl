@@ -13,7 +13,7 @@ x, fs = wavread(joinpath(testdir,"SA1.wav"))
 s = speech_waveform(x,fs)
 
 frames = framed_signal(x,fs,0.05,0.01)
-frame = extract_frame(frames,11)
+frame = extract_frame(frames,32)
 
 dd = zeros(Float64,frames.num_signal_frames-1)
 

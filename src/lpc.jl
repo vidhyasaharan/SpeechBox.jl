@@ -30,10 +30,27 @@ end
 #Compute the LPC/AR model magnitude response given a dicrete-time signal
 function lpc_freqz(x::Array{Float,1}, fs::Real, N::Int = lpc_order(fs); frqs::Array{<:Real,1} = linfreq_array(fmax = fs/2, nfrqs = length(x)))
     a = lpc(x,N)
-    filter = DSP.Filters.PolynomialRatio([1],a)
-    h = DSP.freqresp(filter, frqs * ((2pi) / fs))
+    filter = filter_coefs([1],a)
+    h = filter_resp(filter, frqs, fs)
     return h
 end
+
+function lpc_magz(x::Array{Float,1}, fs::Real, N::Int = lpc_order(fs); frqs::Array{<:Real,1} = linfreq_array(fmax = fs/2, nfrqs = length(x)))
+    a = lpc(x,N)
+    filter = filter_coefs([1],a)
+    h = filter_magresp(filter, frqs, fs)
+    return h
+end
+
+# function lpc_freqz(x::Array{Float,1}, fs::Real, N::Int = lpc_order(fs); frqs::Array{<:Real,1} = linfreq_array(fmax = fs/2, nfrqs = length(x)))
+#     a = lpc(x,N)
+#     filter = DSP.Filters.PolynomialRatio([1],a)
+#     h = DSP.freqresp(filter, frqs * ((2pi) / fs))
+#     return h
+# end
+
+
+
 
 #Compute the LPC/AR model magnitude response given a dicrete-time signal and store in spectrum object
 """
@@ -44,8 +61,8 @@ Compute the magnitude response of the Linear Predictive Coding (LPC) / Autoregre
 When the input is a framed signal `frames`, the magnitude response of the LPC/AR filter model in each frame is computed and concatenated to form an LPC spectrogram.
 """
 function lpc_response(x::Array{Float,1}, fs::Real, N::Int = lpc_order(fs); frqs::Array{<:Real,1} = linfreq_array(fmax = fs/2, nfrqs = length(x)))
-    h = lpc_freqz(x, fs, N; frqs)
-    return spectrum(speech_waveform(x,fs),abs.(h),frqs,"LPC/AR Model Magnitude Respose")
+    h = lpc_magz(x, fs, N; frqs)
+    return spectrum(speech_waveform(x,fs),h,frqs,"LPC/AR Model Magnitude Respose")
 end
 
 
@@ -56,7 +73,7 @@ function lpc_response(sig_frames::framed_signal, N::Int = lpc_order(sig_frames.s
     lpcspec = zeros(nfrqs,nframes)
     for i=1:nframes
         frame = extract_frame(sig_frames,i)
-        lpcspec[:,i] = abs.(lpc_freqz(frame, fs, N; frqs))
+        lpcspec[:,i] = lpc_magz(frame, fs, N; frqs)
     end
     return timefreq(sig_frames, lpcspec, frqs, "LPC/AR Spectrogram")
 end

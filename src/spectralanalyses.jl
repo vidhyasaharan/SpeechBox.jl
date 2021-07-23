@@ -8,19 +8,26 @@ Compute the complex DFT spectrum of speech\\_waveform `signal` (or signal in arr
 """
 function dftspec(signal::speech_waveform;wtype::String="hanning")
     #Choose window - options are rectangle, hamming or hanning (function default is hanning)
-    x = signal.x
+    cmplx_spectrum,frqs = dftspec_components(signal.x, signal.fs; wtype)
+    return spectrum(signal,cmplx_spectrum,frqs,"Complex Fourier Spectrum")
+end
+
+function dftspec(x::AbstractVector{Float},fs::Real=1.0;wtype::String="hanning")
+    #Choose window - options are rectangle, hamming or hanning (function default is hanning)
+    signal = speech_waveform(x,fs)
+    return dftspec(signal;wtype)
+end
+
+
+function dftspec_components(x::AbstractVector{Float}, fs::Real = 1.0; wtype::String="hanning")
+    #Choose window - options are rectangle, hamming or hanning (function default is hanning)
     flen = length(x)
     win = window(flen;wtype=wtype)
     cmplx_spectrum = rfft(x.*win)
     nfrqs = length(cmplx_spectrum)
-    frqs = collect(range(0, signal.fs/2, length = nfrqs))
-    return spectrum(signal,cmplx_spectrum,frqs,"Complex Fourier Spectrum")
-end
-
-function dftspec(x::Array{Float,1},fs::Number=1.0;wtype::String="hanning")
-    #Choose window - options are rectangle, hamming or hanning (function default is hanning)
-    signal = speech_waveform(x,fs)
-    return dftspec(signal;wtype=wtype)
+    frqs = linfreq_array(fmin = 0, fmax = fs/2; nfrqs)
+    # frqs = collect(range(0, fs/2, length = nfrqs))
+    return cmplx_spectrum, frqs
 end
 
 
@@ -33,11 +40,11 @@ Compute the DFT magnitude spectrum of speech\\_waveform `signal` (or signal in a
 """
 function magspec(signal::speech_waveform;wtype::String="hanning")
     #Choose window - options are rectangle, hamming or hanning (function default is hanning)
-    cspec = dftspec(signal;wtype=wtype)
-    return spectrum(signal,abs.(cspec.components),cspec.frqs,"DFT Magnitude Spectrum")
+    cspec,frqs = dftspec_components(signal.x, signal.fs; wtype)
+    return spectrum(signal,abs.(cspec),frqs,"DFT Magnitude Spectrum")
 end
 
-function magspec(x::Array{Float,1},fs::Number=1.0;wtype::String="hanning")
+function magspec(x::AbstractVector{Float},fs::Real=1.0;wtype::String="hanning")
     #Choose window - options are rectangle, hamming or hanning (function default is hanning)
     signal = speech_waveform(x,fs)
     return magspec(signal;wtype=wtype)
@@ -52,6 +59,19 @@ Compute the DFT based spectrogram of signal in framed\\_signal `frames` (or sign
 
 """
 function specgram(sig_frames::framed_signal;wtype::String="hanning")
+    mspec, frqs = specgram_components(sig_frames; wtype)
+    return timefreq(sig_frames,mspec,frqs)
+end
+
+#Spectrogram wrapper for Array{AbstactFloat} input
+function specgram(x::Array{<:AbstractFloat},fs::Number;win_dur::Float=0.02,win_shift::Float=0.01,wtype::String="hanning")
+    sig_frames = framed_signal(x,fs,win_dur,win_shift) #Obtain signal frames object
+    return specgram(sig_frames;wtype=wtype)
+end
+
+
+
+function specgram_components(sig_frames::framed_signal;wtype::String="hanning")
     flen = sig_frames.frame_length
     nfft = nextfastfft(flen) #Get optimal number of points (larger than frame length) for FFT
     nframes = sig_frames.num_signal_frames
@@ -62,23 +82,17 @@ function specgram(sig_frames::framed_signal;wtype::String="hanning")
     buf = zeros(nfft); #Buffer for operating on one frame (length is equal or larger than frame length)
     rfp = plan_rfft(buf); #Real valued FFT operator (gives only positive frequencies)
     nrfft = length(rfp*buf); #Number of FFT coefficeints
-    mspec = zeros(nrfft,nframes); #Buffer for spectrogram values
+    mspec = Matrix{Float}(undef,nrfft,nframes); #Buffer for spectrogram values
     for i=1:nframes
         frame = extract_frame(sig_frames,i)
         buf[1:1:flen] = win.*frame; #Apply window and THEN store in buffer
         mspec[:,i] = abs.(rfp*buf); #Magnitude spectrum
     end
     dithered_mspec = mspec + (eps()*ones(size(mspec))) #Add a tiny floor to spectrogram to avoid potential zero values - in case log spectrogram is required later.
-    frqs = convert.(Float,collect(range(0, sig_frames.signal.fs/2, length = nrfft)))
-    return timefreq(sig_frames,dithered_mspec,frqs)
+    frqs = linfreq_array(fmin = 0, fmax = sig_frames.signal.fs/2, nfrqs = nrfft)
+    # frqs = convert.(Float,collect(range(0, sig_frames.signal.fs/2, length = nrfft)))
+    return dithered_mspec, frqs
 end
-
-#Spectrogram wrapper for Array{AbstactFloat} input
-function specgram(x::Array{<:AbstractFloat},fs::Number;win_dur::Float=0.02,win_shift::Float=0.01,wtype::String="hanning")
-    sig_frames = framed_signal(x,fs,win_dur,win_shift) #Obtain signal frames object
-    return specgram(sig_frames;wtype=wtype)
-end
-
 
 
 

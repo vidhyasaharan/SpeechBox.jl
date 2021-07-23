@@ -28,14 +28,14 @@ end
 
 
 #Compute the LPC/AR model magnitude response given a dicrete-time signal
-function lpc_freqz(x::Array{Float,1}, fs::Real, N::Int = lpc_order(fs); frqs::Array{<:Real,1} = linfreq_array(fmax = fs/2, nfrqs = length(x)))
+function lpc_freqz(x::AbstractVector{Float}, fs::Real, N::Int = lpc_order(fs); frqs::AbstractVector{<:Real} = linfreq_array(fmax = fs/2, nfrqs = length(x)))
     a = lpc(x,N)
     filter = filter_coefs([1],a)
     h = filter_resp(filter, frqs, fs)
     return h
 end
 
-function lpc_magz(x::Array{Float,1}, fs::Real, N::Int = lpc_order(fs); frqs::Array{<:Real,1} = linfreq_array(fmax = fs/2, nfrqs = length(x)))
+function lpc_magz(x::AbstractVector{Float}, fs::Real, N::Int = lpc_order(fs); frqs::AbstractVector{<:Real} = linfreq_array(fmax = fs/2, nfrqs = length(x)))
     a = lpc(x,N)
     filter = filter_coefs([1],a)
     h = filter_magresp(filter, frqs, fs)
@@ -60,13 +60,13 @@ end
 Compute the magnitude response of the Linear Predictive Coding (LPC) / Autoregressive (AR) filter model (of order `N`) of signal in array `x` with sampling rate `fs` at frequencies specified in `frqs`.
 When the input is a framed signal `frames`, the magnitude response of the LPC/AR filter model in each frame is computed and concatenated to form an LPC spectrogram.
 """
-function lpc_response(x::Array{Float,1}, fs::Real, N::Int = lpc_order(fs); frqs::Array{<:Real,1} = linfreq_array(fmax = fs/2, nfrqs = length(x)))
+function lpc_response(x::AbstractVector{Float}, fs::Real, N::Int = lpc_order(fs); frqs::AbstractVector{Float} = linfreq_array(fmax = fs/2, nfrqs = length(x)))
     h = lpc_magz(x, fs, N; frqs)
     return spectrum(speech_waveform(x,fs),h,frqs,"LPC/AR Model Magnitude Respose")
 end
 
 
-function lpc_response(sig_frames::framed_signal, N::Int = lpc_order(sig_frames.signal.fs); frqs::Array{<:Real,1} = linfreq_array(fmax = sig_frames.signal.fs/2, nfrqs = sig_frames.frame_length))
+function lpc_response(sig_frames::framed_signal, N::Int = lpc_order(sig_frames.signal.fs); frqs::AbstractVector{Float} = linfreq_array(fmax = sig_frames.signal.fs/2, nfrqs = sig_frames.frame_length))
     nframes = sig_frames.num_signal_frames
     nfrqs = length(frqs)
     fs = sig_frames.signal.fs
@@ -84,7 +84,7 @@ end
 
 
 #Generate allpole filter given pole frequencies, bandwidths and sampling frequency
-function allpole(pf::Array{<:Real,1} = [1000, 1800, 2900, 3400, 5000, 6800], pbw::Array{<:Real,1} = [50, 120, 200, 300, 500, 800]; fs::Real = 16000)
+function allpole(pf::AbstractVector{<:Real} = [1000, 1800, 2900, 3400, 5000, 6800], pbw::AbstractVector{<:Real} = [50, 120, 200, 300, 500, 800]; fs::Real = 16000)
     num_poles = length(pf)
     poles  = zeros(Complex{Float},2*num_poles)
     for i=1:num_poles

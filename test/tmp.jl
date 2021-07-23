@@ -21,7 +21,7 @@ for i ∈ eachindex(dd)
     f1 = extract_frame(frames,i)
     f2 = extract_frame(frames,i+1)
     p = SpeechBox.lpc_order(frames.signal.fs)
-    dd[i] = SpeechBox.distis_mat(f1,f2,p)
+    dd[i] = SpeechBox.distispf(f1,f2,p)
 end
 
 

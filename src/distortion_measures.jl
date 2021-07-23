@@ -1,4 +1,21 @@
 #Itakura Saito Distortion
+function distispf(x::AbstractVector{Float}, y::AbstractVector{Float}, p::Int)
+    npts = 1000
+    Δθ = 2pi/(npts-1)
+    θ = -pi:Δθ:pi
+    pf1 = lpc_magz(x,2pi,p; frqs = θ)
+    pf2 = lpc_magz(y,2pi,p; frqs = θ)
+    d = zero(Float)
+    for i ∈ eachindex(pf1)
+        v = pf1[i]/pf2[i]
+        t = v - log(v) - 1
+        d += t
+    end
+    d *= Δθ/2pi
+    return d
+end
+
+
 function distis(x::AbstractVector{Float}, y::AbstractVector{Float}, p::Int)
     a = lpc(x, p)
     b = lpcar2ra(a)

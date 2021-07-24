@@ -84,7 +84,7 @@ function specgram_components(sig_frames::framed_signal;wtype::String="hanning")
     nrfft = length(rfp*buf); #Number of FFT coefficeints
     mspec = Matrix{Float}(undef,nrfft,nframes); #Buffer for spectrogram values
     for i=1:nframes
-        frame = extract_frame(sig_frames,i)
+        frame = view_frame(sig_frames,i)
         buf[1:1:flen] = win.*frame; #Apply window and THEN store in buffer
         mspec[:,i] = abs.(rfp*buf); #Magnitude spectrum
     end

@@ -1,10 +1,60 @@
-#Itakura Saito Distortion
-function distispf(x::AbstractVector{Float}, y::AbstractVector{Float}, p::Int)
-    npts = 1000
+#Itakura Distortion
+function distitak(x::AbstractVector{Float}, y::AbstractVector{Float}, p::Int)
+    npts = 100
     Δθ = 2pi/(npts-1)
     θ = -pi:Δθ:pi
     pf1 = lpc_magz(x,2pi,p; frqs = θ)
     pf2 = lpc_magz(y,2pi,p; frqs = θ)
+    d = zero(Float)
+    for i ∈ eachindex(pf1)
+        d += abs2(pf1[i]/pf2[i])
+    end
+    d *= Δθ/2pi
+    return log(d)
+end
+
+
+function distitak2(x::AbstractVector{Float}, y::AbstractVector{Float}, p::Int)
+    npts = 100
+    Δθ = 2pi/(npts-1)
+    θ = -pi:Δθ:pi
+    rx = acorr(x,p+1)
+    ry = acorr(y,p+1)
+    αx,Ex,_ = levinson_durbin(rx)
+    αy,Ey,_ = levinson_durbin(ry)
+    ax = [1;-αx[end:-1:1]]
+    ay = [1;-αy[end:-1:1]]
+
+    fx = filter_coefs([1],ax)
+    fy = filter_coefs([1],ay)
+
+    hx = filter_magresp(fx, θ, 2pi)
+    hy = filter_magresp(fy, θ, 2pi)
+
+    pf1 = abs(Ex).*(hx.^2)
+    pf2 = abs(Ey).*(hy.^2)
+
+    λ = 0.01:0.01:2
+    dis = Vector{Float}(undef,length(λ))
+    for i ∈ eachindex(dis)
+        dis[i] = distispf(pf1,λ[i].*pf2,Δθ)
+    end
+    return minimum(dis)
+end
+
+
+#Itakura Saito Distortion
+function distis(x::AbstractVector{Float}, y::AbstractVector{Float}, p::Int)
+    npts = 100
+    Δθ = 2pi/(npts-1)
+    θ = -pi:Δθ:pi
+    pf1 = lpc_magz(x,2pi,p; frqs = θ)
+    pf2 = lpc_magz(y,2pi,p; frqs = θ)
+    d = distispf(pf1, pf2, Δθ)
+    return d
+end
+
+function distispf(pf1::AbstractVector{Float}, pf2::AbstractVector{Float}, Δθ::Float)
     d = zero(Float)
     for i ∈ eachindex(pf1)
         v = pf1[i]/pf2[i]
@@ -16,34 +66,34 @@ function distispf(x::AbstractVector{Float}, y::AbstractVector{Float}, p::Int)
 end
 
 
-function distis(x::AbstractVector{Float}, y::AbstractVector{Float}, p::Int)
-    a = lpc(x, p)
-    b = lpcar2ra(a)
-    for i ∈ 2:length(b)
-        b[i] *= 2
-    end
+# function distis(x::AbstractVector{Float}, y::AbstractVector{Float}, p::Int)
+#     a = lpc(x, p)
+#     b = lpcar2ra(a)
+#     for i ∈ 2:length(b)
+#         b[i] *= 2
+#     end
 
-    Ryy = acorr(y, p+1)
-    â = lpc(Ryy)
-    r = lpcacorr2v(Ryy)
+#     Ryy = acorr(y, p+1)
+#     â = lpc(Ryy)
+#     r = lpcacorr2v(Ryy)
 
-    c = log(dotavx(a))
-    # d = c + log(dotavx(b,r)) - log(dotavx(â,r))
-    d = dotavx(b,r)/dotavx(â,r)
-    return d
-end
+#     c = log(dotavx(a))
+#     # d = c + log(dotavx(b,r)) - log(dotavx(â,r))
+#     d = dotavx(b,r)/dotavx(â,r)
+#     return d
+# end
 
 
-function distis_mat(x::AbstractVector{Float}, y::AbstractVector{Float}, p::Int)
-    rxx = acorr(x, p+1)
-    V = acorr_mat(rxx)
-    a = lpc(x, p)
-    â = lpc(y, p)
-    N = dotavx(a, V*a)
-    D = dotavx(â, V*â)
-    d = N/D
-    return d
-end
+# function distis_mat(x::AbstractVector{Float}, y::AbstractVector{Float}, p::Int)
+#     rxx = acorr(x, p+1)
+#     V = acorr_mat(rxx)
+#     a = lpc(x, p)
+#     â = lpc(y, p)
+#     N = dotavx(a, V*a)
+#     D = dotavx(â, V*â)
+#     d = N/D
+#     return d
+# end
 
 
 #Convert inverse filter coefficients to autocorrelation coefficients

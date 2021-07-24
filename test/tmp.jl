@@ -16,12 +16,13 @@ frames = framed_signal(x,fs,0.05,0.01)
 frame = extract_frame(frames,32)
 
 dd = zeros(Float64,frames.num_signal_frames-1)
+win = SpeechBox.window(frames.frame_length; wtype="hamming")
+p = SpeechBox.lpc_order(frames.signal.fs)
 
 for i ∈ eachindex(dd)
     f1 = extract_frame(frames,i)
     f2 = extract_frame(frames,i+1)
-    p = SpeechBox.lpc_order(frames.signal.fs)
-    dd[i] = SpeechBox.distispf(f1,f2,p)
+    dd[i] = SpeechBox.distitak2(f1.*win,f2.*win,p)
 end
 
 

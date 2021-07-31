@@ -1,5 +1,5 @@
 """
-    dft(x, comp() [, <keyword argument>])
+    dft(x [, <keyword argument>])
 
 Compute the complex DFT coefficients of the array `x`.
 
@@ -19,10 +19,22 @@ end
 
 
 """
-    magspec(signal::speech_waveform[; wtype="hanning"])
-    magspec(x, fs=1.0[; wtype="hanning"])
+    magspec(signal [, <keywork arguments>])
+    magspec(x, fs = 2π [, <keywork arguments>])
 
-Compute the DFT magnitude spectrum of speech\\_waveform `signal` (or signal in array `x` with sampling rate `fs`) using a window of type `wtype` (default = hanning window)
+Compute the DFT magnitude spectrum of speech\\_waveform `signal` (or signal in array `x` with sampling rate `fs`). Returns `spectrum` object.
+
+    magspec(comp(), x, fs [, <keyword arguments>])
+
+Compute the DFT magnitude spectrum of signal in array `x`.
+
+    magspec(comp(), x [, <keyword arguments>])
+
+Compute the DFT magnitude spectrum of signal in array `x` with sampling rate `fs`. Returns array spectral components and array of frequencies
+
+### Keyword Arguments
+- `ndft` : Number of DFT points [Default value is length of signal array]
+- `wtype` : Window type to use [Default is "hanning"]
 
 """
 magspec(signal::speech_waveform;ndft::Int = length(signal.x), wtype::String="hanning") = magspec(signal.x, signal.fs; ndft, wtype)

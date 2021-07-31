@@ -11,9 +11,11 @@ using LoopVectorization
 
 export speech_waveform, framed_signal, extract_frame, view_frame, dftspec, specgram, magspec, melbankm, melfcc, frq2mel, mel2frq,
                 Float, frame_energy, vad, periodogram, spectrum, timefreq, amp2db, pow2db, lpc, lpc_response,
-                acf, nccf
+                acf, nccf, comp
 
 const Float = Float64 #Set to Float32 to for 32bit floating point operations - NOT YET IMPLEMENTED or TESTED
+
+struct comp end
 
 include("signal_objects.jl")
 include("internal_utilities.jl")

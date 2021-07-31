@@ -8,7 +8,7 @@ Both spectral and Spectro-temporal analyses routines are included and listed bel
 
 ## Fourier Spectrum (Spectral)
 ```@docs
-dftspec
+dft
 magspec
 ```
 

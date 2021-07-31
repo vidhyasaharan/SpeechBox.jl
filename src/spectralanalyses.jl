@@ -1,34 +1,21 @@
-#Function to estimate Fourier spectrum of signal using DFT
 """
-    dftspec(signal::speech_waveform[; wtype="hanning"])
-    dftspec(x, fs=1.0[; wtype="hanning"])
+    dft(x, comp() [, <keyword argument>])
 
-Compute the complex DFT spectrum of speech\\_waveform `signal` (or signal in array `x` with sampling rate `fs`) using a window of type `wtype` (default = hanning window)
+Compute the complex DFT coefficients of the array `x`.
 
+### Keyword Arguments
+- `ndft` : Number of DFT points [Default = `length(x)`]. If input `ndft` is less than the length of `x`, the number of DFT points is changed to `length(x)`
+- `wtype` : Window type to use [Default = "hanning"]
 """
-function dftspec(signal::speech_waveform;wtype::String="hanning")
-    #Choose window - options are rectangle, hamming or hanning (function default is hanning)
-    cmplx_spectrum,frqs = dftspec_components(signal.x, signal.fs; wtype)
-    return spectrum(signal,cmplx_spectrum,frqs,"Complex Fourier Spectrum")
+function dft(x::AbstractVector{Float}; ndft::Int = length(x), wtype::String="hanning")
+    len = length(x)
+    win = window(len;wtype)
+    buflen = max(ndft,len)
+    buf = zeros(Float, buflen)
+    buf[1:len] = x.*win
+    return rfft(buf)
 end
 
-function dftspec(x::AbstractVector{Float},fs::Real=1.0;wtype::String="hanning")
-    #Choose window - options are rectangle, hamming or hanning (function default is hanning)
-    signal = speech_waveform(x,fs)
-    return dftspec(signal;wtype)
-end
-
-
-function dftspec_components(x::AbstractVector{Float}, fs::Real = 1.0; wtype::String="hanning")
-    #Choose window - options are rectangle, hamming or hanning (function default is hanning)
-    flen = length(x)
-    win = window(flen;wtype=wtype)
-    cmplx_spectrum = rfft(x.*win)
-    nfrqs = length(cmplx_spectrum)
-    frqs = linfreq_array(fmin = 0, fmax = fs/2; nfrqs)
-    # frqs = collect(range(0, fs/2, length = nfrqs))
-    return cmplx_spectrum, frqs
-end
 
 
 """
@@ -38,17 +25,23 @@ end
 Compute the DFT magnitude spectrum of speech\\_waveform `signal` (or signal in array `x` with sampling rate `fs`) using a window of type `wtype` (default = hanning window)
 
 """
-function magspec(signal::speech_waveform;wtype::String="hanning")
-    #Choose window - options are rectangle, hamming or hanning (function default is hanning)
-    cspec,frqs = dftspec_components(signal.x, signal.fs; wtype)
-    return spectrum(signal,abs.(cspec),frqs,"DFT Magnitude Spectrum")
+magspec(signal::speech_waveform;ndft::Int = length(signal.x), wtype::String="hanning") = magspec(signal.x, signal.fs; ndft, wtype)
+
+
+function magspec(x::AbstractVector{Float},fs::Real=2π; ndft::Int = length(x), wtype::String="hanning")
+    mspec,frqs = magspec(comp(), x, fs; ndft, wtype)
+    return spectrum(speech_waveform(x,fs), mspec, frqs, "DFT Magnitude Spectrum")
 end
 
-function magspec(x::AbstractVector{Float},fs::Real=1.0;wtype::String="hanning")
-    #Choose window - options are rectangle, hamming or hanning (function default is hanning)
-    signal = speech_waveform(x,fs)
-    return magspec(signal;wtype=wtype)
+
+function magspec(::comp, x::AbstractVector{Float},fs::Real; ndft::Int = length(x), wtype::String="hanning")
+    mspec = magspec(comp(), x; ndft, wtype)
+    frqs = rfftfreq(ndft, fs)
+    return mspec,frqs
 end
+
+magspec(::comp, x::AbstractVector{Float}; ndft::Int = length(x), wtype::String = "hanning") = abs.(dft(x; ndft, wtype))
+
 
 #Spectrogram estimated from framed_signal object input (core method for later verions)
 """
@@ -72,12 +65,12 @@ end
 
 
 function specgram_components(sig_frames::framed_signal;wtype::String="hanning")
-    flen = sig_frames.frame_length
-    nfft = nextfastfft(flen) #Get optimal number of points (larger than frame length) for FFT
+    len = sig_frames.frame_length
+    nfft = nextfastfft(len) #Get optimal number of points (larger than frame length) for FFT
     nframes = sig_frames.num_signal_frames
 
     #Choose window - options are rectangle, hamming or hanning (function default is hanning)
-    win = window(flen;wtype=wtype)
+    win = window(len;wtype=wtype)
 
     buf = zeros(nfft); #Buffer for operating on one frame (length is equal or larger than frame length)
     rfp = plan_rfft(buf); #Real valued FFT operator (gives only positive frequencies)
@@ -85,7 +78,7 @@ function specgram_components(sig_frames::framed_signal;wtype::String="hanning")
     mspec = Matrix{Float}(undef,nrfft,nframes); #Buffer for spectrogram values
     for i=1:nframes
         frame = view_frame(sig_frames,i)
-        buf[1:1:flen] = win.*frame; #Apply window and THEN store in buffer
+        buf[1:1:len] = win.*frame; #Apply window and THEN store in buffer
         mspec[:,i] = abs.(rfp*buf); #Magnitude spectrum
     end
     dithered_mspec = mspec + (eps()*ones(size(mspec))) #Add a tiny floor to spectrogram to avoid potential zero values - in case log spectrogram is required later.
@@ -135,13 +128,13 @@ function periodogram_components(x::Vector{Float},fs::Real,frqs::Vector{<:Real};w
     #Choose window - options are rectangle, hamming or hanning (function default is hanning)
     frqs = Float.(frqs)::Vector{Float}
     fs = Float(fs)::Float
-    flen = length(x)
-    win = window(flen;wtype=wtype)
+    len = length(x)
+    win = window(len;wtype=wtype)
     ip = x.*win
     nfrqs = length(frqs)
     proj = zeros(Float,nfrqs)
     for i ∈ eachindex(proj)
-        proj[i] = abs2(dotavx(ip,cexp(frqs[i],fs,flen)))
+        proj[i] = abs2(dotavx(ip,cexp(frqs[i],fs,len)))
     end
     return proj
 end
@@ -154,14 +147,14 @@ end
 
 function periodogram_components(sig_frames::framed_signal, frqs ;wtype::String="hanning")
     frqs = Float.(frqs)
-    flen = sig_frames.frame_length
+    len = sig_frames.frame_length
     nframes = sig_frames.num_signal_frames
     fs = sig_frames.signal.fs
     pspec = Matrix{Float}(undef,length(frqs),nframes)
     nfrqs = length(frqs)
-    win = window(flen;wtype=wtype)
+    win = window(len;wtype=wtype)
 
-    ce_array = collect(transpose(cexp_proj_matrix(frqs,fs,flen)))
+    ce_array = collect(transpose(cexp_proj_matrix(frqs,fs,len)))
 
     for i in 1:nframes
         ip = extract_frame(sig_frames,i)

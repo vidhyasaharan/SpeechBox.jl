@@ -1,9 +1,13 @@
 @testset "magspec" begin
     t = 0:0.01:0.99
     frq = 25
+    fs = 100.0
     xx = cos.(2*pi*frq*t)
-    spec = magspec(xx,100.0;wtype = "rect")
+    spec = magspec(xx,fs;wtype = "rect")
+    mspec1, frqs1 = magspec(comp(), xx, fs; wtype = "rect")
     mspec = spec.components
+    @test mspec1 == mspec1
+    @test frqs1 == spec.frqs
     mmag,mfrq = findmax(mspec)
     @test length(mspec) == 51
     @test mfrq == frq + 1

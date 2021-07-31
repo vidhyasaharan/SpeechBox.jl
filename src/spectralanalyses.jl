@@ -128,16 +128,16 @@ end
 
 #Periodogram estimated at provided frequncies - estimated by projecting onto complex exponentials and taking the square of the absolute value
 """
-    periodogram(x, fs, frqs[; wtype="hanning"])
-    periodogram(x, fs [;wtype="hanning"[, fmin=10[, fmax=fs/2]]])
-    periodogram(sig_frames::framed_signal, frqs[; wtype="hanning"])
-    periodogram(sig_frames::framed_signal[; wtype="hanning"[, fmin=10[, fmax=sig_frames.signal.fs/2]]])
+    periodogram([comp(),] x, fs, frqs[; wtype="hanning"])
+    periodogram([comp(),] x, fs [;wtype="hanning"[, fmin=10[, fmax=fs/2]]])
+    periodogram([comp(),] sig_frames::framed_signal, frqs[; wtype="hanning"])
+    periodogram([comp(),] sig_frames::framed_signal[; wtype="hanning"[, fmin=10[, fmax=sig_frames.signal.fs/2]]])
 
-Compute the periodogram of a signal in array `x` with sampling frequency `fs` at frequencies specified in `frqs` or frequencies equally spaced on the log-scale between `fmin` and `fmax` as the L2 norm of the inner product between a complex exponential and `x`. When the input is a framed signal object `sig_frames`, the periodogram for each frame is computed.
+Compute the periodogram of a signal in array `x` with sampling frequency `fs` at frequencies specified in `frqs` or frequencies equally spaced on the log-scale between `fmin` and `fmax` as the L2 norm of the inner product between a complex exponential and `x`. When the input is a framed\\_signal object `sig_frames`, the periodogram for each frame is computed. If the optional input argument `comp()` is passed to the function, the periodogram components are returned in a Vector or Matrix; if `comp()` is omitted, the periodogram(s) are returned as `spectrum` or `timefreq` objects as appropriate.
 """
 function periodogram(x::Array{Float,1},fs::Number,frqs::Array{T,1};wtype::String="hanning") where T<:Number
     #Choose window - options are rectangle, hamming or hanning (function default is hanning)
-    components = periodogram_components(x,fs,frqs;wtype)
+    components = periodogram(comp(), x,fs,frqs;wtype)
     signal = speech_waveform(x,fs)
     return spectrum(signal,components,frqs,"Periodogram")
 end
@@ -149,7 +149,7 @@ function periodogram(x::Array{Float,1},fs::Number;wtype::String="hanning",fmin::
 end
 
 function periodogram(sig_frames::framed_signal,frqs ;wtype::String="hanning")
-    pspec = periodogram_components(sig_frames, frqs; wtype)
+    pspec = periodogram(comp(), sig_frames, frqs; wtype)
     return timefreq(sig_frames,pspec,frqs)
 end
 
@@ -160,11 +160,9 @@ end
 
 
 
-#Periodogram components estimated at provided frequncies - estimated by projecting onto complex exponentials and taking the square of the absolute value
-function periodogram_components(x::Vector{Float},fs::Real,frqs::Vector{<:Real};wtype::String="hanning")
-    #Choose window - options are rectangle, hamming or hanning (function default is hanning)
-    frqs = Float.(frqs)::Vector{Float}
-    fs = Float(fs)::Float
+function periodogram(::comp, x::AbstractVector{Float}, fs::Real, frqs::AbstractVector{<:Real}; wtype::String="hanning")
+    frqs = convert(Vector{Float},frqs)::Vector{Float}
+    fs = convert(Float,fs)::Float
     len = length(x)
     win = window(len;wtype=wtype)
     ip = x.*win
@@ -176,13 +174,12 @@ function periodogram_components(x::Vector{Float},fs::Real,frqs::Vector{<:Real};w
     return proj
 end
 
-function periodogram_components(x::Array{Float,1},fs::Real;wtype::String="hanning",fmin::Real=10,fmax::Real=fs/2)
-    #Choose window - options are rectangle, hamming or hanning (function default is hanning)
+function periodogram(::comp, x::Array{Float,1},fs::Real;wtype::String="hanning",fmin::Real=10,fmax::Real=fs/2)
     frqs = logfreq_array(;fmin = fmin,fmax = fmax)
-    return periodogram_components(x,fs,frqs;wtype=wtype)
+    return periodogram(comp(), x,fs,frqs;wtype=wtype)
 end
 
-function periodogram_components(sig_frames::framed_signal, frqs ;wtype::String="hanning")
+function periodogram(::comp, sig_frames::framed_signal, frqs ;wtype::String="hanning")
     frqs = Float.(frqs)
     len = sig_frames.frame_length
     nframes = sig_frames.num_signal_frames
@@ -203,7 +200,7 @@ function periodogram_components(sig_frames::framed_signal, frqs ;wtype::String="
     return pspec
 end
 
-function periodogram_components(sig_frames::framed_signal; wtype::String="hanning", fmin=10,fmax=sig_frames.signal.fs/2)
+function periodogram(::comp, sig_frames::framed_signal; wtype::String="hanning", fmin=10,fmax=sig_frames.signal.fs/2)
     frqs = logfreq_array(;fmin = fmin,fmax = fmax)
-    return periodogram_components(sig_frames, frqs, wtype = wtype)
+    return periodogram(comp(), sig_frames, frqs, wtype = wtype)
 end

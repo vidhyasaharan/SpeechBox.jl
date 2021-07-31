@@ -4,7 +4,8 @@
     sig_frames = framed_signal(x,fs,win_dur,win_shift)
 
     en_thr = 0.05
-    vi = vad(sig_frames,alg = "energy_threshold",energy_threshold = en_thr)
+    # vi = vad(sig_frames,alg = "energy_threshold",energy_threshold = en_thr)
+    vi = vad(energy_threshold(), sig_frames,threshold = en_thr)
 
 
     energy = zeros(Float,sig_frames.num_frames)

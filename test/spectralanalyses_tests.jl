@@ -24,6 +24,7 @@ end
     spec = periodogram(xx,fs,tfrqs)
     @test typeof(spec) == SpeechBox.spectrum{Float}
     pgram  = spec.components
+    @test pgram == periodogram(comp(), xx,fs,tfrqs)
     @test length(pgram) == length(tfrqs)
     mmag, mfindx = findmax(pgram)
     @test tfrqs[mfindx] == frq
@@ -31,6 +32,7 @@ end
     spec = periodogram(xx,fs;fmin=8,fmax=4000)
     @test typeof(spec) == SpeechBox.spectrum{Float}
     pgram = spec.components
+    @test pgram == periodogram(comp(),xx,fs,fmin=8,fmax=4000)
     mmag, mfindx = findmax(pgram)
     frqs = SpeechBox.logfreq_array(;fmin=8,fmax=4000)
     @test length(pgram) == length(frqs)

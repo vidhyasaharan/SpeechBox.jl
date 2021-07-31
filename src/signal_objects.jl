@@ -92,8 +92,8 @@ struct spectrum{T<:RorC}
     title::AbstractString
 end
 
-function spectrum(signal::speech_waveform, components::Vector{<:RorC},frqs::Vector{<:Real},title::AbstractString)
-    frqs = Float.(frqs)
+function spectrum(signal::speech_waveform, components::AbstractVector{<:RorC},frqs::AbstractVector{<:Real},title::AbstractString)
+    frqs = convert(Vector{Float},frqs)
     return spectrum(signal,components,frqs,title)
 end
 

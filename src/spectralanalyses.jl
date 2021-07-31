@@ -1,3 +1,4 @@
+#DFT function
 """
     dft(x [, <keyword argument>])
 
@@ -18,9 +19,10 @@ end
 
 
 
+#Magnitude Spectrum function
 """
-    magspec(signal [, <keywork arguments>])
-    magspec(x, fs = 2π [, <keywork arguments>])
+    magspec(signal [, <keyword arguments>])
+    magspec(x, fs = 2π [, <keyword arguments>])
 
 Compute the DFT magnitude spectrum of speech\\_waveform `signal` (or signal in array `x` with sampling rate `fs`). Returns `spectrum` object.
 
@@ -55,32 +57,17 @@ end
 magspec(::comp, x::AbstractVector{Float}; ndft::Int = length(x), wtype::String = "hanning") = abs.(dft(x; ndft, wtype))
 
 
-#Spectrogram estimated from framed_signal object input (core method for later verions)
+#Spectrogram functions
 """
-    specgram(frames[; wtype="hanning"])
-    specgram(x, fs[; win_dur=0.02[, win_shift=0.01[, wtype="hanning"]]])
+    specgram(comp(), frames::framed_signal [; <keyword arguments>])
+    specgram(frames::framed_signal [; <keyword arguments>])
 
-Compute the DFT based spectrogram of signal in framed\\_signal `frames` (or signal in array `x` with sampling rate `fs` using frames of duration `win_dur` and interval between frames `win_shift`) using a window of type `wtype` (default = hanning window). 
+Compute the DFT magnitude spectrogram from framed\\_signal object `frames`. With the input argument comp(), output is a matrix of DFT magnitude componentes else output is a `timefreq` object. The optional keyword arguments are:
 
+### Keyword Arguments
+- `wtype` : Window type [Default is "hanning"]
+- `ndft` : Number of DFT points in computation [Default value is optimal number of points for FFT greater than or equal to frame length]
 """
-function specgram(sig_frames::framed_signal; ndft::Int = nextfastfft(sig_frames.frame_length), wtype::String="hanning")
-    mspec = specgram(comp(), sig_frames; ndft, wtype)
-    frqs = rfftfreq(size(mspec,1),sig_frames.signal.fs)
-    # mspec, frqs = specgram_components(sig_frames; wtype)
-    return timefreq(sig_frames,mspec,frqs)
-end
-
-#Spectrogram wrapper for Array{AbstactFloat} input
-function specgram(x::Array{<:AbstractFloat},fs::Number;win_dur::Float=0.02,win_shift::Float=0.01,wtype::String="hanning")
-    sig_frames = framed_signal(x,fs,win_dur,win_shift) #Obtain signal frames object
-    return specgram(sig_frames;wtype=wtype)
-end
-
-function specgram(::comp, x::AbstractVector{Float}, fs::Real; win_dur::Float=0.02, win_shift::Float=0.01, ndft::Int = nextfastfft(time2nsamples(win_dur,fs)), wtype::String="hanning")
-    sig_frames = framed_signal(x,fs,win_dur,win_shift) #Obtain signal frames object
-    return specgram(comp(), sig_frames;ndft, wtype)
-end
-
 function specgram(::comp, sig_frames::framed_signal; ndft::Int = nextfastfft(sig_frames.frame_length), wtype::String = "hanning")
     len = sig_frames.frame_length
     nfft = max(len,ndft) #Default value of ndft is the optimal number of points (larger than frame length) for FFT
@@ -105,28 +92,37 @@ function specgram(::comp, sig_frames::framed_signal; ndft::Int = nextfastfft(sig
     return mspec
 end
 
-function specgram_components(sig_frames::framed_signal;wtype::String="hanning")
-    len = sig_frames.frame_length
-    nfft = nextfastfft(len) #Get optimal number of points (larger than frame length) for FFT
-    nframes = sig_frames.num_signal_frames
-
-    #Choose window - options are rectangle, hamming or hanning (function default is hanning)
-    win = window(len;wtype=wtype)
-
-    buf = zeros(nfft); #Buffer for operating on one frame (length is equal or larger than frame length)
-    rfp = plan_rfft(buf); #Real valued FFT operator (gives only positive frequencies)
-    nrfft = length(rfp*buf); #Number of FFT coefficeints
-    mspec = Matrix{Float}(undef,nrfft,nframes); #Buffer for spectrogram values
-    for i=1:nframes
-        frame = view_frame(sig_frames,i)
-        buf[1:1:len] = win.*frame; #Apply window and THEN store in buffer
-        mspec[:,i] = abs.(rfp*buf); #Magnitude spectrum
-    end
-    dithered_mspec = mspec + (eps()*ones(size(mspec))) #Add a tiny floor to spectrogram to avoid potential zero values - in case log spectrogram is required later.
-    frqs = linfreq_array(fmin = 0, fmax = sig_frames.signal.fs/2, nfrqs = nrfft)
-    # frqs = convert.(Float,collect(range(0, sig_frames.signal.fs/2, length = nrfft)))
-    return dithered_mspec, frqs
+function specgram(sig_frames::framed_signal; ndft::Int = nextfastfft(sig_frames.frame_length), wtype::String="hanning")
+    mspec = specgram(comp(), sig_frames; ndft, wtype)
+    frqs = rfftfreq(size(mspec,1),sig_frames.signal.fs)
+    # mspec, frqs = specgram_components(sig_frames; wtype)
+    return timefreq(sig_frames,mspec,frqs)
 end
+
+
+"""
+    specgram([comp(),] x, fs [, <keyword arguments>])
+
+Compute the DFT magnitude spectrogram from signal in array `x` and sampling rate `fs`. With the optional input argument `comp()`, output is a matrix of DFT magnitude componentes else output is a `timefreq` object. The optional keyword arguments are:
+
+### Keyword Arguments
+- `wtype` : Window type [Default is "hanning"]
+- `ndft` : Number of DFT points in computation [Default value is optimal number of points for FFT greater than or equal to frame length]
+- `frame_dur` : Frame duration in secs [Default = 0.02 secs]
+- `frame_shift_dur` : Interval between consecutive frames in secs [Default = 0.01 secs]
+"""
+function specgram(::comp, x::AbstractVector{Float}, fs::Real; frame_dur::Float=0.02, frame_shift_dur::Float=0.01, ndft::Int = nextfastfft(time2nsamples(frame_dur,fs)), wtype::String="hanning")
+    sig_frames = framed_signal(x,fs,frame_dur,frame_shift_dur) #Obtain signal frames object
+    return specgram(comp(), sig_frames;ndft, wtype)
+end
+
+function specgram(x::Array{<:AbstractFloat},fs::Number;frame_dur::Float=0.02, frame_shift_dur::Float=0.01, ndft::Int = nextfastfft(time2nsamples(frame_dur,fs)), wtype::String="hanning")
+    sig_frames = framed_signal(x,fs,frame_dur,frame_shift_dur) #Obtain signal frames object
+    return specgram(sig_frames; ndft, wtype)
+end
+
+
+
 
 
 

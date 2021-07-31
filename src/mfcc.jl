@@ -10,7 +10,7 @@ Compute a vector of mel frequency cepstral coefficients for each frame of the in
 - `x`: an array holding input speech signal
 - `fs`: sampling rate
 - `nfilt`: number of triangular mel filters used in the MFCC extraction [default=17]
-- `ncoeff`: number of desired MFCC coefficients (must be less than `nfilt`) including ``C\\_0`` [default=13]
+- `ncoeff`: number of desired MFCC coefficients (must be less than `nfilt`) including C₀ [default=13]
 - `win_dur`: duration of speech frame in secs [default=0.02]
 - `win_shift`: time interval between consecutive windows in secs [default=0.01]
 """

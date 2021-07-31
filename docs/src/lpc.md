@@ -8,4 +8,6 @@ Linear Predictive Coding (LPC) is based on the linear all-pole vocal tract filte
 ```@docs
 lpc
 lpc_response
+acorr
+acorr!
 ```

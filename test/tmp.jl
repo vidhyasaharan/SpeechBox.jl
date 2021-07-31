@@ -1,6 +1,6 @@
 using SpeechBox
 using WAV
-using Plots
+using Plots; plotlyjs()
 using BenchmarkTools
 # using TIMITutilities
 
@@ -12,7 +12,7 @@ x, fs = wavread(joinpath(testdir,"SA1.wav"))
 
 s = speech_waveform(x,fs)
 
-frames = framed_signal(x,fs,0.05,0.01)
+frames = framed_signal(s,0.05,0.01)
 frame = extract_frame(frames,32)
 
 dd = zeros(Float64,frames.num_signal_frames-1)

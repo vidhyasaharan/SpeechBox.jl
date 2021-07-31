@@ -121,17 +121,17 @@ end
 #Contructor functions for expected input combinations
 timefreq(frames::framed_signal,
         components::RorC_Matrix,
-        frqs::Vector{Float},
+        frqs::AbstractVector{<:Real},
         time::Union{Vector{Float}, Vector{Vector{Float}}},
-        title::Union{AbstractString, Nothing}) = timefreq(frames.signal,frames,components,frqs,time,title)
+        title::Union{AbstractString, Nothing}) = timefreq(frames.signal,frames,components,convert(Vector{Float},frqs),time,title)
 
 timefreq(signal::speech_waveform,
         components::RorC_Matrix,
-        frqs::Vector{Float},
+        frqs::AbstractVector{:Real},
         time::Union{Vector{Float}, Vector{Vector{Float}}},
-        title::Union{AbstractString, Nothing}) = timefreq(signal,nothing,components,frqs,time,title)
+        title::Union{AbstractString, Nothing}) = timefreq(signal,nothing,components,convert(Vector{Float},frqs),time,title)
 
-function timefreq(frames::framed_signal, components::RorC_Matrix, frqs::Vector{Float}, title::Union{AbstractString, Nothing})
+function timefreq(frames::framed_signal, components::RorC_Matrix, frqs::AbstractVector{<:Real}, title::Union{AbstractString, Nothing})
     frame_shift = frames.frame_shift
     fs = frames.signal.fs
     frame_length = frames.frame_length
@@ -140,10 +140,11 @@ function timefreq(frames::framed_signal, components::RorC_Matrix, frqs::Vector{F
     time_shift = frame_shift/fs
     start_time = frame_length/(2*fs)
     t = collect(range(start_time, step = time_shift, length = num_frames))
+    frqs = convert(Vector{Float},frqs)
     return timefreq(frames.signal,frames,components,frqs,t,title)
 end
 
-timefreq(frames::framed_signal, components::RorC_Matrix, frqs::Vector{Float}) =timefreq(frames,components,frqs,nothing)
+timefreq(frames::framed_signal, components::RorC_Matrix, frqs::AbstractVector{Float}) =timefreq(frames,components,convert(Vector{Float},frqs),nothing)
 
 
 

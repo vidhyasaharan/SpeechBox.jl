@@ -1,3 +1,17 @@
+#Pre-emphasis with 1 - 0.95z^-1
+function preemphasis(x::AbstractVector{Float})
+    y = Vector{Float}(undef,length(x))
+    y[1] = 0.05*x[1]
+    @turbo for i ∈ 2:length(x)
+        y[i] = x[i] - 0.95*x[i-1]
+    end
+    return y
+end
+
+preemphasis(s::speech_waveform) = speech_waveform(preemphasis(s.x),s.fs)
+
+
+
 #Generate window function of given length
 function window(flen::Int;wtype::String="hanning")
     if(wtype=="rect")

@@ -63,8 +63,10 @@ magspec(::comp, x::AbstractVector{Float}; ndft::Int = length(x), wtype::String =
 Compute the DFT based spectrogram of signal in framed\\_signal `frames` (or signal in array `x` with sampling rate `fs` using frames of duration `win_dur` and interval between frames `win_shift`) using a window of type `wtype` (default = hanning window). 
 
 """
-function specgram(sig_frames::framed_signal;wtype::String="hanning")
-    mspec, frqs = specgram_components(sig_frames; wtype)
+function specgram(sig_frames::framed_signal; ndft::Int = nextfastfft(sig_frames.frame_length), wtype::String="hanning")
+    mspec = specgram(comp(), sig_frames; ndft, wtype)
+    frqs = rfftfreq(size(mspec,1),sig_frames.signal.fs)
+    # mspec, frqs = specgram_components(sig_frames; wtype)
     return timefreq(sig_frames,mspec,frqs)
 end
 

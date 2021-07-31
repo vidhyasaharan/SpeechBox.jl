@@ -9,7 +9,7 @@ using Interpolations
 using Random
 using LoopVectorization
 
-export speech_waveform, framed_signal, extract_frame, view_frame, dftspec, specgram, magspec, melbankm, melfcc, frq2mel, mel2frq,
+export speech_waveform, framed_signal, extract_frame, view_frame, dft, specgram, magspec, melbankm, melfcc, frq2mel, mel2frq,
                 Float, frame_energy, vad, periodogram, spectrum, timefreq, amp2db, pow2db, lpc, lpc_response,
                 acf, nccf, comp
 

@@ -74,7 +74,34 @@ function specgram(x::Array{<:AbstractFloat},fs::Number;win_dur::Float=0.02,win_s
     return specgram(sig_frames;wtype=wtype)
 end
 
+function specgram(::comp, x::AbstractVector{Float}, fs::Real; win_dur::Float=0.02, win_shift::Float=0.01, ndft::Int = nextfastfft(time2nsamples(win_dur,fs)), wtype::String="hanning")
+    sig_frames = framed_signal(x,fs,win_dur,win_shift) #Obtain signal frames object
+    return specgram(comp(), sig_frames;ndft, wtype)
+end
 
+function specgram(::comp, sig_frames::framed_signal; ndft::Int = nextfastfft(sig_frames.frame_length), wtype::String = "hanning")
+    len = sig_frames.frame_length
+    nfft = max(len,ndft) #Default value of ndft is the optimal number of points (larger than frame length) for FFT
+    nframes = sig_frames.num_signal_frames #Spectrogram only covers frames witout zero padding original signal (i.e., may not include the last few samples of the signal)
+
+    win = window(len;wtype=wtype) #Choose window - options are rectangle, hamming or hanning (function default is hanning)
+
+    buf = zeros(nfft); #Buffer for operating on one frame (length is equal or larger than frame length)
+    rfp = plan_rfft(buf); #Real valued FFT operator (gives only positive frequencies)
+    nrfft = length(rfp*buf); #Number of FFT coefficeints
+    mspec = Matrix{Float}(undef,nrfft,nframes); #Buffer for spectrogram values
+    for i ∈ 1:nframes
+        frame = view_frame(sig_frames,i)
+        buf[1:1:len] = win.*frame; #Apply window and THEN store in buffer
+        mspec[:,i] = abs.(rfp*buf); #Magnitude spectrum
+    end
+
+    #Add a tiny floor to spectrogram to avoid potential zero values - in case log spectrogram is required later.
+    for i ∈ eachindex(mspec)
+        mspec[i] += eps(Float)
+    end
+    return mspec
+end
 
 function specgram_components(sig_frames::framed_signal;wtype::String="hanning")
     len = sig_frames.frame_length

@@ -1,4 +1,3 @@
-
 #RAPT algorithm parameters from Talkin, D., & Kleijn, W. B. (1995). A robust algorithm for pitch tracking (RAPT). Speech coding and synthesis, 495, 518.
 const F0min = 50.0
 const F0max = 500.0

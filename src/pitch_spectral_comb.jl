@@ -1,5 +1,3 @@
-
-
 #Prob of voicing based bifference highest and next highest peak in comb response
 function prob_voiced(frames::framed_signal)
     v1 = 10.0

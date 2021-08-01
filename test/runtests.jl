@@ -45,5 +45,5 @@ signal = speech_waveform(x,fs)
     end
     @testset "RAPT" begin
         include("pitch_RAPT_tests.jl")
-    end   
+    end
 end

@@ -4,8 +4,8 @@
 
 Compute the cross correlation between `x` and `h`, with the optional `z` indicating the position of the zero index of the array `h`. The output is of the same length as `x` and the cross correlation is computed with zero padding.
 """
-function xcorr(x::AbstractVector{Float}, h::AbstractVector{Float}, z::Int=1)
-    y = Vector{Float}(undef,length(x))
+function xcorr(x::AbstractVector{T}, h::AbstractVector{T}, z::Int=1) where {T}
+    y = Vector{T}(undef,length(x))
     xcorr!(y, x, h, z)
     return y
 end
@@ -15,7 +15,7 @@ end
 
 Compute the cross correlation between `x` and `h`, with the optional `z` indicating the position of the zero index of the array `h` and stores the result in `y`. The number of sample lags at which cross correlation is computed is equal to the length of `y` and the cross correlation is computed with zero padding.
 """
-function xcorr!(y::AbstractVector{Float}, x::AbstractVector{Float}, h::AbstractVector{Float}, z::Int=1)
+function xcorr!(y::AbstractVector{T}, x::AbstractVector{T}, h::AbstractVector{T}, z::Int=1) where {T}
     padded_x = zeros(length(x)+length(h)-1)
     @views padded_x[z:z+length(x)-1] = x
     @views @inbounds for i ∈ eachindex(y)
@@ -29,7 +29,7 @@ end
 
 Compute the autocorrelation sequence `rxx` of sequence `x`, with the number of sample lags determined by length of `rxx`. Autocorrelation value at each lag is normalised by length of correlation window (reduces at edges).
 """
-function acorr!(rxx::AbstractVector{Float}, x::AbstractVector{Float})
+function acorr!(rxx::AbstractVector{T}, x::AbstractVector{T}) where {T}
     len = length(x)
     @inbounds @views for i ∈ eachindex(rxx)
         δ = i-1
@@ -44,8 +44,8 @@ end
 
 Compute the autocorrelation sequence of `x`, with the number of sample lags given by `p`. Autocorrelation value at each lag is normalised by length of correlation window (reduces at edges).
 """
-function acorr(x::AbstractVector{Float}, p::Int)
-    rxx = Vector{Float}(undef,p)
+function acorr(x::AbstractVector{T}, p::Int) where {T}
+    rxx = Vector{T}(undef,p)
     acorr!(rxx,x)
     return rxx
 end

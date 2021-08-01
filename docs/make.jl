@@ -11,7 +11,8 @@ makedocs(
             "vad.md",
             "spectralanalyses.md",
             "lpc.md",
-            "mfcc.md"
+            "mfcc.md",
+            "utilities.md"
         ],
     ],
 )

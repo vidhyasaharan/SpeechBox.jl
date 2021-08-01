@@ -3,15 +3,31 @@ module SpeechBox
 
 using DSP
 using FFTW
-using StaticArrays
+# using StaticArrays
 using RecipesBase
 using Interpolations
 using Random
 using LoopVectorization
 
-export speech_waveform, framed_signal, extract_frame, view_frame, dft, specgram, magspec, melbankm, melfcc, frq2mel, mel2frq,
-                Float, frame_energy, vad, periodogram, spectrum, timefreq, amp2db, pow2db, lpc, lpc_response,
-                acf, nccf, comp, acorr, acorr!, energy_threshold, energy_fraction, enframe, enframe!
+
+
+export speech_waveform, framed_signal, spectrum, timefreq
+
+export extract_frame, view_frame, enframe, enframe!, frame_energy
+
+export dft, magspec, specgram, periodogram
+
+export vad, energy_threshold, energy_fraction
+
+export lpc, lpc_response
+
+export xcorr!, xcorr, acorr!, acorr, acf, nccf
+
+export melbankm, melfcc, frq2mel, mel2frq
+
+# export amp2db, pow2db
+
+export comp
 
 const Float = Float64 #Set to Float32 to for 32bit floating point operations - NOT YET IMPLEMENTED or TESTED
 

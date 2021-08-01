@@ -8,6 +8,7 @@ using LinearAlgebra
 # using SampledSignals
 using WAV
 using DSP: filt
+using SpeechBox: Float
 
 
 

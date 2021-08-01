@@ -3,9 +3,7 @@ module SpeechBox
 
 using DSP
 using FFTW
-# using StaticArrays
 using RecipesBase
-using Interpolations
 using Random
 using LoopVectorization
 
@@ -25,7 +23,7 @@ export xcorr!, xcorr, acorr!, acorr, acf, nccf
 
 export melbankm, melfcc, frq2mel, mel2frq
 
-# export amp2db, pow2db
+export amp2db, pow2db
 
 export comp
 

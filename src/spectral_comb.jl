@@ -34,11 +34,13 @@ function xcorr_spectral_comb(frames::framed_signal)
     fs = frames.signal.fs
     frqs = logfreq_array(fmin = 10, fmax = fs/2, frq_per_octave = frq_per_octave)
     h,z = generate_logfrq_pitch_comb(;frq_per_octave)
-    pd = periodogram(frames,frqs)
-    lpd = log.(pd.components)::Matrix{Float}
-    y = zeros(Float,size(lpd))
-    for i ∈ axes(y,2)
-        y[:,i] = xcorr(lpd[:,i],h,z)
+    pd = periodogram(comp(), frames,frqs)
+    @views for i ∈ eachindex(pd)
+        pd[i] = log(pd[i])
+    end
+    y = Matrix{Float}(undef,size(pd))
+    @views for i ∈ axes(y,2)
+        xcorr!(y[:,i],pd[:,i],h,z)
     end
     return y, frqs
 end

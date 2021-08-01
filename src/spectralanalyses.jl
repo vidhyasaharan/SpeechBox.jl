@@ -190,7 +190,7 @@ function periodogram(::comp, sig_frames::framed_signal, frqs ;wtype::String="han
 
     ce_array = collect(transpose(cexp_proj_matrix(frqs,fs,len)))
 
-    for i in 1:nframes
+    for i ∈ 1:nframes
         ip = extract_frame(sig_frames,i)
         mulavx!(ip,win)
         @views for j in 1:nfrqs

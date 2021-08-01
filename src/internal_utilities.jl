@@ -28,10 +28,10 @@ function window(flen::Int;wtype::String="hanning")
 end
 
 #Generate array of frequencies (in Hz), equally spaced in log domain with resolution given in frequencies per octave
-function logfreq_array(;fmin::Number = 10, fmax::Number = 4000, frq_per_octave::Number = 120)
-    fmin = Float(fmin)::Float
-    fmax = Float(fmax)::Float
-    frq_per_octave = Float(frq_per_octave)::Float
+function logfreq_array(;fmin::Real = 10, fmax::Real = 4000, frq_per_octave::Real = 120)
+    fmin = convert(Float,fmin)::Float
+    fmax = convert(Float,fmax)::Float
+    frq_per_octave = convert(Float,frq_per_octave)::Float
     lfmin = log2(fmin)
     lfmax = log2(fmax)
     lfres = 1/frq_per_octave
@@ -40,9 +40,9 @@ function logfreq_array(;fmin::Number = 10, fmax::Number = 4000, frq_per_octave::
 end
 
 #Generate array of desired number of equally spaced frequencies (in Hz)
-function linfreq_array(;fmin::Number = 0, fmax::Number = 4000, nfrqs::Int = 80)
-    fmin = Float(fmin)::Float
-    fmax = Float(fmax)::Float
+function linfreq_array(;fmin::Real = 0, fmax::Real = 4000, nfrqs::Int = 80)
+    fmin = convert(Float,fmin)::Float
+    fmax = convert(Float,fmax)::Float
     fres = (fmax-fmin)/(nfrqs-1)
     frqs = fmin:fres:fmax
     return collect(frqs)

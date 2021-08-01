@@ -23,6 +23,8 @@ export xcorr!, xcorr, acorr!, acorr, acf, nccf
 
 export melbankm, melfcc, frq2mel, mel2frq
 
+export pitch, spectral_comb
+
 export amp2db, pow2db
 
 export comp
@@ -41,7 +43,7 @@ include("mfcc.jl")
 include("vad.jl")
 include("lpc.jl")
 include("spectral_comb.jl")
-include("pitch_spectral_comb.jl")
+include("pitch.jl")
 include("correlations.jl")
 include("pitch_RAPT.jl")
 include("plot_recipes.jl")

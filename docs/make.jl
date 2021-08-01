@@ -12,6 +12,7 @@ makedocs(
             "spectralanalyses.md",
             "correlations.md",
             "lpc.md",
+            "pitch.md",
             "mfcc.md",
             "utilities.md"
         ],

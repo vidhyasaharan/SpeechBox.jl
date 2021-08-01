@@ -11,6 +11,7 @@ Currently SpeechBox.jl implements routines for
 - [Spectral Analyses](spectralanalyses)
 - [Correlations](correlations)
 - [LPC Analyses](lpc)
+- [Pitch Estimation](pitch)
 - [MFCC extraction](mfcc)
 - [Utilities](utilities)
 

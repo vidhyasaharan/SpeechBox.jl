@@ -1,6 +1,11 @@
 struct spectral_comb end
 
 #Frame based pitch estimation based on spectral comb
+"""
+    pitch(spectral_comb(), frames::framed_signal)
+
+Compute the fundamental frequency (f₀) within each frame of a speech signal in the `frames` based on the position of peak of the spectral comb response. The `vad` function is used to determine voicing in each frame and `NaN` is returned for unvoiced frames.
+"""
 function pitch(::spectral_comb, frames::framed_signal)
     max_f₀ = 600.0  #Assume highest f₀ is 200Hz
     comb_resp, frqs = xcorr_spectral_comb(frames)

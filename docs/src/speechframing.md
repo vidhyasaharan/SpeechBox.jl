@@ -28,7 +28,6 @@ enframe
 enframe!
 ```
 
-
 ## `frame_energy`
 
 The utility function [`frame_energy`](@ref) computes the 'energy' (L2 norm) in each frame of a signal. Optionally, the output can be 'normalised' such that the maximum frame energy is 1.

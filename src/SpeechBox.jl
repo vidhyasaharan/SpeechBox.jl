@@ -21,7 +21,7 @@ export vad, energy_threshold, energy_fraction
 
 export lpc, lpc_response
 
-export xcorr!, xcorr, acorr!, acorr, acf, nccf
+export xcorr!, xcorr, acorr!, acorr, acf, nacf
 
 export melbankm, melfcc, frq2mel, mel2frq
 

@@ -3,7 +3,7 @@
 const F0min = 50.0
 const F0max = 500.0
 const frame_step = 0.01
-const nccf_win_size = 0.0075
+const nacf_win_size = 0.0075
 const CAND_TR = 0.3
 const LAG_WT = 0.3
 const FREQ_WT = 0.02
@@ -38,7 +38,7 @@ struct RAPT_timefreq
     candarray::Vector{RAPT_candidates}
 end
 
-function RAPT_timefreq(s::speech_waveform; win_dur::Real = nccf_win_size, win_step::Real = frame_step)
+function RAPT_timefreq(s::speech_waveform; win_dur::Real = nacf_win_size, win_step::Real = frame_step)
     frames = framed_signal(s, win_dur+(1/F0min), win_step)
     pd = amp2db(periodogram(frames))
     candarray = RAPT_pitch_candidates(s; win_dur, win_step)
@@ -107,14 +107,14 @@ end
 
 
 # Estimate pitch candidates from signal at given sample index
-function RAPT_pitch_candidates(s::speech_waveform, indx::Int; win_dur::Real = nccf_win_size, ncands::Int = N_CANDS)
+function RAPT_pitch_candidates(s::speech_waveform, indx::Int; win_dur::Real = nacf_win_size, ncands::Int = N_CANDS)
     A_FACT = 0.0
     fs = s.fs
     win_size = time2nsamples(win_dur,fs)
     min_lag = time2nsamples(1/F0max,fs)
     max_lag = time2nsamples(1/F0min,fs)
     k = min_lag:max_lag
-    cf = nccf(s, indx, k; win_size, nconst = A_FACT)
+    cf = nacf(s, indx, k; win_size, nconst = A_FACT)
     inds, mags = findpeaks_sorted(cf)
     thr = CAND_TR*mags[1]
     num_cands = min(sum(mags.>thr), ncands)
@@ -126,7 +126,7 @@ function RAPT_pitch_candidates(s::speech_waveform, indx::Int; win_dur::Real = nc
 end
 
 #Estimate pitch candidates of a signal at every window step (win_step)
-function RAPT_pitch_candidates(s::speech_waveform; win_dur::Real = nccf_win_size, win_step::Real = frame_step, ncands::Int = N_CANDS)
+function RAPT_pitch_candidates(s::speech_waveform; win_dur::Real = nacf_win_size, win_step::Real = frame_step, ncands::Int = N_CANDS)
     fs = s.fs
     win_size = time2nsamples(win_dur,fs)
     win_shift = time2nsamples(win_step,fs)
@@ -176,11 +176,11 @@ end
 
 
 
-function RAPT_nccf(s::speech_waveform; win_dur::Real = nccf_win_size, win_step::Real = frame_step, nconst::Real = A_FACT)
+function RAPT_nacf(s::speech_waveform; win_dur::Real = nacf_win_size, win_step::Real = frame_step, nconst::Real = A_FACT)
     fs = s.fs
     win_size = time2nsamples(win_dur,fs)
     win_shift = time2nsamples(win_step,fs)
     min_lag = time2nsamples(1/F0max,fs)
     max_lag = time2nsamples(1/F0min,fs)
-    nccf(s;min_lag, max_lag, win_size, win_shift, nconst)
+    nacf(s;min_lag, max_lag, win_size, win_shift, nconst)
 end

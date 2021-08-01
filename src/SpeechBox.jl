@@ -11,6 +11,8 @@ using LoopVectorization
 
 export speech_waveform, framed_signal, spectrum, timefreq
 
+export preemphasis, window, resample
+
 export extract_frame, view_frame, enframe, enframe!, frame_energy
 
 export dft, magspec, specgram, periodogram
@@ -34,6 +36,7 @@ const Float = Float64 #Set to Float32 to for 32bit floating point operations - N
 struct comp end
 
 include("signal_objects.jl")
+include("utilities.jl")
 include("internal_utilities.jl")
 include("loopvectorized_utilities.jl")
 include("dsp_utilities.jl")

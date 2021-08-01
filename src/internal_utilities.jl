@@ -1,32 +1,3 @@
-#Pre-emphasis with 1 - 0.95z^-1
-function preemphasis(x::AbstractVector{Float})
-    y = Vector{Float}(undef,length(x))
-    y[1] = 0.05*x[1]
-    @turbo for i ∈ 2:length(x)
-        y[i] = x[i] - 0.95*x[i-1]
-    end
-    return y
-end
-
-preemphasis(s::speech_waveform) = speech_waveform(preemphasis(s.x),s.fs)
-
-
-
-#Generate window function of given length
-function window(flen::Int;wtype::String="hanning")
-    if(wtype=="rect")
-        win = ones(flen)
-    elseif(wtype=="hamming")
-        win = hamming(flen)
-    elseif(wtype=="hanning")
-        win = hanning(flen)
-    else
-        println("Warning: window type not recognised - using Hann window")
-        win = hanning(flen)
-    end
-    return win
-end
-
 #Generate array of frequencies (in Hz), equally spaced in log domain with resolution given in frequencies per octave
 function logfreq_array(;fmin::Real = 10, fmax::Real = 4000, frq_per_octave::Real = 120)
     fmin = convert(Float,fmin)::Float
@@ -133,12 +104,7 @@ function remove_nearest_peak!(ind::Vector,mag::Vector)
     # return ind,mag
 end
 
-#Resample signal in speech_waveform object (wrapper for resample from DSP.jl)
-function resample(signal::speech_waveform, fs_new::Number)
-    rx = DSP.Filters.resample(signal.x, fs_new/signal.fs)
-    fs = convert(Float,fs_new)
-    return speech_waveform(rx,fs)
-end
+
 
 #Index of closest frequency in an array to a given frequency
 frqindex(f::Float, frqs::AbstractVector{Float}) = argmin(abs.(frqs.-f))

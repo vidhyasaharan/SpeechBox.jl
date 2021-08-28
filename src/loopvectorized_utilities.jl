@@ -55,15 +55,29 @@ function dotavx(a::AbstractVector{T}) where {T}
 end
 
 
-
-
-
 #Vector Multiplication (in place)
 function mulavx!(a::AbstractVector{T}, b::AbstractVector{T}) where {T}
     @turbo for i ∈ eachindex(a,b)
         a[i] *= b[i]
     end
 end
+
+
+#Running mean
+function running_mean(x::AbstractMatrix{T}) where T<:AbstractFloat
+    ndim,npts = size(x)
+    m = zeros(T,ndim)
+    k = zero(T)
+    for j ∈ axes(x,2)
+        k = 1/j
+        @turbo for i ∈ axes(x,1)
+            temp = (x[i,j] - m[i])
+            m[i] += temp*k
+        end
+    end
+    return m
+end
+
 
 
 #Matrix multiplcation (in place for resultnant matrix)

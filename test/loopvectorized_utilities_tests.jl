@@ -20,3 +20,11 @@ end
     SpeechBox.mulavx!(a,b)
     @test c == a
 end
+
+
+@testset "running_mean" begin
+    ndim = 2
+    npts = 100000
+    x = randn(Float,ndim,npts)
+    @test mean(x,dims=2) ≈ SpeechBox.running_mean(x)
+end

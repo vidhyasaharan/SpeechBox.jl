@@ -64,6 +64,8 @@ function sqL2avx(a::AbstractVector{T}, b::AbstractVector{T}) where {T}
     return s
 end
 
+L2avx(a::AbstractVector{T}, b::AbstractVector{T}) where {T} = sqrt(sqL2avx(a,b))
+
 
 
 #Vector Multiplication (in place)

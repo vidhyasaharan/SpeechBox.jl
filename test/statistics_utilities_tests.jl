@@ -24,3 +24,33 @@ end
     end
     @test mean(x,dims=2) ≈ m
 end
+
+@testset "Distance" begin
+    a = randn(Float64,10)
+    b = randn(Float64,10)
+    c1 = [a b a b]
+    c2 = [a b]
+
+    @test SpeechBox.SqL2 <: SpeechBox.Distance
+    @test SpeechBox.L2 <: SpeechBox.Distance
+
+    @test SpeechBox.dist(SpeechBox.SqL2(),a,b) ≈ SpeechBox.sqL2avx(a,b)
+    @test SpeechBox.dist(SpeechBox.L2(),a,b) ≈ SpeechBox.L2avx(a,b)
+
+    distances = (SpeechBox.SqL2(), SpeechBox.L2())
+    for dm ∈ distances
+        d = SpeechBox.pairwise(dm,a,c1)
+        @test length(d) == size(c1,2)
+        @test d[1] == 0.0
+        @test d[2] == SpeechBox.dist(dm, a, b)
+
+        dd = SpeechBox.pairwise(dm, c2, c1)
+        @test size(dd,1) == size(c2,2)
+        @test size(dd,2) == size(c1,2)
+        @test dd[1,1] == 0.0
+        @test dd[2,2] == 0.0
+        @test dd[1,2] == SpeechBox.dist(dm, a, b)
+        @test dd[2,1] == SpeechBox.dist(dm, b, a)
+    end
+
+end

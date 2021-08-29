@@ -12,3 +12,7 @@ function generate_4_clusters(npts_per_cluster)
     return data
 end
 
+#k-mean++
+
+
+

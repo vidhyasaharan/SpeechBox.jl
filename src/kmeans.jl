@@ -12,6 +12,3 @@ function generate_4_clusters(npts_per_cluster)
     return data
 end
 
-# function update_running_mean(mean::AbstractVector{T}, data::AbstractVector{T}, data_index::Int) where T<:AbstractFloat
-#     temp
-# end

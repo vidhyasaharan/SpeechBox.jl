@@ -33,3 +33,12 @@ function running_meanvar(x::AbstractMatrix{T}) where T<:AbstractFloat
     end
     return m, s
 end
+
+
+#Update running mean with a nth data point where n is the running index
+function update_running_mean!(mean::AbstractVector{T}, data::AbstractVector{T}, n::Int) where T<:AbstractFloat
+    @inbounds @views for i ∈ eachindex(mean)
+        temp = (data[i] - mean[i])/n
+        mean[i] += temp
+    end
+end

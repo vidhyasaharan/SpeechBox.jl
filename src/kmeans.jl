@@ -20,3 +20,26 @@ end
 # end
 
 
+function mindist2cntrs(cntrs::AbstractMatrix{T}, data::AbstractMatrix{T}) where T<:AbstractFloat
+    mdist = Vector{Float}(undef,size(data,2))
+    @inbounds @views for i ∈ eachindex(mdist)
+        temp = pairwise(SqL2(), data[:,i], cntrs)
+        mdist[i] = minimum(temp)
+    end
+    return mdist
+end
+
+
+function kmeanspp(data::AbstractMatrix{T}, ncntrs::Int) where T<:AbstractFloat
+    cin = [rand(1:size(data,2))]
+    din = collect(1:size(data,2))
+    deleteat!(din,cin)
+    while(length(cin)<ncntrs)
+        mindist = SpeechBox.mindist2cntrs(data[:,cin], data[:,din])
+        cdist = SpeechBox.pdist2cdist(mindist)
+        ncin = SpeechBox.findclosest(rand(),cdist)
+        push!(cin, din[ncin])
+        deleteat!(din,ncin)
+    end
+    return cin
+end

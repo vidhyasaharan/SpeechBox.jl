@@ -1,5 +1,5 @@
 #Generate 2D data from 4 spherical (σ=0.25) gaussian clusters centered at [-1,1], [1,-1], [-1,1] and [1,1]
-function gen_4_clusters(npts_per_cluster)
+function generate_4_clusters(npts_per_cluster)
     c = convert(Matrix{Float},[1 1 -1 -1; 1 -1 1 -1])
     σ = 0.25
     data = Matrix{Float}(undef,2,4*npts_per_cluster)

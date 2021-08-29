@@ -12,7 +12,11 @@ function generate_4_clusters(npts_per_cluster)
     return data
 end
 
-#k-mean++
+##k-mean++
 
+#Draw  Centre based on distances
+# function kmpp_choose_cntr(min_dist::AbstractVector{T}) where {T}
+#     r = rand()
+# end
 
 

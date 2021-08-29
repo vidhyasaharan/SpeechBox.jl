@@ -104,10 +104,24 @@ function remove_nearest_peak!(ind::Vector,mag::Vector)
     # return ind,mag
 end
 
+# Find index of closest element of data array to input x (same as argmin(abs.(data.-x)) but faster)
+function findclosest(x::T, data::AbstractVector{T}) where T<:Real
+    d = zero(T)
+    mindx::Int = 1
+    mmag::T = Inf
+    @inbounds @views for i ∈ eachindex(data)
+        d = abs(data[i] - x)
+        if(d<mmag)
+            mmag = d
+            mindx = i
+        end 
+    end
+    return mindx
+end
 
 
 #Index of closest frequency in an array to a given frequency
-frqindex(f::Float, frqs::AbstractVector{Float}) = argmin(abs.(frqs.-f))
+frqindex(f::Float, frqs::AbstractVector{Float}) = findclosest(f,frqs) #argmin(abs.(frqs.-f))
 
 function frqindex(f::AbstractVector{Float}, frqs::AbstractVector{Float})
     findx = Vector{Int}(undef,length(f))

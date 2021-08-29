@@ -187,6 +187,14 @@ end
 
 end
 
+@testset "findclosest" begin
+    data = 0.0:0.1:10.0
+    rin = 7
+    x = (rin-1)*0.1
+    cin = SpeechBox.findclosest(x,data)
+    @test cin == rin
+end
+
 
 @testset "frqindex" begin
     frqs = 0.0:10.0:1000.0

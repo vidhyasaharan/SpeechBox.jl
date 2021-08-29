@@ -11,6 +11,12 @@
     @test a⋅a ≈ SpeechBox.dotavx(a)
 end
 
+@testset "sqL2avx" begin
+    ndim = 10
+    a = rand(Float,ndim)
+    b = rand(Float,ndim)
+    @test (a-b)⋅(a-b) ≈ SpeechBox.sqL2avx(a,b)
+end
 
 @testset "mulavx!" begin
     ndim = 10

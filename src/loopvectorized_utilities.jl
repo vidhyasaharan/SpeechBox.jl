@@ -54,6 +54,17 @@ function dotavx(a::AbstractVector{T}) where {T}
     return s
 end
 
+#L2 Distance square using LoopVectorization (real)
+function sqL2avx(a::AbstractVector{T}, b::AbstractVector{T}) where {T}
+    s = zero(T)
+    @turbo for i ∈ eachindex(a,b)
+        t = a[i] - b[i]
+        s += t * t
+    end
+    return s
+end
+
+
 
 #Vector Multiplication (in place)
 function mulavx!(a::AbstractVector{T}, b::AbstractVector{T}) where {T}

@@ -19,17 +19,19 @@ end
 #     r = rand()
 # end
 
-
+#Return distance to closest centre for each data point (helper function for k-mean++)
 function mindist2cntrs(cntrs::AbstractMatrix{T}, data::AbstractMatrix{T}) where T<:AbstractFloat
     mdist = Vector{Float}(undef,size(data,2))
+    temp = Vector{Float}(undef,size(cntrs,2))
     @inbounds @views for i ∈ eachindex(mdist)
-        temp = pairwise(SqL2(), data[:,i], cntrs)
+        # temp = pairwise(SqL2(), data[:,i], cntrs)
+        pairwise!(SqL2(), temp, data[:,i], cntrs)
         mdist[i] = minimum(temp)
     end
     return mdist
 end
 
-
+#k-means++ algorithm for initialising centres
 function kmeanspp(data::AbstractMatrix{T}, ncntrs::Int) where T<:AbstractFloat
     cin = [rand(1:size(data,2))]
     din = collect(1:size(data,2))
@@ -42,4 +44,19 @@ function kmeanspp(data::AbstractMatrix{T}, ncntrs::Int) where T<:AbstractFloat
         deleteat!(din,ncin)
     end
     return cin
+end
+
+function closest_centre!(ccntr::AbstractVector{Int}, cntrs::AbstractMatrix{T}, data::AbstractMatrix{T}) where T<:AbstractFloat
+    temp = Vector{Float}(undef,size(cntrs,2))
+    @inbounds @views for i ∈ eachindex(ccntr)
+        pairwise!(SqL2(), temp, data[:,i], cntrs)
+        ccntr[i] = argmin(temp)
+    end
+end
+
+
+function closest_centre(cntrs::AbstractMatrix{T}, data::AbstractMatrix{T}) where T<:AbstractFloat
+    ccntr = Vector{Int}(undef,size(data,2))
+    closest_centre!(ccntr, cntrs, data)
+    return ccntr
 end

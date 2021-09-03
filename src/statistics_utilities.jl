@@ -1,12 +1,12 @@
 #Running mean
 function running_mean!(m::AbstractVector{T}, x::AbstractMatrix{T}) where T<:AbstractFloat
     k = zero(T)
-    @inbounds @turbo for i ∈ eachindex(m)
+    @turbo for i ∈ eachindex(m)
         m[i] = zero(T)
     end
     @inbounds for j ∈ axes(x,2)
         k = 1/j
-        @inbounds @turbo for i ∈ axes(x,1)
+        @turbo for i ∈ axes(x,1)
             temp = (x[i,j] - m[i])
             m[i] += temp*k
         end
@@ -22,11 +22,11 @@ end
 #Running mean and variance
 function running_meanvar!(m::AbstractVector{T}, v::AbstractVector{T}, x::AbstractMatrix{T}) where T<:AbstractFloat
     k = zero(T)
-    @inbounds @turbo for i ∈ eachindex(m)
+    @turbo for i ∈ eachindex(m)
         m[i] = zero(T)
         v[i] = zero(T)
     end
-    for j ∈ axes(x,2)
+    @inbounds for j ∈ axes(x,2)
         k = 1/j
         @turbo for i ∈ axes(x,1)
             temp = (x[i,j] - m[i])

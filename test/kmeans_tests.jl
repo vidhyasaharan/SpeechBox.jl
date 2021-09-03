@@ -1,6 +1,11 @@
-x = SpeechBox.generate_4_clusters(10)
-cin = SpeechBox.kmeanspp(x,4)
+using SpeechBox
+using BenchmarkTools
+using Plots; plotlyjs()
 
-cc1 = Vector{Int}(undef,size(x,2))
-cc = SpeechBox.closest_centre(x[:,cin],x)
-SpeechBox.closest_centre!(cc1,x[:,cin],x)
+x = SpeechBox.generate_4_clusters(10)
+# icn = SpeechBox.kmeans_init(SpeechBox.kmpp(),x,4)
+# cn = SpeechBox.kmeans_init(SpeechBox.kmrand(),x,4)
+
+# cn = copy(icn)
+cn = SpeechBox.kmeans(x,4)
+# @benchmark SpeechBox.kmeans!(cn,x)

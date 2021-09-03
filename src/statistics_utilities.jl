@@ -1,8 +1,9 @@
 #Running mean
-function running_mean(x::AbstractMatrix{T}) where T<:AbstractFloat
-    ndim = size(x,1)
-    m = zeros(T,ndim)
+function running_mean!(m::AbstractVector{T}, x::AbstractMatrix{T}) where T<:AbstractFloat
     k = zero(T)
+    @inbounds @turbo for i ∈ eachindex(m)
+        m[i] = zero(T)
+    end
     @inbounds for j ∈ axes(x,2)
         k = 1/j
         @inbounds @turbo for i ∈ axes(x,1)
@@ -10,28 +11,54 @@ function running_mean(x::AbstractMatrix{T}) where T<:AbstractFloat
             m[i] += temp*k
         end
     end
+end
+
+function running_mean(x::AbstractMatrix{T}) where T<:AbstractFloat
+    m = zeros(T,size(x,1))
+    running_mean!(m, x)
     return m
 end
 
 #Running mean and variance
-function running_meanvar(x::AbstractMatrix{T}) where T<:AbstractFloat
-    ndim,npts = size(x)
-    m = zeros(T,ndim)
-    s = zeros(T,ndim)
+function running_meanvar!(m::AbstractVector{T}, v::AbstractVector{T}, x::AbstractMatrix{T}) where T<:AbstractFloat
     k = zero(T)
+    @inbounds @turbo for i ∈ eachindex(m)
+        m[i] = zero(T)
+        v[i] = zero(T)
+    end
     for j ∈ axes(x,2)
         k = 1/j
         @turbo for i ∈ axes(x,1)
             temp = (x[i,j] - m[i])
             m[i] += temp*k
-            s[i] += temp*(x[i,j] - m[i])
+            v[i] += temp*(x[i,j] - m[i])
         end
     end
-    N = 1/(npts-1)
-    @turbo for i ∈ eachindex(s)
-        s[i] *= N
+    N = 1/(size(x,2)-1)
+    @turbo for i ∈ eachindex(v)
+        v[i] *= N
     end
-    return m, s
+end
+
+function running_meanvar(x::AbstractMatrix{T}) where T<:AbstractFloat
+    # ndim,npts = size(x)
+    m = zeros(T,size(x,1))
+    v = zeros(T,size(x,1))
+    running_meanvar!(m,v,x)
+    # k = zero(T)
+    # for j ∈ axes(x,2)
+    #     k = 1/j
+    #     @turbo for i ∈ axes(x,1)
+    #         temp = (x[i,j] - m[i])
+    #         m[i] += temp*k
+    #         s[i] += temp*(x[i,j] - m[i])
+    #     end
+    # end
+    # N = 1/(npts-1)
+    # @turbo for i ∈ eachindex(s)
+    #     s[i] *= N
+    # end
+    return m, v
 end
 
 

@@ -12,6 +12,29 @@ function generate_4_clusters(npts_per_cluster; σ = 0.25)
     return data
 end
 
+function generate_4_circle_clusters(npts_per_cluster::Int = 8; r::Float = 0.5)
+    c = convert(Matrix{Float},[1 1 -1 -1; 1 -1 1 -1])
+    data = Matrix{Float}(undef,2,4*npts_per_cluster)
+    for i ∈ axes(c,2)
+        sindx = (i-1)*npts_per_cluster+1
+        eindx = i*npts_per_cluster
+        pts = generate_circle_cluster(npts_per_cluster)
+        data[:,sindx:eindx] = r*pts .+ c[:,i]
+    end
+    return data
+end
+
+function generate_circle_cluster(npts::Int = 8)
+    Δθ = 2π/npts
+    θ = 0:Δθ:2π-Δθ
+    x = Matrix{Float}(undef,2,npts)
+    for i ∈ eachindex(θ)
+        x[1,i] = cos(θ[i])
+        x[2,i] = sin(θ[i])
+    end
+    return x
+end
+
 ##k-mean++
 
 #Return distance to closest centre for each data point (helper function for k-mean++)
@@ -88,7 +111,7 @@ function kmeans_update!(ccntr::AbstractVector{Int}, cntrs::AbstractMatrix{T}, da
     closest_centre!(ccntr,cntrs,data)
     for i ∈ axes(cntrs,2)
         if(sum(ccntr.==i)>0)
-            running_mean!(cntrs[:,i],data[:,ccntr.==i])
+            cntrs[:,i] = running_mean(data[:,ccntr.==i])
         end
     end
 end

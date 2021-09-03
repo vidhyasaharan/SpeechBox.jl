@@ -41,23 +41,9 @@ function running_meanvar!(m::AbstractVector{T}, v::AbstractVector{T}, x::Abstrac
 end
 
 function running_meanvar(x::AbstractMatrix{T}) where T<:AbstractFloat
-    # ndim,npts = size(x)
     m = zeros(T,size(x,1))
     v = zeros(T,size(x,1))
     running_meanvar!(m,v,x)
-    # k = zero(T)
-    # for j ∈ axes(x,2)
-    #     k = 1/j
-    #     @turbo for i ∈ axes(x,1)
-    #         temp = (x[i,j] - m[i])
-    #         m[i] += temp*k
-    #         s[i] += temp*(x[i,j] - m[i])
-    #     end
-    # end
-    # N = 1/(npts-1)
-    # @turbo for i ∈ eachindex(s)
-    #     s[i] *= N
-    # end
     return m, v
 end
 

@@ -54,21 +54,29 @@ dist(::SqL2, a::AbstractVector{T}, b::AbstractVector{T}) where {T} = sqL2avx(a,b
 dist(::L2, a::AbstractVector{T}, b::AbstractVector{T}) where {T} = L2avx(a,b)
 
 #Pairwise distances
-function pairwise(dm::Distance, x::AbstractVector{T}, y::AbstractMatrix{T}) where {T}
-    d = Vector{Float}(undef,size(y,2))
+function pairwise!(dm::Distance, d::AbstractVector{<:AbstractFloat}, x::AbstractVector{T}, y::AbstractMatrix{T}) where {T}
     @inbounds @views for i ∈ axes(y,2)
         d[i] = dist(dm, x, y[:,i])
     end
-    return d
 end
 
-function pairwise(dm::Distance, x::AbstractMatrix{T}, y::AbstractMatrix{T}) where {T}
-    d = Matrix{Float}(undef,size(x,2),size(y,2))
+function pairwise!(dm::Distance, d::AbstractMatrix{<:AbstractFloat}, x::AbstractMatrix{T}, y::AbstractMatrix{T}) where {T}
     @inbounds @views for i ∈ axes(x,2)
         for j ∈ axes(y,2)
             d[i,j] = dist(dm, x[:,i], y[:,j])
         end
     end
+end
+
+function pairwise(dm::Distance, x::AbstractVector{T}, y::AbstractMatrix{T}) where {T}
+    d = Vector{Float}(undef,size(y,2))
+    pairwise!(dm,d,x,y)
+    return d
+end
+
+function pairwise(dm::Distance, x::AbstractMatrix{T}, y::AbstractMatrix{T}) where {T}
+    d = Matrix{Float}(undef,size(x,2),size(y,2))
+    pairwise!(dm,d,x,y)
     return d
 end
 

@@ -6,6 +6,7 @@ using FFTW
 using RecipesBase
 using Random
 using LoopVectorization
+using LinearAlgebra
 
 
 
@@ -31,6 +32,8 @@ export amp2db, pow2db
 
 export comp
 
+export kmeans, kmeans!
+
 const Float = Float64 #Set to Float32 to for 32bit floating point operations - NOT YET IMPLEMENTED or TESTED
 
 struct comp end
@@ -53,6 +56,7 @@ include("correlations.jl")
 include("plot_recipes.jl")
 include("levinson_durbin.jl")
 include("kmeans.jl")
+include("GMM.jl")
 
 
 

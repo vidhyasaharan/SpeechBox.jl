@@ -76,6 +76,25 @@ function mulavx!(a::AbstractVector{T}, b::AbstractVector{T}) where {T}
 end
 
 
+function xAxavx(x::AbstractVector{T}, A::AbstractMatrix{T}) where {T}
+    s = zero(T)
+    @turbo for i ∈ eachindex(x), j ∈ eachindex(x)
+        s += x[i]*x[j]*A[j,i]
+    end
+    return s
+end
+
+
+function mahalavx(x::AbstractVector{T}, y::AbstractVector{T}, A::AbstractMatrix{T}) where {T}
+    s = zero(T)
+    @turbo for i ∈ eachindex(x,y), j ∈ eachindex(x,y)
+        Ti = x[i] - y[i]
+        Tj = x[j] - y[j]
+        s += Ti*Tj*A[j,i]
+    end
+    return s
+end
+
 
 #Matrix multiplcation (in place for resultnant matrix)
 function A_mul_B!(C::AbstractMatrix{T}, A::AbstractMatrix{T}, B::AbstractMatrix{T}) where {T}

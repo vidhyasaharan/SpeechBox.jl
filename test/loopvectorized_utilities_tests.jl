@@ -27,3 +27,15 @@ end
     SpeechBox.mulavx!(a,b)
     @test c == a
 end
+
+
+@testset "mahalavx" begin
+    ndim = 10
+    A = randn(Float,ndim,ndim)
+    x = randn(Float,ndim)
+    y = randn(Float,ndim)
+    q = x'*A*x
+    d = (x-y)'*A*(x-y)
+    @test SpeechBox.xAxavx(x,A) ≈ q
+    @test SpeechBox.mahalavx(x,y,A) ≈ d
+end

@@ -14,6 +14,17 @@ end
     @test var(x,dims=2) ≈ v
 end
 
+@testset "running_meancov" begin
+    ndim = 20
+    npts = 10000
+    x = randn(Float64,ndim,npts)
+    m,C = SpeechBox.running_meancov(x)
+    m̂ = mean(x,dims=2)
+    Ĉ = ((x.-m̂)*(x.-m̂)')/(size(x,2)-1)
+    @test m̂ ≈ m
+    @test Ĉ ≈ C
+end
+
 @testset "update_running_mean!" begin
     ndim = 20
     npts = 10000

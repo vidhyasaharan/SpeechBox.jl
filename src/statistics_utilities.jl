@@ -48,6 +48,36 @@ function running_meanvar(x::AbstractMatrix{T}) where T<:AbstractFloat
 end
 
 
+#running mean and covariance
+function running_meancov!(m::AbstractVector{T}, C::AbstractMatrix{T}, x::AbstractMatrix{T}) where T<:AbstractFloat
+    k = zero(T)
+    temp = Vector{T}(undef,length(m))
+    fill!(m,zero(T))
+    fill!(C,zero(T))
+    @inbounds for n ∈ axes(x,2)
+        k = 1/n
+        @turbo for i ∈ axes(x,1)
+            temp[i] = (x[i,n] - m[i])
+            m[i] += temp[i]*k
+        end
+        @turbo for i ∈ axes(x,1), j ∈ axes(x,1)
+            C[j,i] += (x[j,n] - m[j])*temp[i]
+        end
+    end
+    N = 1/(size(x,2)-1)
+    @turbo for i ∈ eachindex(C)
+        C[i] *= N
+    end
+end
+
+function running_meancov(x::AbstractMatrix{T}) where T<:AbstractFloat
+    m = Vector{Float}(undef,size(x,1))
+    C = Matrix{Float}(undef,size(x,1),size(x,1))
+    running_meancov!(m,C,x)
+    return m, C
+end
+
+
 #Update running mean with a nth data point where n is the running index
 function update_running_mean!(mean::AbstractVector{T}, data::AbstractVector{T}, n::Int) where T<:AbstractFloat
     k = 1/n

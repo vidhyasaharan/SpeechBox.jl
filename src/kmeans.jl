@@ -42,7 +42,6 @@ function mindist2cntrs(cntrs::AbstractMatrix{T}, data::AbstractMatrix{T}) where 
     mdist = Vector{Float}(undef,size(data,2))
     temp = Vector{Float}(undef,size(cntrs,2))
     @inbounds @views for i ∈ eachindex(mdist)
-        # temp = pairwise(SqL2(), data[:,i], cntrs)
         pairwise!(SqL2(), temp, data[:,i], cntrs)
         mdist[i] = minimum(temp)
     end
@@ -127,7 +126,6 @@ function kmeans!(cntrs::AbstractMatrix{T}, data::AbstractMatrix{T}; threshold::F
         copy!(old_cntrs,cntrs)
         kmeans_update!(ccntr, cntrs, data)
         max_shift = max_centre_shift(cntrs, old_cntrs)
-        # println(max_shift)
     end
 end
 

@@ -48,4 +48,7 @@ signal = speech_waveform(x,fs)
     @testset "RAPT" begin
         include("pitch_RAPT_tests.jl")
     end
+    @testset "k-means" begin
+        include("kmeans_tests.jl")
+    end
 end

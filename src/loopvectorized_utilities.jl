@@ -75,7 +75,7 @@ function mulavx!(a::AbstractVector{T}, b::AbstractVector{T}) where {T}
     end
 end
 
-
+#computes Quadratic term - x'Ax 
 function xAxavx(x::AbstractVector{T}, A::AbstractMatrix{T}) where {T}
     s = zero(T)
     @turbo for i ∈ eachindex(x), j ∈ eachindex(x)
@@ -84,7 +84,7 @@ function xAxavx(x::AbstractVector{T}, A::AbstractMatrix{T}) where {T}
     return s
 end
 
-
+#computes Mahalanobis distance (x-y)'A(x-y)
 function mahalavx(x::AbstractVector{T}, y::AbstractVector{T}, A::AbstractMatrix{T}) where {T}
     s = zero(T)
     @turbo for i ∈ eachindex(x,y), j ∈ eachindex(x,y)

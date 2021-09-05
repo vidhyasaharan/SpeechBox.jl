@@ -1,3 +1,42 @@
+#Generate 2D data from 4 spherical (σ=0.25) gaussian clusters centered at [-1,1], [1,-1], [-1,1] and [1,1]
+function generate_4_clusters(npts_per_cluster; σ = 0.25)
+    c = convert(Matrix{Float},[1 1 -1 -1; 1 -1 1 -1])
+    # σ = 0.25
+    data = Matrix{Float}(undef,2,4*npts_per_cluster)
+    for i ∈ axes(c,2)
+        rpts = randn(Float,(2,npts_per_cluster))
+        sindx = (i-1)*npts_per_cluster+1
+        eindx = i*npts_per_cluster
+        data[:,sindx:eindx] = σ*rpts .+ c[:,i]
+    end
+    return data
+end
+
+#Generate 2D data arranged in a circle (default radius, r =0.5) around centres at [-1,1], [1,-1], [-1,1] and [1,1]
+function generate_4_circle_clusters(npts_per_cluster::Int = 8; r::Float = 0.5)
+    c = convert(Matrix{Float},[1 1 -1 -1; 1 -1 1 -1])
+    data = Matrix{Float}(undef,2,4*npts_per_cluster)
+    for i ∈ axes(c,2)
+        sindx = (i-1)*npts_per_cluster+1
+        eindx = i*npts_per_cluster
+        pts = generate_circle_cluster(npts_per_cluster)
+        data[:,sindx:eindx] = r*pts .+ c[:,i]
+    end
+    return data
+end
+
+#Generate 2D data arranged in a circle of radius one around [0,0]
+function generate_circle_cluster(npts::Int = 8)
+    Δθ = 2π/npts
+    θ = 0:Δθ:2π-Δθ
+    x = Matrix{Float}(undef,2,npts)
+    for i ∈ eachindex(θ)
+        x[1,i] = cos(θ[i])
+        x[2,i] = sin(θ[i])
+    end
+    return x
+end
+
 #Running mean
 function running_mean!(m::AbstractVector{T}, x::AbstractMatrix{T}) where T<:AbstractFloat
     k = zero(T)

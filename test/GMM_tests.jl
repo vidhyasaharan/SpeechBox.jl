@@ -1,14 +1,11 @@
-ndim = 100
-a = randn(Float64,ndim,ndim)
-A = a'*a + LinearAlgebra.I(ndim)
-x = randn(ndim)
-y = randn(ndim)
+data = SpeechBox.generate_4_clusters(5)
+g = SpeechBox.GMMinit(4,data)
 
-
-x = randn(3,10)
-m = Vector{Float64}(undef,size(x,1))
-C = Matrix{Float64}(undef,size(x,1),size(x,1))
-SpeechBox.running_meancov!(m, C, x)
+p = scatter(data[1,:], data[2,:])
+scatter!(p,g.μ[1])
+scatter!(p,g.μ[2])
+scatter!(p,g.μ[3])
+scatter!(p,g.μ[4])
 
 
 

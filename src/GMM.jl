@@ -36,16 +36,37 @@ function GMM(means::AbstractMatrix{T}) where {T<:AbstractFloat}
 end
 
 
+#Initialise GMM parameters - equal weights, k-means for means and data covariance for each mixture covariance
 function GMMinit(nmix::Int, data::AbstractMatrix{T}) where {T<:AbstractFloat}
     means = kmeans(data,nmix)
     m,C = running_meancov(data)
     w = ones(T,nmix)
     normaliseWeights!(w)
-    μ = [mean[:,i] for i ∈ axes(means,2)]
+    μ = [means[:,i] for i ∈ axes(means,2)]
     Σ = [C for i ∈ 1:nmix]
     return GMM(w,μ,Σ)
 end
 
+#Compute Log Probability (Log-likelihood)
+logprob(μ::AbstractVector{T}, P::AbstractMatrix{T}, Z::T, x::AbstractVector{T}) where {T<:AbstractFloat} = Z-(mahalavx(x,μ,P)/2)
+
+function logprob(G::GMM, x::AbstractVector{Float})
+    nmix = length(G.w)
+    lprobs = Vector{Float}(undef,nmix)
+    for i ∈ eachindex(lprobs, G.μ, G.P, G.Z, G.w)
+        lprobs[i] = logprob(G.μ[i], G.P[i], G.Z[i], x) + log(G.w[i])
+    end
+    return logsumexp(lprobs)
+end
+
+function logsumexp(lp::AbstractVector{T}) where T<:AbstractFloat
+    lmax = maximum(lp)
+    s = zero(T)
+    for i ∈ eachindex(lp)
+        s += exp(lp[i] - lmax)
+    end
+    return log(s) + lmax
+end
 
 
 ## Utility functions to check consistency among GMM parameters

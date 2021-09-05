@@ -68,6 +68,8 @@ function running_meancov!(m::AbstractVector{T}, C::AbstractMatrix{T}, x::Abstrac
     @turbo for i ∈ eachindex(C)
         C[i] *= N
     end
+    C += C'
+    C /= 2
 end
 
 function running_meancov(x::AbstractMatrix{T}) where T<:AbstractFloat

@@ -62,7 +62,7 @@ end
 function logsumexp(lp::AbstractVector{T}) where T<:AbstractFloat
     lmax = maximum(lp)
     s = zero(T)
-    for i ∈ eachindex(lp)
+    @turbo for i ∈ eachindex(lp)
         s += exp(lp[i] - lmax)
     end
     return log(s) + lmax

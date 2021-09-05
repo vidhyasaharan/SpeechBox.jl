@@ -8,6 +8,10 @@ scatter!(p,g.μ[3])
 scatter!(p,g.μ[4])
 
 
+t = log.(rand(Float64,10000))
+SpeechBox.logsumexp(t) ≈ log(sum(exp.(t)))
+@benchmark SpeechBox.logsumexp(t)
+
 
 x = randn(10,100000)
 m1 = Vector{Float64}(undef,size(x,1))

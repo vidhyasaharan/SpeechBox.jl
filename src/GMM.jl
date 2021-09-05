@@ -81,11 +81,14 @@ end
 
 #Combine all consistency checks in one function
 function isconsistentParams(w::AbstractVector{T}, μ::Vector{Vector{T}}, Σ::Vector{Matrix{T}}) where {T<:AbstractFloat}
-    flag = true
-    flag &= isconsistentComponents(w,μ,Σ)
-    flag &= isconsistentWeights(w)
-    flag &= isconsistentDimensions(μ,Σ)
-    return flag
+    if(!isconsistentComponents(w,μ,Σ))
+        return false
+    elseif(!isconsistentWeights(w))
+        return false
+    elseif(!isconsistentDimensions(μ,Σ))
+        return false
+    end
+    return true
 end
 
 #Check if Number of components are consistent
@@ -105,7 +108,7 @@ end
 
 #Check if weights sum to one
 function isconsistentWeights(w::AbstractVector{T}) where {T<:AbstractFloat}
-    if(sum(w)==one(T))
+    if(sum(w) ≈ one(T))
         return true
     else
         return false

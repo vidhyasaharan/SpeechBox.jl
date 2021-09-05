@@ -1,24 +1,5 @@
 
-
-using Test
-using SpeechBox
-using LinearAlgebra
-# using LibSndFile
-# using FileIO
-# using SampledSignals
-using WAV
-using DSP: filt
-using SpeechBox: Float
-using Statistics
-
-
-
-testdir = normpath(joinpath(dirname(pathof(SpeechBox)),"../test/"))
-srcdir = normpath(joinpath(dirname(pathof(SpeechBox)),"../src/"))
-
-x, fs = wavread(joinpath(testdir,"King.wav"))
-x = x[:]
-signal = speech_waveform(x,fs)
+include("setup.jl")
 
 @testset verbose = true "SpeechBox" begin
     @testset "utilities" begin 
@@ -50,5 +31,8 @@ signal = speech_waveform(x,fs)
     end
     @testset "k-means" begin
         include("kmeans_tests.jl")
+    end
+    @testset "GMM" begin
+        include("GMM_tests.jl")
     end
 end

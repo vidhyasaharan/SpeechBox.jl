@@ -17,9 +17,9 @@ function kmeanspp(data::AbstractMatrix{T}, ncntrs::Int) where T<:AbstractFloat
     din = collect(1:size(data,2))
     deleteat!(din,cin)
     while(length(cin)<ncntrs)
-        mindist = SpeechBox.mindist2cntrs(data[:,cin], data[:,din])
-        cdist = SpeechBox.pdist2cdist(mindist)
-        ncin = SpeechBox.findclosest(rand(),cdist)
+        mindist = mindist2cntrs(data[:,cin], data[:,din])
+        cdist = pdist2cdist(mindist)
+        ncin = findclosest(rand(),cdist)
         push!(cin, din[ncin])
         deleteat!(din,ncin)
     end

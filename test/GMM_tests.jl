@@ -115,3 +115,13 @@ end
     lprobs = log.(probs)
     @test SpeechBox.logsumexp(lprobs) ≈ log(sum(probs))
 end
+
+@testset "Categorical" begin
+    ncat = 10
+    p = rand(Float,ncat)
+    SpeechBox.normaliseWeights!(p)
+    c = SpeechBox.pdist2cdist(p)
+    for i ∈ eachindex(p,c)
+        @test c[i] ≈ sum(p[1:i])
+    end
+end

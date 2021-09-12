@@ -130,4 +130,54 @@ function isconsistentDimensions(μ::Vector{Vector{T}}, Σ::Vector{Matrix{T}}) wh
     return flag
 end
 
+#Sample points from a GMM
+function sample(G::GMM, npts::Int)
+    data = Matrix{Float}(undef,length(G.μ[1]),npts)
+    gcomps = Vector{Gaussian}(undef,length(G.w))
+    wdist = Categorical(G.w)
+    for i ∈ eachindex(G.μ,G.Σ)
+        gcomps[i] = Gaussian(G.μ[i], G.Σ[i])
+    end
+    for i ∈ axes(data,2)
+        cin = sample(wdist)
+        data[:,i] = sample(gcomps[cin])
+    end
+    return data
+end
 
+
+#Struct to hold categorical distribution
+struct Categorical
+    pdidt::Vector{Float}
+    cdist::Vector{Float}
+end
+
+function Categorical(pdist::AbstractVector{Float})
+    cdist = pdist2cdist(pdist)
+    return Categorical(pdist,cdist)
+end
+
+sample(C::Categorical) = findclosest(rand(), C.cdist)
+
+
+#Struct to hold a multivariate Gaussian
+struct Gaussian
+    μ::Vector{Float}
+    Σ::Matrix{Float}
+    A::Cholesky{Float}
+end
+
+Gaussian(μ::AbstractVector{T}, Σ::AbstractMatrix{T}) where {T<:AbstractFloat} = Gaussian(μ,Σ,cholesky(Σ))
+
+function sample(g::Gaussian)
+    z = randn(Float,length(g.μ))
+    return g.μ + g.A.L*z
+end
+
+function sample(g::Gaussian, npts::Int)
+    data = Matrix{Float}(undef,length(g.μ),npts)
+    for i ∈ axes(data,2)
+        data[:,i] = sample(g)
+    end
+    return data
+end

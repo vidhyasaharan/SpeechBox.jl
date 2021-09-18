@@ -148,7 +148,7 @@ end
 
 #Struct to hold categorical distribution
 struct Categorical
-    pdidt::Vector{Float}
+    pdist::Vector{Float}
     cdist::Vector{Float}
 end
 

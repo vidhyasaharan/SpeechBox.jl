@@ -1,3 +1,9 @@
+function posdefmatrix(ndim::Int)
+    a = randn(Float,ndim,ndim)
+    A = a*a' + LinearAlgebra.I(ndim)
+    return A
+end
+
 @testset "normaliseWeights" begin
     nmix = 10
     w = rand(Float,nmix)
@@ -10,11 +16,6 @@
 end
 
 @testset "isconsistentX" begin
-    function posdefmatrix(ndim::Int)
-        a = randn(Float,ndim,ndim)
-        A = a*a' + LinearAlgebra.I(ndim)
-        return A
-    end
     nmix = 5
     ndim = 3
     w = rand(nmix)
@@ -49,11 +50,6 @@ end
 
 
 @testset "GMM Struct" begin
-    function posdefmatrix(ndim::Int)
-        a = randn(Float,ndim,ndim)
-        A = a*a' + LinearAlgebra.I(ndim)
-        return A
-    end
     ndim = 10
     nmix = 5
     w = rand(nmix)
@@ -120,8 +116,23 @@ end
     ncat = 10
     p = rand(Float,ncat)
     SpeechBox.normaliseWeights!(p)
-    c = SpeechBox.pdist2cdist(p)
-    for i ∈ eachindex(p,c)
-        @test c[i] ≈ sum(p[1:i])
+    # c = SpeechBox.pdist2cdist(p)
+    c = SpeechBox.Categorical(p)
+    @test typeof(c) == SpeechBox.Categorical
+    for i ∈ eachindex(p,c.pdist,c.cdist)
+        @test c.pdist[i] ≈ p[i]
+        @test c.cdist[i] ≈ sum(p[1:i])
     end
+end
+
+@testset "Gaussian" begin
+    ndim = 5
+    μ = randn(Float,ndim)
+    Σ = posdefmatrix(ndim)
+    g = SpeechBox.Gaussian(μ,Σ)
+    @test typeof(g) == SpeechBox.Gaussian
+    @test μ == g.μ
+    @test Σ == g.Σ
+    @test LinearAlgebra.cholesky(Σ) == g.A
+    @test g.A.L*g.A.U ≈ g.Σ
 end

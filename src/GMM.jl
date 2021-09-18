@@ -50,13 +50,25 @@ end
 #Compute Log Probability (Log-likelihood)
 logprob(μ::AbstractVector{T}, P::AbstractMatrix{T}, Z::T, x::AbstractVector{T}) where {T<:AbstractFloat} = Z-(mahalavx(x,μ,P)/2)
 
-function logprob(G::GMM, x::AbstractVector{Float})
-    nmix = length(G.w)
-    lprobs = Vector{Float}(undef,nmix)
+function logmixprob!(lprobs::AbstractVector{Float}, G::GMM, x::AbstractVector{Float})
     for i ∈ eachindex(lprobs, G.μ, G.P, G.Z, G.w)
         lprobs[i] = logprob(G.μ[i], G.P[i], G.Z[i], x) + log(G.w[i])
     end
+end
+
+function logprob(G::GMM, x::AbstractVector{Float})
+    nmix = length(G.w)
+    lprobs = Vector{Float}(undef,nmix)
+    logmixprob!(lprobs,G,x)
     return logsumexp(lprobs)
+end
+
+function logprob(G::GMM, x::AbstractMatrix{Float})
+    LL = zero(Float)
+    @views for i ∈ axes(x,2)
+        LL += logprob(G,x[:,i])
+    end
+    return LL
 end
 
 function logsumexp(lp::AbstractVector{T}) where T<:AbstractFloat
@@ -180,4 +192,94 @@ function sample(g::Gaussian, npts::Int)
         data[:,i] = sample(g)
     end
     return data
+end
+
+function generate_4mix_GMM()
+    c = 4*convert(Matrix{Float},[1 1 -1 -1; 1 -1 1 -1])
+    μ = [c[:,i] for i ∈ axes(c,2)]
+    Σ₁ = [1 0; 0 1]
+    Σ₂ = [2 0; 0 1]
+    Σ₃ = [1 .75; .75 1]
+    Σ₄ = [1 -.75; -.75 1]
+    Σ = convert(Vector{Matrix{Float}},[Σ₁, Σ₂, Σ₃, Σ₄])
+    w = [0.1, 0.2, 0.3, 0.4]
+    return GMM(w,μ,Σ)
+end
+
+## EM Algorithm (ML Estimate)
+
+#E-step
+function mixture_posterior!(γ::AbstractVector{Float}, G::GMM, x::AbstractVector{Float})
+    logmixprob!(γ,G,x)
+    lp = logsumexp(γ)
+    @turbo for i ∈ eachindex(γ)
+        γ[i] = exp(γ[i] - lp)
+    end
+end
+
+function mixture_posterior(G::GMM, x::AbstractVector{Float})
+    γ = Vector{Float}(undef,length(G.w))
+    mixture_posterior!(γ,G,x)
+    return γ
+end
+
+function mixture_posterior!(γ::AbstractMatrix{Float}, G::GMM, x::AbstractMatrix{Float})
+    @views for i ∈ axes(x,2)
+        mixture_posterior!(γ[:,i],G,x[:,i])
+    end
+end
+
+function mixture_posterior(G::GMM, x::AbstractMatrix{Float})
+    γ = Matrix{Float}(undef,length(G.w), size(x,2))
+    mixture_posterior!(γ,G,x)
+    return γ
+end
+
+#M-step
+function update_ML(G::GMM, γ::AbstractMatrix{Float}, x::AbstractMatrix{Float})
+    N = size(x,2)
+    ndim = length(G.μ[1])
+    nmix = length(G.w)
+    w = Vector{Float}(undef,nmix)
+    μ = [zeros(Float,ndim) for i ∈ 1:nmix]
+    Σ = [zeros(Float,ndim,ndim) for i ∈ 1:nmix]
+    k = Vector{Float}(undef,nmix)
+    temp = Matrix{Float}(undef,ndim,nmix)
+    Nm = zeros(Float,nmix)
+    for j ∈ axes(x,2)
+        for i ∈ 1:nmix
+            Nm[i] += γ[i,j]
+        end
+    end
+    for i ∈ eachindex(w,Nm)
+        w[i] = Nm[i]/N
+        k[i] = 1/Nm[i]
+    end
+    for m ∈ 1:nmix
+        for n ∈ axes(x,2)
+            kn = γ[m,n]*k[m]
+            @turbo for i ∈ 1:ndim
+                μ[m][i] += kn*x[i,n]
+                temp[i,m] = x[i,n] - G.μ[m][i]
+            end
+            @turbo for i ∈ 1:ndim, j ∈ 1:ndim
+                Σ[m][i,j] += kn*temp[i,m]*temp[j,m]
+            end
+        end
+        Σ[m] += Σ[m]'
+        Σ[m] /= 2
+    end
+    return GMM(w,μ,Σ)
+end
+
+
+function trainML(G::GMM, x::AbstractMatrix{Float}, niter::Int)
+    γ = Matrix{Float}(undef,length(G.w),size(x,2))
+    LL = Vector{Float}(undef,0)
+    for i ∈ 1:niter
+        mixture_posterior!(γ,G,x)
+        G = update_ML(G, γ, x)
+        push!(LL,logprob(G,x))
+    end
+    return G, LL
 end

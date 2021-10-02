@@ -4,7 +4,14 @@ function posdefmatrix(ndim::Int)
     return A
 end
 
-@testset "normaliseWeights" begin
+function normpdf(x::AbstractVector{T}, μ::AbstractVector{T}, Σ::AbstractMatrix{T}) where {T<:AbstractFloat}
+    x̄ = x - μ
+    D = length(x)
+    z = sqrt(det(Σ)*((2π)^D))
+    return (exp(-(x̄'*inv(Σ)*x̄)/2))/z
+end
+
+@testset "normaliseWts" begin
     nmix = 10
     w = rand(Float,nmix)
     ŵ = copy(w)
@@ -94,15 +101,15 @@ end
     end
 end
 
-
 @testset "GMMinit" begin
     x = SpeechBox.generate_4_circle_clusters(r=0.1)
     kmeans = SpeechBox.kmeans(x,4)
-    G = SpeechBox.GMMinit(4,x)
+    G = SpeechBox.GMMinit(SpeechBox.init_kmeans(),4,x)
     @test G.w == (1/4)*ones(4)
-    for i = 1:4
-        @test SpeechBox.mindist2cntrs(kmeans,hcat(G.μ...)) == zeros(4)
-    end
+    @test SpeechBox.mindist2cntrs(kmeans,hcat(G.μ...)) == zeros(4)
+
+    G = SpeechBox.GMMinit(SpeechBox.init_rand(),4,x)
+    @test SpeechBox.mindist2cntrs(x, hcat(G.μ...)) == zeros(4)
 end
 
 @testset "logsumexp" begin
@@ -135,4 +142,82 @@ end
     @test Σ == g.Σ
     @test LinearAlgebra.cholesky(Σ) == g.A
     @test g.A.L*g.A.U ≈ g.Σ
+end
+
+
+@testset "logprob" begin
+    D = 5
+    μ = randn(D)
+    Σ = posdefmatrix(D)
+    P = inv(Σ)
+    Z = -(D/2)*log(2π) - (logdet(Σ)/2)
+    for i ∈ 1:10
+        x = randn(D)
+        @test SpeechBox.logprob(μ,P,Z,x) ≈ log(normpdf(x,μ,Σ))
+    end
+
+    G = SpeechBox.generate_4mix_GMM()
+    for i ∈ 1:10
+        x = randn(2)
+        p = 0
+        for j ∈ 1:4
+            p += G.w[j]*normpdf(x,G.μ[j],G.Σ[j])
+        end
+        @test SpeechBox.logprob(G,x) ≈ log(p)
+    end
+
+    for n ∈ 1:10
+        x = randn(2,10)
+        ll = 0
+        for i ∈ axes(x,2)
+            ll += SpeechBox.logprob(G,x[:,i])
+        end
+        @test SpeechBox.logprob(G,x) ≈ ll
+    end
+end
+
+@testset "mix_posterior" begin
+    G = SpeechBox.generate_4mix_GMM()
+    for m ∈ 1:4
+        x = SpeechBox.sample(SpeechBox.Gaussian(G.μ[m],G.Σ[m]),10)
+        γ = SpeechBox.mixture_posterior(G,x)
+        for i ∈ axes(γ,2)
+            @test argmax(γ[:,i]) == m
+        end
+    end
+end
+
+@testset "GMM Classify" begin
+    c1 = 6*convert(Matrix{Float64},[1 -1; 1 -1])
+    c2 = 6*convert(Matrix{Float64},[1 -1; -1 1])
+    μ₁ = [c1[:,i] for i ∈ axes(c1,2)]
+    μ₂ = [c2[:,i] for i ∈ axes(c2,2)]
+    Σ1 = [1 0; 0 1]
+    Σ2 = [1 0; 0 1]
+    Σ3 = [1 0; 0 1]
+    Σ4 = [1 0; 0 1]
+    Σ₁ = convert(Vector{Matrix{Float64}},[Σ1, Σ2])
+    Σ₂ = convert(Vector{Matrix{Float64}},[Σ3, Σ4])
+    w₁ = [0.5, 0.5]
+    w₂ = [0.5, 0.5]
+
+    g1 = SpeechBox.GMM(w₁,μ₁,Σ₁)
+    g2 = SpeechBox.GMM(w₂,μ₂,Σ₂)
+
+    x1 = SpeechBox.sample(g1,100000)
+    x2 = SpeechBox.sample(g2,100000)
+
+    t1 = SpeechBox.sample(g1,1000)
+    t2 = SpeechBox.sample(g2,1000)
+    
+    gm1,ll1 = SpeechBox.trainML(SpeechBox.init_rand(), x1, 2, 10)
+    gm2,ll2 = SpeechBox.trainML(SpeechBox.init_rand(), x2, 2, 10)
+
+    for i ∈ axes(t1,2)
+        @test SpeechBox.logprob(gm1,t1[:,i]) > SpeechBox.logprob(gm2,t1[:,i])
+    end
+    
+    for i ∈ axes(t2,2)
+        @test SpeechBox.logprob(gm1,t2[:,i]) < SpeechBox.logprob(gm2,t2[:,i])
+    end
 end

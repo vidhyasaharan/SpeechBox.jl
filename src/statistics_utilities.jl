@@ -61,17 +61,23 @@ end
 #Running mean and variance
 function running_meanvar!(m::AbstractVector{T}, v::AbstractVector{T}, x::AbstractMatrix{T}) where T<:AbstractFloat
     k = zero(T)
+    # tbuf = zeros(T,size(x,1))
     @turbo for i ∈ eachindex(m)
         m[i] = zero(T)
         v[i] = zero(T)
     end
     @inbounds for j ∈ axes(x,2)
         k = 1/j
-        @turbo for i ∈ axes(x,1)
+        @inbounds for i ∈ axes(x,1)
+            # tbuf[i] = (x[i,j] - m[i])
+            # m[i] += tbuf[i]*k
             temp = (x[i,j] - m[i])
             m[i] += temp*k
             v[i] += temp*(x[i,j] - m[i])
         end
+        # @inbounds @turbo for i ∈ axes(x,1)
+        #     v[i] += tbuf[i]*(x[i,j] - m[i])
+        # end
     end
     N = 1/(size(x,2)-1)
     @turbo for i ∈ eachindex(v)

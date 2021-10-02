@@ -37,13 +37,31 @@ end
 
 
 #Initialise GMM parameters - equal weights, k-means for means and data covariance for each mixture covariance
-function GMMinit(nmix::Int, data::AbstractMatrix{T}) where {T<:AbstractFloat}
+abstract type GMinit end
+struct init_kmeans <: GMinit end
+struct init_rand <: GMinit end
+
+GMMinit(nmix::Int, data::AbstractMatrix{T}) where {T<:AbstractFloat} = GMMinit(init_kmeans(), nmix, data)
+
+function GMMinit(::init_kmeans, nmix::Int, data::AbstractMatrix{T}) where {T<:AbstractFloat}
     means = kmeans(data,nmix)
     m,C = running_meancov(data)
     w = ones(T,nmix)
     normaliseWeights!(w)
     μ = [means[:,i] for i ∈ axes(means,2)]
     Σ = [C for i ∈ 1:nmix]
+    return GMM(w,μ,Σ)
+end
+
+function GMMinit(::init_rand, nmix::Int, data::AbstractMatrix{T}) where {T<:AbstractFloat}
+    ndims,npts = size(data)
+    mindx = rand(1:npts,nmix)
+    means = data[:,mindx]
+    II = convert(Matrix{Float},collect(I(ndims)))
+    w = ones(T,nmix)
+    normaliseWeights!(w)
+    μ = [means[:,i] for i ∈ axes(means,2)]
+    Σ = [II for i ∈ 1:nmix]
     return GMM(w,μ,Σ)
 end
 
@@ -283,3 +301,12 @@ function trainML(G::GMM, x::AbstractMatrix{Float}, niter::Int)
     end
     return G, LL
 end
+
+
+function trainML(itype::GMinit, x::AbstractMatrix{Float}, nmix::Int, niter::Int)
+    G = GMMinit(itype, nmix, x)
+    return trainML(G, x, niter)
+end
+
+
+trainML(x::AbstractMatrix{Float}, nmix::Int, niter::Int) = trainML(init_kmeans(), x, nmix, niter)

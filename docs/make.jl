@@ -14,6 +14,7 @@ makedocs(
             "lpc.md",
             "pitch.md",
             "mfcc.md",
+            "kmeans.md",
             "utilities.md"
         ],
     ],

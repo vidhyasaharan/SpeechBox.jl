@@ -32,7 +32,7 @@ export amp2db, pow2db
 
 export comp
 
-export kmeans, kmeans!
+export kmeans, kmeans!, kmpp, kmrand
 
 const Float = Float64 #Set to Float32 to for 32bit floating point operations - NOT YET IMPLEMENTED or TESTED
 

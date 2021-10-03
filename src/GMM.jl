@@ -10,6 +10,20 @@ end
 ## Constructors for GMM object
 
 #Construct GMM given a set of weights, means and covariance matrices
+"""
+    GMM(w::Vector{Float}, μ::Vector{Vector{Float}}, Σ::Vector{Matrix{Float}})
+
+Create a `GMM` object given all its parameters.
+* `w` must be a `Vector` of `Float` with the each element corresponding the weight of a Gaussian component
+* `μ` must be a `Vector` of `Vector` of `Float`, each element of `μ` is a vector of `Float` representing the mean of a Gaussian component
+* `Σ` must be a `Vector` of `Matrix` of `Float`, each element of `Σ` is a matrix of `Float` representing the covariance matrix of a Gaussian component
+
+!!! note
+    The elements of `w` must add up to 1.0 and the elements of `Σ` must be valid covariance matrices (symmetric and positive semi-definite) -  these
+    constraints are not checked by the function. All elements of `μ` must be vectors of length `D` and all elements of `Σ` must be `D×D` matrices,
+    where `D` is the dimensionality of the random variable being modelled.
+    
+"""
 function GMM(w::AbstractVector{T}, μ::Vector{Vector{T}}, Σ::Vector{Matrix{T}}) where {T<:AbstractFloat}
     if(isconsistentParams(w,μ,Σ))
         D::Int = length(μ[1])
@@ -26,6 +40,13 @@ function GMM(w::AbstractVector{T}, μ::Vector{Vector{T}}, Σ::Vector{Matrix{T}})
 end
 
 #Construct GMM when given a set of means, assuming equal weights and identity covariances
+"""
+    GMM(means)
+
+Create a GMM object given the `means` of each component. The weights of all components are assumed to be equal and each covariance matrix is
+assumed to be an identity matrix. The input `means` must be a matrix with each column representing the mean of a component.
+    
+"""
 function GMM(means::AbstractMatrix{T}) where {T<:AbstractFloat}
     ndim,ncomp = size(means)
     w = convert(Vector{T},(1/ncomp)*ones(ncomp))
@@ -74,6 +95,15 @@ function logmixprob!(lprobs::AbstractVector{Float}, G::GMM, x::AbstractVector{Fl
     end
 end
 
+"""
+    logprob(G::GMM, x)
+
+Compute the log probability of data `x` given a Gaussian mixture model `G` (provided as a `GMM` object). Equivalently,
+this is the log-likelyhood of model `G` given the data `x`.
+* when `x` is a vector representing one data point, the log probability of the data point given the model is returned
+* when `x` is a `D×N` matrix representing a set of `N` points of dimensionality `D`, the sum of the log probabilities
+  of each point is returned (i.e., total probability assuming points are independent)
+"""
 function logprob(G::GMM, x::AbstractVector{Float})
     nmix = length(G.w)
     lprobs = Vector{Float}(undef,nmix)
@@ -102,6 +132,11 @@ end
 ## Utility functions to check consistency among GMM parameters
 
 #Normalise component weights so that they sum to one
+"""
+    normaliseWeights!(weights)
+
+Normalises the elements of the vector `weights` in place such that they sum to 1.0
+"""
 function normaliseWeights!(w::AbstractVector{<:AbstractFloat})
     w₀ = 1/sum(w)
     for i ∈ eachindex(w)
@@ -161,6 +196,11 @@ function isconsistentDimensions(μ::Vector{Vector{T}}, Σ::Vector{Matrix{T}}) wh
 end
 
 #Sample points from a GMM
+"""
+    sample(G::GMM, N::Integer)
+
+Draw `N` sample from a Gaussian mixture model `G` provided as a `GMM` object
+"""
 function sample(G::GMM, npts::Int)
     data = Matrix{Float}(undef,length(G.μ[1]),npts)
     gcomps = Vector{Gaussian}(undef,length(G.w))
@@ -182,11 +222,25 @@ struct Categorical
     cdist::Vector{Float}
 end
 
+"""
+    Categorical(probability_vector)
+
+Create a `Categorical` object to hold probability and cumulative distributions of a finite set of discrete outcomes
+given `probability_vector` a `Vector` of probabilities of each outcome.
+
+!!! note
+    The elements of `probability_vector` should sum to 1.0. This is NOT checked.
+"""
 function Categorical(pdist::AbstractVector{Float})
     cdist = pdist2cdist(pdist)
     return Categorical(pdist,cdist)
 end
 
+"""
+    sample(C::Categorical)
+
+Draw a sample from a categorical distribution `C` provided as a `Categorical` object
+"""
 sample(C::Categorical) = findclosest(rand(), C.cdist)
 
 
@@ -197,8 +251,23 @@ struct Gaussian
     A::Cholesky{Float}
 end
 
+"""
+    Gaussian(μ, Σ)
+
+Create a `Gaussian` object to hold the parameters of a Gaussian distribution when its mean `μ` is given as a vector (of Floats) and its
+covariance matrix `Σ` is given as a matrix (of Floats)
+
+!!! note
+    `Σ` must be a symmetric, positive semi-definite matrix. This is NOT checked.
+"""
 Gaussian(μ::AbstractVector{T}, Σ::AbstractMatrix{T}) where {T<:AbstractFloat} = Gaussian(μ,Σ,cholesky(Σ))
 
+"""
+    sample(g::Gaussian)
+    sample(g::Gaussian, N::Integer)
+
+Draw one or `N` samples from a Gaussian distributions `g` provided as a `Gaussian` object
+"""
 function sample(g::Gaussian)
     z = randn(Float,length(g.μ))
     return g.μ + g.A.L*z
@@ -290,7 +359,18 @@ function update_ML(G::GMM, γ::AbstractMatrix{Float}, x::AbstractMatrix{Float})
     return GMM(w,μ,Σ)
 end
 
+"""
+    trainML(G::GMM, data, num_iterations)
+    trainML([initalise_method], data, num_iterations)
 
+Train a Maximum Likelihood (ML) Gaussian mixture model fit for `data` using the Expectation-Maximisation (EM) algorithm.
+`data` must be a matrix of `Float` with each column representing a point. Initial values for the Gaussian mixture model
+parameters may be obtained from a GMM object `G` or estimated from `data` using a suitable initialisation method:
+* Use `init_kmeans()` as `initialise_method` to use k-means (with k-mean++ initialisation) on `data` to initialise the means, the
+  weights are set as equal weights, covariance matrices of each component are set to covariance of `data`
+* Use `init_rand()` as `initialise_method` to select poitsn from `data` at random as means, the weights are set as equal weights, and
+  the covariance matrices of each component are set as identity matrices
+"""
 function trainML(G::GMM, x::AbstractMatrix{Float}, niter::Int)
     γ = Matrix{Float}(undef,length(G.w),size(x,2))
     LL = Vector{Float}(undef,0)
@@ -302,11 +382,9 @@ function trainML(G::GMM, x::AbstractMatrix{Float}, niter::Int)
     return G, LL
 end
 
-
 function trainML(itype::GMinit, x::AbstractMatrix{Float}, nmix::Int, niter::Int)
     G = GMMinit(itype, nmix, x)
     return trainML(G, x, niter)
 end
-
 
 trainML(x::AbstractMatrix{Float}, nmix::Int, niter::Int) = trainML(init_kmeans(), x, nmix, niter)

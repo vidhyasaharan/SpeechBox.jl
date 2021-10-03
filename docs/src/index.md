@@ -13,6 +13,7 @@ Currently SpeechBox.jl implements routines for
 - [LPC Analyses](lpc)
 - [Pitch Estimation](pitch)
 - [MFCC extraction](mfcc)
+- [K-Means Clustering](kmeans)
 - [Utilities](utilities)
 
 

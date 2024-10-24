@@ -1,4 +1,6 @@
+
 docs/build/
 .github/workflows/CI.yml
 .github/workflows/TagBot.yml
 .github/workflows/CompatHelper.yml
+.Manifest.toml

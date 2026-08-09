@@ -25,7 +25,7 @@ speech_waveform
 ```
 
 ## `framed_signal`
-Stores a [`speech_waveform`] (@ref) as well as all the information required to split the signal into frames. Namely, the length of the frame (`frame_length`), the number of samples between the start of consecutive frames (`frame_shift`), the total number of frames covering the signal with the smallest amount of zero padding to ensure an integer number of frames (`num_frames`), and the total number of frames spanning as much of the signal as possible with an integer number of frames without requiring any padding and ignoring any samples at the end of the signal that do not fit into a full frame (`num_signal_frames`).
+Stores a [`speech_waveform`](@ref) as well as all the information required to split the signal into frames. Namely, the length of the frame (`frame_length`), the number of samples between the start of consecutive frames (`frame_shift`), the total number of frames covering the signal with the smallest amount of zero padding to ensure an integer number of frames (`num_frames`), and the total number of frames spanning as much of the signal as possible with an integer number of frames without requiring any padding and ignoring any samples at the end of the signal that do not fit into a full frame (`num_signal_frames`).
 
 ```julia
 struct framed_signal

@@ -8,6 +8,6 @@ Linear Predictive Coding (LPC) is based on the linear all-pole vocal tract filte
 ```@docs
 lpc
 lpc_response
-acorr
-acorr!
 ```
+
+The autocorrelation functions [`acorr`](@ref) and [`acorr!`](@ref) used in LPC analysis are documented on the [Correlations](correlations.md) page.

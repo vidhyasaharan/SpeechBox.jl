@@ -5,7 +5,6 @@ using DSP
 using FFTW
 using RecipesBase
 using Random
-using LoopVectorization
 using LinearAlgebra
 
 
@@ -41,7 +40,6 @@ struct comp end
 include("signal_objects.jl")
 include("utilities.jl")
 include("internal_utilities.jl")
-include("loopvectorized_utilities.jl")
 include("statistics_utilities.jl")
 include("dsp_utilities.jl")
 include("speechframing.jl")

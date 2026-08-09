@@ -78,9 +78,9 @@ end
 #     â = lpc(Ryy)
 #     r = lpcacorr2v(Ryy)
 
-#     c = log(dotavx(a))
-#     # d = c + log(dotavx(b,r)) - log(dotavx(â,r))
-#     d = dotavx(b,r)/dotavx(â,r)
+#     c = log(sum(abs2,a))
+#     # d = c + log(dot(b,r)) - log(dot(â,r))
+#     d = dot(b,r)/dot(â,r)
 #     return d
 # end
 
@@ -90,8 +90,8 @@ end
 #     V = acorr_mat(rxx)
 #     a = lpc(x, p)
 #     â = lpc(y, p)
-#     N = dotavx(a, V*a)
-#     D = dotavx(â, V*â)
+#     N = dot(a, V*a)
+#     D = dot(â, V*â)
 #     d = N/D
 #     return d
 # end
@@ -99,12 +99,12 @@ end
 
 #Convert inverse filter coefficients to autocorrelation coefficients
 function lpcar2ra(a::AbstractVector{Float})
-    na = 1/dotavx(a)
+    na = 1/sum(abs2,a)
     p = length(a)
     b = Vector{Float}(undef,p)
     b[1] = 1
     for i ∈ 2:p
-        b[i] = na*dotavx(a[1:p-i+1],a[i:p])
+        b[i] = na*dot(a[1:p-i+1],a[i:p])
     end
     return b
 end

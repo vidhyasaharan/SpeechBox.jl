@@ -87,7 +87,7 @@ function GMMinit(::init_rand, nmix::Int, data::AbstractMatrix{T}) where {T<:Abst
 end
 
 #Compute Log Probability (Log-likelihood)
-logprob(μ::AbstractVector{T}, P::AbstractMatrix{T}, Z::T, x::AbstractVector{T}) where {T<:AbstractFloat} = Z-(mahalavx(x,μ,P)/2)
+logprob(μ::AbstractVector{T}, P::AbstractMatrix{T}, Z::T, x::AbstractVector{T}) where {T<:AbstractFloat} = Z-(sqmahal(x,μ,P)/2)
 
 function logmixprob!(lprobs::AbstractVector{Float}, G::GMM, x::AbstractVector{Float})
     for i ∈ eachindex(lprobs, G.μ, G.P, G.Z, G.w)
@@ -122,7 +122,7 @@ end
 function logsumexp(lp::AbstractVector{T}) where T<:AbstractFloat
     lmax = maximum(lp)
     s = zero(T)
-    @turbo for i ∈ eachindex(lp)
+    @inbounds @simd for i ∈ eachindex(lp)
         s += exp(lp[i] - lmax)
     end
     return log(s) + lmax
@@ -299,7 +299,7 @@ end
 function mixture_posterior!(γ::AbstractVector{Float}, G::GMM, x::AbstractVector{Float})
     logmixprob!(γ,G,x)
     lp = logsumexp(γ)
-    @turbo for i ∈ eachindex(γ)
+    @inbounds @simd for i ∈ eachindex(γ)
         γ[i] = exp(γ[i] - lp)
     end
 end
@@ -345,12 +345,14 @@ function update_ML(G::GMM, γ::AbstractMatrix{Float}, x::AbstractMatrix{Float})
     for m ∈ 1:nmix
         for n ∈ axes(x,2)
             kn = γ[m,n]*k[m]
-            @turbo for i ∈ 1:ndim
+            @inbounds @simd for i ∈ 1:ndim
                 μ[m][i] += kn*x[i,n]
                 temp[i,m] = x[i,n] - G.μ[m][i]
             end
-            @turbo for i ∈ 1:ndim, j ∈ 1:ndim
-                Σ[m][i,j] += kn*temp[i,m]*temp[j,m]
+            @inbounds for j ∈ 1:ndim
+                @simd for i ∈ 1:ndim
+                    Σ[m][i,j] += kn*temp[i,m]*temp[j,m]
+                end
             end
         end
         Σ[m] += Σ[m]'

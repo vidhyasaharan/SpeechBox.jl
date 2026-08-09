@@ -8,7 +8,7 @@ Pre-emphasise speech signal stored in array `x` or given by `speech_waveform` ob
 function preemphasis(x::AbstractVector{Float})
     y = Vector{Float}(undef,length(x))
     y[1] = 0.05*x[1]
-    @turbo for i ∈ 2:length(x)
+    @inbounds @simd for i ∈ 2:length(x)
         y[i] = x[i] - 0.95*x[i-1]
     end
     return y

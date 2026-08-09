@@ -2,9 +2,8 @@
 include("setup.jl")
 
 @testset verbose = true "SpeechBox" begin
-    @testset "utilities" begin 
+    @testset "utilities" begin
         include("internal_utilities_tests.jl")
-        include("loopvectorized_utilities_tests.jl")
         include("statistics_utilities_tests.jl")
     end
     @testset "correlation" begin

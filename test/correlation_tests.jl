@@ -12,7 +12,7 @@
     @test length(y) == length(x)
     @test y1 == y
     @test argmax(y) == hstart + z - 1
-    @test maximum(y) ≈ SpeechBox.dotavx(h)
+    @test maximum(y) ≈ sum(abs2,h)
 end
 
 @testset "acorr" begin
@@ -26,5 +26,5 @@ end
     @test length(rx) == p
     @test rxx == rx
     @test argmax(rx) == 1
-    @test maximum(rx) ≈ SpeechBox.dotavx(x)/len
+    @test maximum(rx) ≈ sum(abs2,x)/len
 end

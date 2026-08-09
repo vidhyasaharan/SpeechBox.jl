@@ -169,7 +169,7 @@ function periodogram(::comp, x::AbstractVector{Float}, fs::Real, frqs::AbstractV
     nfrqs = length(frqs)
     proj = zeros(Float,nfrqs)
     for i ∈ eachindex(proj)
-        proj[i] = abs2(dotavx(ip,cexp(frqs[i],fs,len)))
+        proj[i] = abs2(dot(ip,cexp(frqs[i],fs,len)))
     end
     return proj
 end
@@ -192,9 +192,9 @@ function periodogram(::comp, sig_frames::framed_signal, frqs ;wtype::String="han
 
     for i ∈ 1:nframes
         ip = extract_frame(sig_frames,i)
-        mulavx!(ip,win)
+        ip .*= win
         @views for j in 1:nfrqs
-            pspec[j,i] = abs2(dotavx(ip,ce_array[:,j]))
+            pspec[j,i] = abs2(dot(ip,ce_array[:,j]))
         end
     end
     return pspec

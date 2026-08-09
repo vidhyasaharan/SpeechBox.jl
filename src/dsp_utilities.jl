@@ -51,7 +51,7 @@ end
 function H(F::filter_coefs, z::Complex{<:Real})
     npz = powers(z, length(F.num)-1)
     dpz = powers(z, length(F.den)-1)
-    Hz = dotavx(F.num,npz)/dotavx(F.den,dpz)
+    Hz = dot(F.num,npz)/dot(F.den,dpz)
     return Hz
 end
 

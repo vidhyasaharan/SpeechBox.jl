@@ -40,12 +40,10 @@ end
 #Running mean
 function running_mean!(m::AbstractVector{T}, x::AbstractMatrix{T}) where T<:AbstractFloat
     k = zero(T)
-    @turbo for i ∈ eachindex(m)
-        m[i] = zero(T)
-    end
+    fill!(m, zero(T))
     @inbounds for j ∈ axes(x,2)
         k = 1/j
-        @turbo for i ∈ axes(x,1)
+        @simd for i ∈ axes(x,1)
             temp = (x[i,j] - m[i])
             m[i] += temp*k
         end
@@ -61,28 +59,18 @@ end
 #Running mean and variance
 function running_meanvar!(m::AbstractVector{T}, v::AbstractVector{T}, x::AbstractMatrix{T}) where T<:AbstractFloat
     k = zero(T)
-    # tbuf = zeros(T,size(x,1))
-    @turbo for i ∈ eachindex(m)
-        m[i] = zero(T)
-        v[i] = zero(T)
-    end
+    fill!(m, zero(T))
+    fill!(v, zero(T))
     @inbounds for j ∈ axes(x,2)
         k = 1/j
-        @inbounds for i ∈ axes(x,1)
-            # tbuf[i] = (x[i,j] - m[i])
-            # m[i] += tbuf[i]*k
+        for i ∈ axes(x,1)
             temp = (x[i,j] - m[i])
             m[i] += temp*k
             v[i] += temp*(x[i,j] - m[i])
         end
-        # @inbounds @turbo for i ∈ axes(x,1)
-        #     v[i] += tbuf[i]*(x[i,j] - m[i])
-        # end
     end
     N = 1/(size(x,2)-1)
-    @turbo for i ∈ eachindex(v)
-        v[i] *= N
-    end
+    v .*= N
 end
 
 function running_meanvar(x::AbstractMatrix{T}) where T<:AbstractFloat
@@ -101,18 +89,18 @@ function running_meancov!(m::AbstractVector{T}, C::AbstractMatrix{T}, x::Abstrac
     fill!(C,zero(T))
     @inbounds for n ∈ axes(x,2)
         k = 1/n
-        @turbo for i ∈ axes(x,1)
+        @simd for i ∈ axes(x,1)
             temp[i] = (x[i,n] - m[i])
             m[i] += temp[i]*k
         end
-        @turbo for i ∈ axes(x,1), j ∈ axes(x,1)
-            C[j,i] += (x[j,n] - m[j])*temp[i]
+        for i ∈ axes(x,1)
+            @simd for j ∈ axes(x,1)
+                C[j,i] += (x[j,n] - m[j])*temp[i]
+            end
         end
     end
     N = 1/(size(x,2)-1)
-    @turbo for i ∈ eachindex(C)
-        C[i] *= N
-    end
+    C .*= N
     C += C'
     C /= 2
 end
@@ -128,10 +116,40 @@ end
 #Update running mean with a nth data point where n is the running index
 function update_running_mean!(mean::AbstractVector{T}, data::AbstractVector{T}, n::Int) where T<:AbstractFloat
     k = 1/n
-    @inbounds @turbo for i ∈ eachindex(mean)
+    @inbounds @simd for i ∈ eachindex(mean)
         temp = (data[i] - mean[i])*k
         mean[i] += temp
     end
+end
+
+
+## Distance computations
+
+#Squared L2 (Euclidean) distance between two vectors
+function sqL2dist(a::AbstractVector{T}, b::AbstractVector{T}) where {T}
+    s = zero(T)
+    @inbounds @simd for i ∈ eachindex(a,b)
+        t = a[i] - b[i]
+        s += t * t
+    end
+    return s
+end
+
+#L2 (Euclidean) distance between two vectors
+L2dist(a::AbstractVector{T}, b::AbstractVector{T}) where {T} = sqrt(sqL2dist(a,b))
+
+#Squared Mahalanobis-type distance (x-y)'A(x-y), where A is typically a precision matrix
+function sqmahal(x::AbstractVector{T}, y::AbstractVector{T}, A::AbstractMatrix{T}) where {T}
+    s = zero(T)
+    @inbounds for j ∈ eachindex(x,y)
+        tj = x[j] - y[j]
+        r = zero(T)
+        @simd for i ∈ eachindex(x,y)
+            r += (x[i] - y[i]) * A[i,j]
+        end
+        s += tj * r
+    end
+    return s
 end
 
 
@@ -140,8 +158,8 @@ end
 abstract type Distance end
 struct SqL2 <: Distance end
 struct L2 <: Distance end
-dist(::SqL2, a::AbstractVector{T}, b::AbstractVector{T}) where {T} = sqL2avx(a,b)
-dist(::L2, a::AbstractVector{T}, b::AbstractVector{T}) where {T} = L2avx(a,b)
+dist(::SqL2, a::AbstractVector{T}, b::AbstractVector{T}) where {T} = sqL2dist(a,b)
+dist(::L2, a::AbstractVector{T}, b::AbstractVector{T}) where {T} = L2dist(a,b)
 
 #Pairwise distances
 function pairwise!(dm::Distance, d::AbstractVector{<:AbstractFloat}, x::AbstractVector{T}, y::AbstractMatrix{T}) where {T}
@@ -181,8 +199,6 @@ function pdist2cdist(pdist::AbstractVector{T}) where {T}
         cdist[i] = cdist[i-1] + pdist[i]
     end
     K = 1/cdist[end]
-    @turbo for i ∈ eachindex(cdist)
-        cdist[i] *= K
-    end
+    cdist .*= K
     return cdist
 end

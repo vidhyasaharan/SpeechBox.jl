@@ -1,19 +1,19 @@
 name = "SpeechBox"
 uuid = "5977877c-68b9-11e9-19cb-f954a5ed1fbc"
 authors = ["Vidhyasaharan Sethu <v.sethu@unsw.edu.au>"]
-version = "0.2.1"
+version = "0.3.0"
 
 [deps]
 DSP = "717857b8-e6f2-59f4-9121-6e50c889abd2"
 FFTW = "7a1cc6ca-52ef-59f5-83cd-3a7055c09341"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
-LoopVectorization = "bdcacae8-1622-11e9-2a5c-532679323890"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 RecipesBase = "3cdcf5f2-1ef4-517c-9805-6587b60abb01"
-WAV = "8149f6b0-98f6-5db9-b78f-408fbbb8ef88"
 
 [compat]
-DSP = ">= 0.6"
-FFTW = ">= 1.3"
-RecipesBase = ">= 1.1"
-WAV = ">= 1.1"
+DSP = "0.8"
+FFTW = "1.8"
+LinearAlgebra = "1"
+Random = "1"
+RecipesBase = "1"
+julia = "1.10"

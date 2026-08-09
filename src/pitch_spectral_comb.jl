@@ -40,11 +40,11 @@ end
 
 
 function comb_resp_dist(a::AbstractVector{Float}, b::AbstractVector{Float})
-    anorm = 1/dotavx(a)
-    bnorm = 1/dotavx(b)
+    anorm = 1/sum(abs2,a)
+    bnorm = 1/sum(abs2,b)
     ā = anorm.*a
     b̄ = bnorm.*b
-    return dotavx(ā-b̄)
+    return sum(abs2,ā-b̄)
 end
 
 

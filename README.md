@@ -1,7 +1,8 @@
 # SpeechBox
 
-<!-- [![codecov](https://codecov.io/gh/vidhyasaharan/SpeechBox.jl/branch/master/graph/badge.svg?token=SOB3LPJO8I)](https://codecov.io/gh/vidhyasaharan/SpeechBox.jl)  ![build](https://github.com/unsw-edu-au/SpeechBox.jl/actions/workflows/CI.yml/badge.svg) -->
+<!-- [![codecov](https://codecov.io/gh/vidhyasaharan/SpeechBox.jl/branch/master/graph/badge.svg?token=SOB3LPJO8I)](https://codecov.io/gh/vidhyasaharan/SpeechBox.jl) -->
 
+[![CI](https://github.com/unsw-edu-au/SpeechBox.jl/actions/workflows/CI.yml/badge.svg)](https://github.com/unsw-edu-au/SpeechBox.jl/actions/workflows/CI.yml)
 [![](https://img.shields.io/badge/docs-stable-blue.svg)](https://unsw-edu-au.github.io/SpeechBox.jl/stable)
 [![](https://img.shields.io/badge/docs-dev-blue.svg)](https://unsw-edu-au.github.io/SpeechBox.jl/dev)
 

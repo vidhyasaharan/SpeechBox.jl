@@ -36,6 +36,20 @@ end
     @test mean(x,dims=2) ≈ m
 end
 
+@testset "distance computations" begin
+    ndim = 10
+    a = rand(Float,ndim)
+    b = rand(Float,ndim)
+    @test (a-b)⋅(a-b) ≈ SpeechBox.sqL2dist(a,b)
+    @test sqrt(sum(abs2,a-b)) ≈ SpeechBox.L2dist(a,b)
+
+    A = randn(Float,ndim,ndim)
+    x = randn(Float,ndim)
+    y = randn(Float,ndim)
+    d = (x-y)'*A*(x-y)
+    @test SpeechBox.sqmahal(x,y,A) ≈ d
+end
+
 @testset "Distance" begin
     a = randn(Float64,10)
     b = randn(Float64,10)
@@ -45,8 +59,8 @@ end
     @test SpeechBox.SqL2 <: SpeechBox.Distance
     @test SpeechBox.L2 <: SpeechBox.Distance
 
-    @test SpeechBox.dist(SpeechBox.SqL2(),a,b) ≈ SpeechBox.sqL2avx(a,b)
-    @test SpeechBox.dist(SpeechBox.L2(),a,b) ≈ SpeechBox.L2avx(a,b)
+    @test SpeechBox.dist(SpeechBox.SqL2(),a,b) ≈ SpeechBox.sqL2dist(a,b)
+    @test SpeechBox.dist(SpeechBox.L2(),a,b) ≈ SpeechBox.L2dist(a,b)
 
     distances = (SpeechBox.SqL2(), SpeechBox.L2())
     for dm ∈ distances

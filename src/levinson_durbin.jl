@@ -24,7 +24,7 @@ end
 
 function update_k!(k::AbstractVector{Float}, α::AbstractVector{Float}, rxx::AbstractVector{Float}, E::AbstractVector{Float}, iter::Int)
     @views a = α[end-iter+2:end]
-    @views k[iter] = (rxx[iter+1] - dotavx(a,rxx[2:iter]))/E[iter]
+    @views k[iter] = (rxx[iter+1] - dot(a,rxx[2:iter]))/E[iter]
 end
 
 function update_α!(α::AbstractVector{Float}, k::AbstractVector{Float}, iter::Int)

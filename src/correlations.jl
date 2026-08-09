@@ -1,4 +1,4 @@
-#Cross corrleation sequence with zero padding (and using dotavx)
+#Cross correlation sequence with zero padding
 """
     xcorr(x, h[, z=1])
 
@@ -19,11 +19,11 @@ function xcorr!(y::AbstractVector{T}, x::AbstractVector{T}, h::AbstractVector{T}
     padded_x = zeros(length(x)+length(h)-1)
     @views padded_x[z:z+length(x)-1] = x
     @views @inbounds for i ∈ eachindex(y)
-        y[i] = dotavx(padded_x[i:i+length(h)-1],h)
+        y[i] = dot(padded_x[i:i+length(h)-1],h)
     end
 end
 
-#Autocorrleation sequence without zero padding (and using dotavx)
+#Autocorrelation sequence without zero padding
 """
     acorr!(rxx, x)
 
@@ -34,7 +34,7 @@ function acorr!(rxx::AbstractVector{T}, x::AbstractVector{T}) where {T}
     @inbounds @views for i ∈ eachindex(rxx)
         δ = i-1
         N = len - δ
-        rxx[i] = (1/N)*dotavx(x[1:end-δ],x[1+δ:end])
+        rxx[i] = (1/N)*dot(x[1:end-δ],x[1+δ:end])
     end
 end
 
@@ -59,7 +59,7 @@ end
 
 Computes the autocorrelation function of input signal `sig` provided as a `speech_waveform` object at sample `i` (or at time `t` in secs) at one of more lag index/indices `k` (or at time lags `lags` in secs) given a window size of `win_size` samples (or a window duration `win_dur` given in seconds)
 """
-acf(s::speech_waveform, i::Int, k::Int; win_size::Int) = dotavx(s.x[i:i+win_size-k-1], s.x[i+k:i+win_size-1])
+acf(s::speech_waveform, i::Int, k::Int; win_size::Int) = dot(s.x[i:i+win_size-k-1], s.x[i+k:i+win_size-1])
 
 function acf(s::speech_waveform, t::Real, lag::Real; win_dur::Real)
     i = time2nsamples(t,s.fs)
@@ -87,9 +87,9 @@ function nacf(s::speech_waveform, i::Int, k::Int; win_size::Int, nconst::Real = 
     mean_s = sum(s1)/length(s1)
     s1 .-= mean_s
     s2 .-= mean_s
-    e1 = dotavx(s1)
-    e2 = dotavx(s2)
-    ccf = dotavx(s1, s2)
+    e1 = sum(abs2,s1)
+    e2 = sum(abs2,s2)
+    ccf = dot(s1, s2)
     return ccf/(sqrt(nconst + (e1*e2)))
 end
 

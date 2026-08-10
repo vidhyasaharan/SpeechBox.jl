@@ -47,6 +47,9 @@ end
     @test typeof(msp) == Matrix{Float}
     @test size(msp,1) > 0
     @test size(msp,2) > 0
+    @test length(tf.frqs) == size(msp,1) #one frequency index per spectrogram row
+    @test tf.frqs[1] == 0.0
+    @test tf.frqs[end] <= fs/2
     @test maximum(isa.(msp,Complex))==false
     @test minimum(msp) >= eps()
 
@@ -64,5 +67,8 @@ end
     mmag2,mfrq2 = findmax(msp[:,2])
     @test mfrq1 == frq1 + 1
     @test mfrq2 == frq2 + 1
+    @test length(tf.frqs) == size(msp,1)
+    @test tf.frqs[mfrq1] ≈ frq1 #frequency axis maps spectrogram rows to Hz
+    @test tf.frqs[mfrq2] ≈ frq2
 
 end

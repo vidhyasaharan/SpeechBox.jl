@@ -49,6 +49,7 @@ end
 
 
 function magspec(::comp, x::AbstractVector{Float},fs::Real; ndft::Int = length(x), wtype::String="hanning")
+    ndft = max(ndft, length(x)) #dft() raises the number of DFT points to the signal length; keep the frequency grid consistent with that
     mspec = magspec(comp(), x; ndft, wtype)
     frqs = rfftfreq(ndft, fs)
     return mspec,frqs
@@ -94,8 +95,8 @@ end
 
 function specgram(sig_frames::framed_signal; ndft::Int = nextfastfft(sig_frames.frame_length), wtype::String="hanning")
     mspec = specgram(comp(), sig_frames; ndft, wtype)
-    frqs = rfftfreq(size(mspec,1),sig_frames.signal.fs)
-    # mspec, frqs = specgram_components(sig_frames; wtype)
+    nfft = max(sig_frames.frame_length, ndft) #Number of DFT points used by the computation above
+    frqs = rfftfreq(nfft,sig_frames.signal.fs)
     return timefreq(sig_frames,mspec,frqs)
 end
 

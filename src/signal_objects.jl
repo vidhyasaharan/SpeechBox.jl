@@ -127,7 +127,7 @@ timefreq(frames::framed_signal,
 
 timefreq(signal::speech_waveform,
         components::RorC_Matrix,
-        frqs::AbstractVector{:Real},
+        frqs::AbstractVector{<:Real},
         time::Union{Vector{Float}, Vector{Vector{Float}}},
         title::Union{AbstractString, Nothing}) = timefreq(signal,nothing,components,convert(Vector{Float},frqs),time,title)
 

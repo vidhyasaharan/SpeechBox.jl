@@ -12,7 +12,7 @@ const VTR_S_C = 0.5
 const VO_BIAS = 0.0
 const DOUBL_C = 0.35
 # const A_FACT = 10000.0
-# const A_FACT = 0.0
+const A_FACT = 0.0
 const N_CANDS = 20
 
 struct RAPT_candidates
@@ -107,7 +107,6 @@ end
 
 # Estimate pitch candidates from signal at given sample index
 function RAPT_pitch_candidates(s::speech_waveform, indx::Int; win_dur::Real = nacf_win_size, ncands::Int = N_CANDS)
-    A_FACT = 0.0
     fs = s.fs
     win_size = time2nsamples(win_dur,fs)
     min_lag = time2nsamples(1/F0max,fs)

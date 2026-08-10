@@ -50,3 +50,18 @@ end
     @test typeof(sp.frqs) == Array{Float,1}
     @test typeof(sp.title) <: AbstractString
 end
+
+
+@testset "timefreq" begin
+    sw = speech_waveform(rand(Float,1000),1000)
+    comps = rand(Float,5,4)
+    frqs = collect(1.0:5.0)
+    t = collect(0.1:0.1:0.4)
+    tf = SpeechBox.timefreq(sw, comps, frqs, t, "test") #construct directly from a waveform (no frames)
+    @test tf.signal == sw
+    @test tf.frames === nothing
+    @test tf.components == comps
+    @test tf.frqs == frqs
+    @test tf.time == t
+    @test tf.title == "test"
+end

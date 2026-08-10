@@ -16,7 +16,7 @@ end
 Compute the cross correlation between `x` and `h`, with the optional `z` indicating the position of the zero index of the array `h` and stores the result in `y`. The number of sample lags at which cross correlation is computed is equal to the length of `y` and the cross correlation is computed with zero padding.
 """
 function xcorr!(y::AbstractVector{T}, x::AbstractVector{T}, h::AbstractVector{T}, z::Int=1) where {T}
-    padded_x = zeros(length(x)+length(h)-1)
+    padded_x = zeros(T,length(x)+length(h)-1)
     @views padded_x[z:z+length(x)-1] = x
     @views @inbounds for i ∈ eachindex(y)
         y[i] = dot(padded_x[i:i+length(h)-1],h)

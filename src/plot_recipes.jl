@@ -36,7 +36,7 @@ end
 
 
 #Plot recipe for plotting spectrogram
-@recipe function f(msp::SpeechBox.timefreq; nxticks = 8, nyticks = 8)
+@recipe function f(msp::timefreq; nxticks = 8, nyticks = 8)
     frqs = msp.frqs
     time = msp.time
     xtks = generate_ticks(time,nxticks)
@@ -57,7 +57,7 @@ end
 
 
 #Plot recipe for plotting spectra
-@recipe function f(spec::SpeechBox.spectrum; nticks = 8)
+@recipe function f(spec::spectrum; nticks = 8)
     frqs = spec.frqs
     xtks = generate_ticks(frqs,nticks)
 

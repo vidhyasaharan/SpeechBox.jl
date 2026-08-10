@@ -10,10 +10,7 @@ makedocs(
     pages = [
         "Home" => "index.md",
         "Contents" => [
-            "signal_objects.md",
-            "speechframing.md",
             "vad.md",
-            "spectralanalyses.md",
             "correlations.md",
             "lpc.md",
             "pitch.md",

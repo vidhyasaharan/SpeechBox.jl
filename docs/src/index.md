@@ -1,14 +1,31 @@
 # SpeechBox Documentation
 
-SpeechBox.jl provides a number of basic speech processing and analyses routines in Julia. In addition, plot recipes are provided for speech waveforms, magnitude sprectra and spectrograms. [Data Structures](signal_objects.md) are defined to hold these objects, which also serve as inputs and outputs to the speech processing routines.
+```@docs
+SpeechBox
+```
 
+The time-frequency core — the `waveform`/`framed_signal`/`spectrum`/`timefreq` data
+structures, signal framing, window functions, spectral analyses (`magspec`, `specgram`,
+`periodogram`) and their supporting utilities — lives in
+[TimeFrequencyAnalysis.jl](https://unsw-edu-au.github.io/TimeFrequencyAnalysis.jl/dev/)
+and is re-exported by SpeechBox, so `using SpeechBox` provides the complete API. The name
+`speech_waveform` is kept as an alias for the `waveform` container. Plot recipes are
+provided for waveforms, magnitude spectra, spectrograms and pitch overlays.
 
+## Installation
+
+Neither package is registered yet; add the core first, then SpeechBox:
+
+```julia
+pkg> add https://github.com/unsw-edu-au/TimeFrequencyAnalysis.jl.git
+pkg> add https://github.com/unsw-edu-au/SpeechBox.jl.git
+```
 
 ## Outline
-Currently SpeechBox.jl implements routines for 
-- [Speech Framing](speechframing.md)
+
+SpeechBox.jl implements routines for
+
 - [Voice Activity Detection](vad.md)
-- [Spectral Analyses](spectralanalyses.md)
 - [Correlations](correlations.md)
 - [LPC Analyses](lpc.md)
 - [Pitch Estimation](pitch.md)
@@ -16,4 +33,5 @@ Currently SpeechBox.jl implements routines for
 - [K-Means Clustering](kmeans.md)
 - [Utilities](utilities.md)
 
-
+For framing, spectral analyses and the data structures, see the
+[TimeFrequencyAnalysis.jl documentation](https://unsw-edu-au.github.io/TimeFrequencyAnalysis.jl/dev/).

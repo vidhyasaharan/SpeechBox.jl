@@ -10,16 +10,15 @@ include("setup.jl")
         include("correlation_tests.jl")
     end
     @testset "structs" begin
-        include("signal_objects_tests.jl")
+        include("pitch_objects_tests.jl")
     end
-    @testset "spectrum" begin 
-        include("spectralanalyses_tests.jl")
+    @testset "spectrum" begin
         include("lpc_tests.jl")
     end
     @testset "vad" begin
         include("vad_tests.jl")
     end
-    @testset "MFCC" begin 
+    @testset "MFCC" begin
         include("mfcc_tests.jl")
     end
     @testset "spec. comb" begin

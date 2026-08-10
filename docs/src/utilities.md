@@ -1,21 +1,15 @@
 # Utility Functions
 
-Some utility functions that are commonly employed in speech processing systems and algorithms are provided:
+Speech-specific signal conditioning provided by SpeechBox:
+
 - `preemphasis` - Pre-emphasise speech signal using high pass filter: ``H(z) = 1 - 0.95z^{-1}``
-- `resample` - Resample speech signal given new sampling rate
-- `window` - Generate a array corresponding to a window function
+
+Generic signal utilities — window functions, resampling, frequency grids and synthetic
+signal generators — are provided (and documented) by
+[TimeFrequencyAnalysis.jl](https://unsw-edu-au.github.io/TimeFrequencyAnalysis.jl/dev/)
+and re-exported by SpeechBox.
 
 ## Pre-Emphasis
 ```@docs
 preemphasis
-```
-
-## Resample
-```@docs
-resample
-```
-
-## Window Function
-```@docs
-window
 ```

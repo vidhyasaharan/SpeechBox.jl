@@ -10,6 +10,8 @@ permissions:
   contents: write
   pull-requests: read
   statuses: write
+env:
+  JULIA_PKG_USE_CLI_GIT: 'true' # the docs environment resolves TimeFrequencyAnalysis from its GitHub url via [sources]
 jobs:
   docs:
     name: Documentation

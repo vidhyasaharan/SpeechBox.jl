@@ -19,7 +19,7 @@ jobs:
       fail-fast: false
       matrix:
         version:
-          - '1.10' # current LTS / minimum supported version
+          - '1.12' # minimum supported version (see [compat] julia in Project.toml)
           - '1'    # latest stable release
         os:
           - ubuntu-latest

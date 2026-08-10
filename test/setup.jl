@@ -3,8 +3,9 @@ using SpeechBox
 using LinearAlgebra
 using WAV
 using DSP: filt
-using SpeechBox: Float
 using Statistics
+
+const Float = Float64 #Concrete type used by the test fixtures
 
 testdir = normpath(joinpath(dirname(pathof(SpeechBox)),"../test/"))
 srcdir = normpath(joinpath(dirname(pathof(SpeechBox)),"../src/"))

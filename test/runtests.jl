@@ -34,4 +34,7 @@ include("setup.jl")
     @testset "GMM" begin
         include("GMM_tests.jl")
     end
+    @testset "Float32" begin
+        include("float32_tests.jl")
+    end
 end

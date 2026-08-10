@@ -7,7 +7,7 @@
     time = 0.04
     indx = Int(round(time*fs))
     cands = SpeechBox.RAPT_candidates(length(rcands), rcands, mags, indx, time, fs)
-    @test typeof(cands) == SpeechBox.RAPT_candidates
+    @test cands isa SpeechBox.RAPT_candidates{Float}
     @test typeof(cands.num_cands) == Int
     @test typeof(cands.cands) == Vector{Float}
     @test typeof(cands.Φ) == Vector{Float}
@@ -21,7 +21,7 @@ end
 @testset "RAPT_pitch_candidates_index" begin
     indx = Int(round((10*SpeechBox.frame_step*signal.fs) + 1))
     cands = SpeechBox.RAPT_pitch_candidates(signal, indx)
-    @test typeof(cands) == SpeechBox.RAPT_candidates
+    @test cands isa SpeechBox.RAPT_candidates{Float}
     @test cands.num_cands == length(cands.cands)
     @test cands.index == indx
     @test cands.time == indx/signal.fs
@@ -29,7 +29,7 @@ end
 
 @testset "RAPT_pitch_candidates" begin
     cand_array = SpeechBox.RAPT_pitch_candidates(signal)
-    @test typeof(cand_array) == Vector{SpeechBox.RAPT_candidates}
+    @test typeof(cand_array) == Vector{SpeechBox.RAPT_candidates{Float}}
 end
 
 @testset "RAPT_maxcands" begin

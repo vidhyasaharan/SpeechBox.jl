@@ -13,7 +13,7 @@ end
     frames = framed_signal(x,fs) #for Array{Float} input
     frames_alt = framed_signal(signal)
     @test frames == frames_alt
-    @test typeof(frames) == framed_signal
+    @test frames isa framed_signal{Float}
     @test typeof(frames.signal.x) <: Array{Float}
     @test length(frames.signal.x) > 0
     @test typeof(frames.frame_length) <: Int
@@ -45,7 +45,7 @@ end
     c = rand(Complex{Float},111)
     f = convert.(Float,collect(1:length(c)))
     sp = spectrum(speech_waveform(x,fs),c,f)
-    @test typeof(sp.signal) == speech_waveform
+    @test sp.signal isa speech_waveform{Float}
     @test typeof(sp.components) == Array{Complex{Float},1}
     @test typeof(sp.frqs) == Array{Float,1}
     @test typeof(sp.title) <: AbstractString

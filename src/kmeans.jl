@@ -5,16 +5,16 @@
     mindist2cntrs(centres, data)
 
 Computes the square of the L2 distance to closest centre for each data point.
-* `data` must be a matrix of `Float` with each column representing a point
-* `centres` must be a matrix of `Float` with each column representing a centre
+* `data` must be a matrix of floats with each column representing a point
+* `centres` must be a matrix of floats with each column representing a centre
 
 !!! note
     `mindist2cntrs(centres, data)` does not check the whether the dimensions of the input match.
     Users must ensure that `size(data,1) = size(centres,1)`.
 """
 function mindist2cntrs(cntrs::AbstractMatrix{T}, data::AbstractMatrix{T}) where T<:AbstractFloat
-    mdist = Vector{Float}(undef,size(data,2))
-    temp = Vector{Float}(undef,size(cntrs,2))
+    mdist = Vector{T}(undef,size(data,2))
+    temp = Vector{T}(undef,size(cntrs,2))
     @inbounds @views for i ∈ eachindex(mdist)
         pairwise!(SqL2(), temp, data[:,i], cntrs)
         mdist[i] = minimum(temp)
@@ -27,7 +27,7 @@ end
     kmeanspp(data, number_of_centres)
 
 Indentfies initial cluster centres for k-means clustering using the k-means++ alogrithm for given `data`.
-* `data` must be a matrix of `Float` with each column vector representing a point
+* `data` must be a matrix of floats with each column vector representing a point
 * Function will return a vector of indices corresponding to columns of `data` identified as cluster centres
 """
 function kmeanspp(data::AbstractMatrix{T}, ncntrs::Int) where T<:AbstractFloat
@@ -52,8 +52,8 @@ end
     closest_centre!(closest_centre, centres, data)
 
 Identifies the centre closest to each data point based on L2 distance.
-* `data` must be a matrix of `Float` with each column representing a point
-* `centres` must be a matrix of `Float` with each column representing a centre
+* `data` must be a matrix of floats with each column representing a point
+* `centres` must be a matrix of floats with each column representing a centre
 * `closest_centre` must be a vector of `Int` with each element holding the column index of `centres` that corresponds to the closest centre
 
 
@@ -62,7 +62,7 @@ Identifies the centre closest to each data point based on L2 distance.
     Users must ensure that `length(closest_centre) = size(data,2)` and `size(data,1) = size(centres,1)`.
 """
 function closest_centre!(ccntr::AbstractVector{Int}, cntrs::AbstractMatrix{T}, data::AbstractMatrix{T}) where T<:AbstractFloat
-    temp = Vector{Float}(undef,size(cntrs,2))
+    temp = Vector{T}(undef,size(cntrs,2))
     @inbounds @views for i ∈ eachindex(ccntr)
         pairwise!(SqL2(), temp, data[:,i], cntrs)
         ccntr[i] = argmin(temp)
@@ -73,8 +73,8 @@ end
     closest_centre(centres, data)
 
 Identifies the centre closest to each data point based on L2 distance.
-* `data` must be a matrix of `Float` with each column representing a point
-* `centres` must be a matrix of `Float` with each column representing a centre
+* `data` must be a matrix of floats with each column representing a point
+* `centres` must be a matrix of floats with each column representing a centre
 * Output is a vector of `Int` with each element holding the column index of `centres` that corresponds to the closest centre
 
 
@@ -109,7 +109,7 @@ struct kmrand <: KMinit end
     kmeans_init([initialise_method], data, number_of_centres)
 
 Pick a set of points from `data` to serve as the initial cluster centres for k-means clustering. Method for initialisation can random or k-means++.
-* `data` must be a matrix of `Float` with each column representing a point
+* `data` must be a matrix of floats with each column representing a point
 * Use `kmpp()` as `initialise_method` to use k-mean++ as initialisation method [DEFAULT if `initialise_method` is not specified]
 * Use `kmrand()` as `intialise_method` to randomly select points as initial centres. This can be much faster than k-means++ for large datasets
 """
@@ -137,15 +137,15 @@ end
 Updates (inplace) cluster centres `centres` using the k-means clustering algorithm based on `data`.
 Cluster centres are iteratively updated until the largest shift in cluster centres,
 measured in terms of square of L2 distance, falls below `update_threshold`.
-* `centres` must be a matrix of `Float` with each column representing a cluster centre
-* `data` must be a matrix of `Float` with each column representing a point
+* `centres` must be a matrix of floats with each column representing a cluster centre
+* `data` must be a matrix of floats with each column representing a point
 * Default value of optional named parameter is `update_threshold = 0.0` and corresponds to the setting that algorithm will converge when cluster centres do not shift
 """
-function kmeans!(cntrs::AbstractMatrix{T}, data::AbstractMatrix{T}; update_threshold::Float = 0.0) where T<:AbstractFloat
+function kmeans!(cntrs::AbstractMatrix{T}, data::AbstractMatrix{T}; update_threshold::Real = 0.0) where T<:AbstractFloat
     ndims,ncntrs = size(cntrs)
     old_cntrs = Matrix{T}(undef,ndims,ncntrs)
     ccntr = Vector{Int}(undef,size(data,2))
-    max_shift::Float = Inf
+    max_shift::T = typemax(T)
     while(max_shift > update_threshold)
         copy!(old_cntrs,cntrs)
         kmeans_update!(ccntr, cntrs, data)
@@ -161,15 +161,15 @@ end
 Estimate cluster centres from `data` using the k-means clustering algorithm.
 Cluster centres are iteratively updated until the largest shift in cluster centres,
 measured in terms of square of L2 distance, falls below `update_threshold`.
-* `data` must be a matrix of `Float` with each column representing a point
+* `data` must be a matrix of floats with each column representing a point
 * Default value of optional named parameter is `update_threshold = 0.0` and corresponds to the setting that algorithm will converge when cluster centres do not shift
 * Use `kmpp()` as `initialise_method` to use k-mean++ as initialisation method [DEFAULT if `initialise_method` is not specified]
 * Use `kmrand()` as `intialise_method` to randomly select points as initial centres. This can be faster than k-means++ for large datasets
 """
-function kmeans(data::AbstractMatrix{T}, ncntrs::Int, init_method::KMinit; update_threshold::Float = 0.0) where T<:AbstractFloat
+function kmeans(data::AbstractMatrix{T}, ncntrs::Int, init_method::KMinit; update_threshold::Real = 0.0) where T<:AbstractFloat
     cntrs = kmeans_init(init_method, data, ncntrs)
     kmeans!(cntrs, data; update_threshold)
     return cntrs
 end
 
-kmeans(data::AbstractMatrix{T}, ncntrs::Int; update_threshold::Float = 0.0) where T<:AbstractFloat = kmeans(data, ncntrs, kmpp(); update_threshold)
+kmeans(data::AbstractMatrix{T}, ncntrs::Int; update_threshold::Real = 0.0) where T<:AbstractFloat = kmeans(data, ncntrs, kmpp(); update_threshold)

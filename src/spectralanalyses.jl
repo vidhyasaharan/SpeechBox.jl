@@ -8,11 +8,11 @@ Compute the complex DFT coefficients of the array `x`.
 - `ndft` : Number of DFT points [Default = `length(x)`]. If input `ndft` is less than the length of `x`, the number of DFT points is changed to `length(x)`
 - `wtype` : Window type to use [Default = "hanning"]
 """
-function dft(x::AbstractVector{Float}; ndft::Int = length(x), wtype::String="hanning")
+function dft(x::AbstractVector{T}; ndft::Int = length(x), wtype::String="hanning") where {T<:AbstractFloat}
     len = length(x)
-    win = window(len;wtype)
+    win = window(T,len;wtype)
     buflen = max(ndft,len)
-    buf = zeros(Float, buflen)
+    buf = zeros(T, buflen)
     buf[1:len] = x.*win
     return rfft(buf)
 end
@@ -42,20 +42,20 @@ Compute the DFT magnitude spectrum of signal in array `x` with sampling rate `fs
 magspec(signal::speech_waveform;ndft::Int = length(signal.x), wtype::String="hanning") = magspec(signal.x, signal.fs; ndft, wtype)
 
 
-function magspec(x::AbstractVector{Float},fs::Real=2π; ndft::Int = length(x), wtype::String="hanning")
+function magspec(x::AbstractVector{<:AbstractFloat},fs::Real=2π; ndft::Int = length(x), wtype::String="hanning")
     mspec,frqs = magspec(comp(), x, fs; ndft, wtype)
     return spectrum(speech_waveform(x,fs), mspec, frqs, "DFT Magnitude Spectrum")
 end
 
 
-function magspec(::comp, x::AbstractVector{Float},fs::Real; ndft::Int = length(x), wtype::String="hanning")
+function magspec(::comp, x::AbstractVector{<:AbstractFloat},fs::Real; ndft::Int = length(x), wtype::String="hanning")
     ndft = max(ndft, length(x)) #dft() raises the number of DFT points to the signal length; keep the frequency grid consistent with that
     mspec = magspec(comp(), x; ndft, wtype)
     frqs = rfftfreq(ndft, fs)
     return mspec,frqs
 end
 
-magspec(::comp, x::AbstractVector{Float}; ndft::Int = length(x), wtype::String = "hanning") = abs.(dft(x; ndft, wtype))
+magspec(::comp, x::AbstractVector{<:AbstractFloat}; ndft::Int = length(x), wtype::String = "hanning") = abs.(dft(x; ndft, wtype))
 
 
 #Spectrogram functions
@@ -69,17 +69,17 @@ Compute the DFT magnitude spectrogram from framed\\_signal object `frames`. With
 - `wtype` : Window type [Default is "hanning"]
 - `ndft` : Number of DFT points in computation [Default value is optimal number of points for FFT greater than or equal to frame length]
 """
-function specgram(::comp, sig_frames::framed_signal; ndft::Int = nextfastfft(sig_frames.frame_length), wtype::String = "hanning")
+function specgram(::comp, sig_frames::framed_signal{T}; ndft::Int = nextfastfft(sig_frames.frame_length), wtype::String = "hanning") where {T<:AbstractFloat}
     len = sig_frames.frame_length
     nfft = max(len,ndft) #Default value of ndft is the optimal number of points (larger than frame length) for FFT
     nframes = sig_frames.num_signal_frames #Spectrogram only covers frames witout zero padding original signal (i.e., may not include the last few samples of the signal)
 
-    win = window(len;wtype=wtype) #Choose window - options are rectangle, hamming or hanning (function default is hanning)
+    win = window(T,len;wtype=wtype) #Choose window - options are rectangle, hamming or hanning (function default is hanning)
 
-    buf = zeros(nfft); #Buffer for operating on one frame (length is equal or larger than frame length)
+    buf = zeros(T,nfft); #Buffer for operating on one frame (length is equal or larger than frame length)
     rfp = plan_rfft(buf); #Real valued FFT operator (gives only positive frequencies)
     nrfft = length(rfp*buf); #Number of FFT coefficeints
-    mspec = Matrix{Float}(undef,nrfft,nframes); #Buffer for spectrogram values
+    mspec = Matrix{T}(undef,nrfft,nframes); #Buffer for spectrogram values
     for i ∈ 1:nframes
         frame = view_frame(sig_frames,i)
         buf[1:1:len] = win.*frame; #Apply window and THEN store in buffer
@@ -88,7 +88,7 @@ function specgram(::comp, sig_frames::framed_signal; ndft::Int = nextfastfft(sig
 
     #Add a tiny floor to spectrogram to avoid potential zero values - in case log spectrogram is required later.
     for i ∈ eachindex(mspec)
-        mspec[i] += eps(Float)
+        mspec[i] += eps(T)
     end
     return mspec
 end
@@ -112,12 +112,12 @@ Compute the DFT magnitude spectrogram from signal in array `x` and sampling rate
 - `frame_dur` : Frame duration in secs [Default = 0.02 secs]
 - `frame_shift_dur` : Interval between consecutive frames in secs [Default = 0.01 secs]
 """
-function specgram(::comp, x::AbstractVector{Float}, fs::Real; frame_dur::Float=0.02, frame_shift_dur::Float=0.01, ndft::Int = nextfastfft(time2nsamples(frame_dur,fs)), wtype::String="hanning")
+function specgram(::comp, x::AbstractVector{<:AbstractFloat}, fs::Real; frame_dur::Real=0.02, frame_shift_dur::Real=0.01, ndft::Int = nextfastfft(time2nsamples(frame_dur,fs)), wtype::String="hanning")
     sig_frames = framed_signal(x,fs,frame_dur,frame_shift_dur) #Obtain signal frames object
     return specgram(comp(), sig_frames;ndft, wtype)
 end
 
-function specgram(x::Array{<:AbstractFloat},fs::Number;frame_dur::Float=0.02, frame_shift_dur::Float=0.01, ndft::Int = nextfastfft(time2nsamples(frame_dur,fs)), wtype::String="hanning")
+function specgram(x::Array{<:AbstractFloat},fs::Number;frame_dur::Real=0.02, frame_shift_dur::Real=0.01, ndft::Int = nextfastfft(time2nsamples(frame_dur,fs)), wtype::String="hanning")
     sig_frames = framed_signal(x,fs,frame_dur,frame_shift_dur) #Obtain signal frames object
     return specgram(sig_frames; ndft, wtype)
 end
@@ -136,14 +136,14 @@ end
 
 Compute the periodogram of a signal in array `x` with sampling frequency `fs` at frequencies specified in `frqs` or frequencies equally spaced on the log-scale between `fmin` and `fmax` as the L2 norm of the inner product between a complex exponential and `x`. When the input is a framed\\_signal object `sig_frames`, the periodogram for each frame is computed. If the optional input argument `comp()` is passed to the function, the periodogram components are returned in a Vector or Matrix; if `comp()` is omitted, the periodogram(s) are returned as `spectrum` or `timefreq` objects as appropriate.
 """
-function periodogram(x::Array{Float,1},fs::Number,frqs::Array{T,1};wtype::String="hanning") where T<:Number
+function periodogram(x::AbstractVector{<:AbstractFloat},fs::Number,frqs::AbstractVector{<:Number};wtype::String="hanning")
     #Choose window - options are rectangle, hamming or hanning (function default is hanning)
     components = periodogram(comp(), x,fs,frqs;wtype)
     signal = speech_waveform(x,fs)
     return spectrum(signal,components,frqs,"Periodogram")
 end
 
-function periodogram(x::Array{Float,1},fs::Number;wtype::String="hanning",fmin::Number=10,fmax::Number=fs/2)
+function periodogram(x::AbstractVector{<:AbstractFloat},fs::Number;wtype::String="hanning",fmin::Number=10,fmax::Number=fs/2)
     #Choose window - options are rectangle, hamming or hanning (function default is hanning)
     frqs = logfreq_array(;fmin = fmin,fmax = fmax)
     return periodogram(x,fs,frqs;wtype=wtype)
@@ -161,35 +161,32 @@ end
 
 
 
-function periodogram(::comp, x::AbstractVector{Float}, fs::Real, frqs::AbstractVector{<:Real}; wtype::String="hanning")
-    frqs = convert(Vector{Float},frqs)::Vector{Float}
-    fs = convert(Float,fs)::Float
+function periodogram(::comp, x::AbstractVector{T}, fs::Real, frqs::AbstractVector{<:Real}; wtype::String="hanning") where {T<:AbstractFloat}
     len = length(x)
-    win = window(len;wtype=wtype)
+    win = window(T,len;wtype=wtype)
     ip = x.*win
     nfrqs = length(frqs)
-    proj = zeros(Float,nfrqs)
+    proj = zeros(T,nfrqs)
     for i ∈ eachindex(proj)
-        proj[i] = abs2(dot(ip,cexp(frqs[i],fs,len)))
+        proj[i] = abs2(dot(ip,cexp(T,frqs[i],fs,len)))
     end
     return proj
 end
 
-function periodogram(::comp, x::Array{Float,1},fs::Real;wtype::String="hanning",fmin::Real=10,fmax::Real=fs/2)
+function periodogram(::comp, x::AbstractVector{<:AbstractFloat},fs::Real;wtype::String="hanning",fmin::Real=10,fmax::Real=fs/2)
     frqs = logfreq_array(;fmin = fmin,fmax = fmax)
     return periodogram(comp(), x,fs,frqs;wtype=wtype)
 end
 
-function periodogram(::comp, sig_frames::framed_signal, frqs ;wtype::String="hanning")
-    frqs = Float.(frqs)
+function periodogram(::comp, sig_frames::framed_signal{T}, frqs ;wtype::String="hanning") where {T<:AbstractFloat}
     len = sig_frames.frame_length
     nframes = sig_frames.num_signal_frames
     fs = sig_frames.signal.fs
-    pspec = Matrix{Float}(undef,length(frqs),nframes)
+    pspec = Matrix{T}(undef,length(frqs),nframes)
     nfrqs = length(frqs)
-    win = window(len;wtype=wtype)
+    win = window(T,len;wtype=wtype)
 
-    ce_array = collect(transpose(cexp_proj_matrix(frqs,fs,len)))
+    ce_array = collect(transpose(cexp_proj_matrix(T,frqs,fs,len)))
 
     for i ∈ 1:nframes
         ip = extract_frame(sig_frames,i)

@@ -14,7 +14,7 @@ end
 
 function comb_resp_peak_diff(frames::framed_signal)
     comb_resp, _ = xcorr_spectral_comb(frames)
-    peak_diff = Vector{Float}(undef,frames.num_signal_frames)
+    peak_diff = Vector{Float64}(undef,frames.num_signal_frames)
     for i ∈ eachindex(peak_diff)
         peaks = findpeaks_sorted(comb_resp[:,i]; num_peaks = 2)
         mag = peaks[2]
@@ -24,9 +24,9 @@ function comb_resp_peak_diff(frames::framed_signal)
 end
 
 
-function dist_pitch_range(frames::framed_signal; min_f₀::Float = 40.0, max_f₀::Float = 500.0)
+function dist_pitch_range(frames::framed_signal; min_f₀::Float64 = 40.0, max_f₀::Float64 = 500.0)
     comb_resp, frqs = xcorr_spectral_comb(frames)
-    peak_dist = zeros(Float,frames.num_signal_frames)
+    peak_dist = zeros(Float64,frames.num_signal_frames)
     for i ∈ eachindex(peak_dist)
         ind = argmax(comb_resp[:,i])
         pf = frqs[ind]
@@ -39,7 +39,7 @@ function dist_pitch_range(frames::framed_signal; min_f₀::Float = 40.0, max_f�
 end
 
 
-function comb_resp_dist(a::AbstractVector{Float}, b::AbstractVector{Float})
+function comb_resp_dist(a::AbstractVector{Float64}, b::AbstractVector{Float64})
     anorm = 1/sum(abs2,a)
     bnorm = 1/sum(abs2,b)
     ā = anorm.*a
@@ -50,7 +50,7 @@ end
 
 function comb_resp_Δ(frames::framed_signal)
     comb_resp, _ = xcorr_spectral_comb(frames)
-    Δ = Vector{Float}(undef,frames.num_signal_frames-1)
+    Δ = Vector{Float64}(undef,frames.num_signal_frames-1)
     for i ∈ eachindex(Δ)
         Δ[i] = comb_resp_dist(comb_resp[:,i],comb_resp[:,i+1])
     end

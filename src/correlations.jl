@@ -93,24 +93,24 @@ function nacf(s::speech_waveform, i::Int, k::Int; win_size::Int, nconst::Real = 
     return ccf/(sqrt(nconst + (e1*e2)))
 end
 
-function nacf(s::speech_waveform, t::Real, lag::Real; win_dur::Real, nconst::Float = 0.0)
+function nacf(s::speech_waveform, t::Real, lag::Real; win_dur::Real, nconst::Real = 0.0)
     i = time2nsamples(t, s.fs)
     k = time2nsamples(lag, s.fs)
     win_size = time2nsamples(win_dur, s.fs)
     return nacf(s,i,k;win_size,nconst)
 end
 
-nacf(s::speech_waveform, i::Int, k::AbstractVector{Int}; win_size::Int, nconst::Float = 0.0) = map(x->nacf(s,i,x;win_size,nconst),k)
+nacf(s::speech_waveform, i::Int, k::AbstractVector{Int}; win_size::Int, nconst::Real = 0.0) = map(x->nacf(s,i,x;win_size,nconst),k)
 
-nacf(s::speech_waveform, t::Real, lags::AbstractVector{<:Real}; win_dur::Real, nconst::Float = 0.0) = map(x->nacf(s,t,x;win_dur,nconst),lags)
+nacf(s::speech_waveform, t::Real, lags::AbstractVector{<:Real}; win_dur::Real, nconst::Real = 0.0) = map(x->nacf(s,t,x;win_dur,nconst),lags)
 
 
-function nacf(s::speech_waveform; min_lag::Int, max_lag::Int, win_size::Int, win_shift::Int, nconst::Float = 0.0)
+function nacf(s::speech_waveform{T}; min_lag::Int, max_lag::Int, win_size::Int, win_shift::Int, nconst::Real = 0.0) where {T<:AbstractFloat}
     lags = min_lag:max_lag
     nlags = length(lags)
     # nframes = 1 + Int(round((length(s.x) - (win_size+max_lag-1))/win_shift))
     nframes = number_signal_frames(s, win_size + max_lag, win_shift)
-    cf = Matrix{Float}(undef,nlags,nframes)
+    cf = Matrix{T}(undef,nlags,nframes)
     for j = 1:nframes
         for i ∈ eachindex(lags)
             sindx = (j-1)*win_shift + 1

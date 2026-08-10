@@ -9,12 +9,12 @@ lpc_order(fs::Real) = Int(round(fs/1000))+2
 
 Compute the Linear Predictive Coding (LPC) coefficients of order `N`, from a sequence `x` or directly from autocorrelation sequence `Rxx` (order is `length(Rxx)-1`). Uses Levinson-Durbin recursion on autocorrelation.
 """
-function lpc(x::AbstractVector{Float}, p::Int)
+function lpc(x::AbstractVector{<:AbstractFloat}, p::Int)
     rxx = acorr(x, p+1)
     return lpc(rxx)
 end
 
-function lpc(rxx::AbstractVector{Float})
+function lpc(rxx::AbstractVector{<:AbstractFloat})
     α,_ = levinson_durbin(rxx)
     return [1;-α[end:-1:1]]
 end
@@ -28,14 +28,14 @@ end
 
 
 #Compute the LPC/AR model magnitude response given a dicrete-time signal
-function lpc_freqz(x::AbstractVector{Float}, fs::Real, N::Int = lpc_order(fs); frqs::AbstractVector{<:Real} = linfreq_array(fmax = fs/2, nfrqs = length(x)))
+function lpc_freqz(x::AbstractVector{<:AbstractFloat}, fs::Real, N::Int = lpc_order(fs); frqs::AbstractVector{<:Real} = linfreq_array(fmax = fs/2, nfrqs = length(x)))
     a = lpc(x,N)
     filter = filter_coefs([1],a)
     h = filter_resp(filter, frqs, fs)
     return h
 end
 
-function lpc_magz(x::AbstractVector{Float}, fs::Real, N::Int = lpc_order(fs); frqs::AbstractVector{<:Real} = linfreq_array(fmax = fs/2, nfrqs = length(x)))
+function lpc_magz(x::AbstractVector{<:AbstractFloat}, fs::Real, N::Int = lpc_order(fs); frqs::AbstractVector{<:Real} = linfreq_array(fmax = fs/2, nfrqs = length(x)))
     a = lpc(x,N)
     filter = filter_coefs([1],a)
     h = filter_magresp(filter, frqs, fs)
@@ -52,29 +52,29 @@ end
 Compute the magnitude response of the Linear Predictive Coding (LPC) / Autoregressive (AR) filter model (of order `N`) of signal in array `x` with sampling rate `fs` at frequencies specified in `frqs`.
 When the input is a framed signal `frames`, the magnitude response of the LPC/AR filter model in each frame is computed and concatenated to form an LPC spectrogram.
 """
-function lpc_response(x::AbstractVector{Float}, fs::Real, N::Int = lpc_order(fs); frqs::AbstractVector{Float} = linfreq_array(fmax = fs/2, nfrqs = length(x)))
+function lpc_response(x::AbstractVector{<:AbstractFloat}, fs::Real, N::Int = lpc_order(fs); frqs::AbstractVector{<:Real} = linfreq_array(fmax = fs/2, nfrqs = length(x)))
     h = lpc_response(comp(), x, fs, N; frqs)
     return spectrum(speech_waveform(x,fs),h,frqs,"LPC/AR Model Magnitude Respose")
 end
 
-function lpc_response(::comp, x::AbstractVector{Float}, fs::Real, N::Int = lpc_order(fs); frqs::AbstractVector{<:Real} = linfreq_array(fmax = fs/2, nfrqs = length(x)))
+function lpc_response(::comp, x::AbstractVector{T}, fs::Real, N::Int = lpc_order(fs); frqs::AbstractVector{<:Real} = linfreq_array(fmax = fs/2, nfrqs = length(x))) where {T<:AbstractFloat}
     a = lpc(x,N)
     filter = filter_coefs([1],a)
     h = filter_magresp(filter, frqs, fs)
-    return h
+    return convert(Vector{T},h)
 end
 
 
-function lpc_response(sig_frames::framed_signal, N::Int = lpc_order(sig_frames.signal.fs); frqs::AbstractVector{Float} = linfreq_array(fmax = sig_frames.signal.fs/2, nfrqs = sig_frames.frame_length))
+function lpc_response(sig_frames::framed_signal, N::Int = lpc_order(sig_frames.signal.fs); frqs::AbstractVector{<:Real} = linfreq_array(fmax = sig_frames.signal.fs/2, nfrqs = sig_frames.frame_length))
     lpcspec = lpc_response(comp(), sig_frames, N; frqs)
     return timefreq(sig_frames, lpcspec, frqs, "LPC/AR Spectrogram")
 end
 
-function lpc_response(::comp, sig_frames::framed_signal, N::Int = lpc_order(sig_frames.signal.fs); frqs::AbstractVector{Float} = linfreq_array(fmax = sig_frames.signal.fs/2, nfrqs = sig_frames.frame_length))
+function lpc_response(::comp, sig_frames::framed_signal{T}, N::Int = lpc_order(sig_frames.signal.fs); frqs::AbstractVector{<:Real} = linfreq_array(fmax = sig_frames.signal.fs/2, nfrqs = sig_frames.frame_length)) where {T<:AbstractFloat}
     nframes = sig_frames.num_signal_frames
     nfrqs = length(frqs)
     fs = sig_frames.signal.fs
-    lpcspec = zeros(nfrqs,nframes)
+    lpcspec = zeros(T,nfrqs,nframes)
     for i=1:nframes
         frame = extract_frame(sig_frames,i)
         lpcspec[:,i] = lpc_response(comp(), frame, fs, N; frqs)
@@ -89,7 +89,7 @@ end
 #Generate allpole filter given pole frequencies, bandwidths and sampling frequency
 function allpole(pf::AbstractVector{<:Real} = [1000, 1800, 2900, 3400, 5000, 6800], pbw::AbstractVector{<:Real} = [50, 120, 200, 300, 500, 800]; fs::Real = 16000)
     num_poles = length(pf)
-    poles  = zeros(Complex{Float},2*num_poles)
+    poles  = zeros(Complex{Float64},2*num_poles)
     for i=1:num_poles
         r = exp(-pi*pbw[i]/fs)
         # println(r)
@@ -112,8 +112,8 @@ end
 function rand_allpole(fs::Real = 8000, num_res::Real = 10)
     fmax = fs/2
     fint = fmax/num_res
-    frqs = zeros(Float,num_res)
-    bws = zeros(Float,num_res)
+    frqs = zeros(Float64,num_res)
+    bws = zeros(Float64,num_res)
     flo = 50
     fhi = 1.5*fint
     for i=1:num_res

@@ -1,8 +1,8 @@
 #Generate array of frequencies (in Hz), equally spaced in log domain with resolution given in frequencies per octave
 function logfreq_array(;fmin::Real = 10, fmax::Real = 4000, frq_per_octave::Real = 120)
-    fmin = convert(Float,fmin)::Float
-    fmax = convert(Float,fmax)::Float
-    frq_per_octave = convert(Float,frq_per_octave)::Float
+    fmin = convert(Float64,fmin)::Float64
+    fmax = convert(Float64,fmax)::Float64
+    frq_per_octave = convert(Float64,frq_per_octave)::Float64
     lfmin = log2(fmin)
     lfmax = log2(fmax)
     lfres = 1/frq_per_octave
@@ -12,8 +12,8 @@ end
 
 #Generate array of desired number of equally spaced frequencies (in Hz)
 function linfreq_array(;fmin::Real = 0, fmax::Real = 4000, nfrqs::Int = 80)
-    fmin = convert(Float,fmin)::Float
-    fmax = convert(Float,fmax)::Float
+    fmin = convert(Float64,fmin)::Float64
+    fmax = convert(Float64,fmax)::Float64
     fres = (fmax-fmin)/(nfrqs-1)
     frqs = fmin:fres:fmax
     return collect(frqs)
@@ -21,19 +21,26 @@ end
 
 
 
-#Generate complex negative exponential sequence with norm = 1
-cexp(f::T,fs::T,N::Int) where {T<:Real} = (1/sqrt(N))*exp.(-2π*im*(f/fs)*(1:N))
+#Generate complex negative exponential sequence with norm = 1 (element type Complex{T})
+function cexp(::Type{T}, f::Real, fs::Real, N::Int) where {T<:AbstractFloat}
+    k = T(2π)*(T(f)/T(fs))
+    return (1/sqrt(T(N)))*exp.((-im*k).*(1:N))
+end
+
+cexp(f::Real,fs::Real,N::Int) = cexp(Float64,f,fs,N)
 
 
 #Generate projection matrix for complex exponential signals/vectors
-function cexp_proj_matrix(frqs::Vector{<:Real},fs::Real,N::Int)
+function cexp_proj_matrix(::Type{T}, frqs::AbstractVector{<:Real},fs::Real,N::Int) where {T<:AbstractFloat}
     nfrqs = length(frqs)
-    proj_matrix = zeros(Complex{Float},nfrqs,N)
+    proj_matrix = zeros(Complex{T},nfrqs,N)
     for i in eachindex(frqs)
-        proj_matrix[i,:] = cexp(frqs[i],fs,N)
+        proj_matrix[i,:] = cexp(T,frqs[i],fs,N)
     end
     return proj_matrix
 end
+
+cexp_proj_matrix(frqs::AbstractVector{<:Real},fs::Real,N::Int) = cexp_proj_matrix(Float64,frqs,fs,N)
 
 
 #Generate first order difference of a sequence y[i] = x[i+1] - x[i] (output sequence length is 1 less than input sequence length)
@@ -105,25 +112,26 @@ function remove_nearest_peak!(ind::Vector,mag::Vector)
 end
 
 # Find index of closest element of data array to input x (same as argmin(abs.(data.-x)) but faster)
-function findclosest(x::T, data::AbstractVector{T}) where T<:Real
+function findclosest(x::Real, data::AbstractVector{<:Real})
+    T = float(promote_type(typeof(x), eltype(data)))
     d = zero(T)
     mindx::Int = 1
-    mmag::T = Inf
-    @inbounds @views for i ∈ eachindex(data)
+    mmag::T = typemax(T)
+    @inbounds for i ∈ eachindex(data)
         d = abs(data[i] - x)
         if(d<mmag)
             mmag = d
             mindx = i
-        end 
+        end
     end
     return mindx
 end
 
 
 #Index of closest frequency in an array to a given frequency
-frqindex(f::Float, frqs::AbstractVector{Float}) = findclosest(f,frqs) #argmin(abs.(frqs.-f))
+frqindex(f::Real, frqs::AbstractVector{<:Real}) = findclosest(f,frqs) #argmin(abs.(frqs.-f))
 
-function frqindex(f::AbstractVector{Float}, frqs::AbstractVector{Float})
+function frqindex(f::AbstractVector{<:Real}, frqs::AbstractVector{<:Real})
     findx = Vector{Int}(undef,length(f))
     for i in eachindex(f)
         findx[i] = frqindex(f[i],frqs)
@@ -133,7 +141,7 @@ end
 
 
 #Zero pad a vector
-zero_pad(x::Vector, pad_len::Int) = [zeros(pad_len); x; zeros(pad_len)]
+zero_pad(x::Vector, pad_len::Int) = [zeros(eltype(x),pad_len); x; zeros(eltype(x),pad_len)]
 
 #Symmetrically pad a vector
 symmetric_pad(x::Vector, pad_len::Int) = [x[pad_len+1:-1:2]; x; x[end-1:-1:end-(pad_len)]]
@@ -142,7 +150,8 @@ symmetric_pad(x::Vector, pad_len::Int) = [x[pad_len+1:-1:2]; x; x[end-1:-1:end-(
 unpad_vector(x::Vector, pad_len::Int) = x[pad_len+1:end-pad_len]
 
 #Generate white noise
-white_noise(len::Int) = randn(MersenneTwister(), Float, len)
+white_noise(::Type{T}, len::Int) where {T<:AbstractFloat} = randn(MersenneTwister(), T, len)
+white_noise(len::Int) = white_noise(Float64, len)
 white_noise(dur::Real, fs::Real) = white_noise(time2nsamples(dur,fs))
 
 #Generate AR process noise
@@ -153,11 +162,13 @@ ar_process(a::Vector, dur::Real, fs::Real) = ar_process(a,time2nsamples(dur,fs))
 time2nsamples(dur::Real, fs::Real) = Int(round(dur*fs))
 
 #Generate impulse train
-function impulse_train(period::Int, len::Int)
-    x = zeros(Float,len)
+function impulse_train(::Type{T}, period::Int, len::Int) where {T<:AbstractFloat}
+    x = zeros(T,len)
     x[1:period:end] .= 1
     return x
 end
+
+impulse_train(period::Int, len::Int) = impulse_train(Float64, period, len)
 
 impulse_train(f₀::Real, dur::Real, fs::Real) = impulse_train(Int(round(fs/f₀)), Int(round(dur*fs)))
 

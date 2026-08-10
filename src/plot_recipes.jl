@@ -1,4 +1,4 @@
-function generate_ticks(label_values::Vector{Float}, nticks::Int)
+function generate_ticks(label_values::AbstractVector{<:Real}, nticks::Int)
     indx = Int.(round.(range(1, length(label_values), length = nticks)))
     tks = (indx,string.(round.(label_values[indx],digits=1)))
     return tks

@@ -3,7 +3,7 @@
 freq2θ(f::Real, fs::Real) = 2pi*(f/fs)
 
 function freq2θ(f::AbstractVector{<:Real}, fs::Real)
-    θ = Vector{Float}(undef,length(f))
+    θ = Vector{float(promote_type(eltype(f),typeof(fs)))}(undef,length(f))
     freq2θ!(θ,f,fs)
     return θ
 end
@@ -20,7 +20,7 @@ end
 freq2z(f::Real,fs::Real) = exp(im*freq2θ(f,fs))
 
 function freq2z(f::AbstractVector{<:Real}, fs::Real)
-    z = Vector{Complex{Float}}(undef,length(f))
+    z = Vector{Complex{float(promote_type(eltype(f),typeof(fs)))}}(undef,length(f))
     freq2z!(z,f,fs)
     return z
 end
@@ -32,9 +32,14 @@ function freq2z!(z::AbstractVector{<:Complex}, f::AbstractVector{<:Real}, fs::Re
 end
 
 #Filter structs
-struct filter_coefs
-    num::Array{Float}
-    den::Array{Float}
+struct filter_coefs{T<:AbstractFloat}
+    num::Vector{T}
+    den::Vector{T}
+end
+
+function filter_coefs(num::AbstractVector{<:Real}, den::AbstractVector{<:Real})
+    T = float(promote_type(eltype(num),eltype(den)))
+    return filter_coefs(convert(Vector{T},num), convert(Vector{T},den))
 end
 
 
@@ -65,10 +70,11 @@ function filter_resp(F::filter_coefs, f::AbstractVector{<:Real}, fs::Real)
 end
 
 
-function Hmag(F::filter_coefs, θ::Real)
+function Hmag(F::filter_coefs{T}, θ::Real) where {T<:AbstractFloat}
     iθ = im*θ
-    Nm = convert(Complex{Float},F.num[1])
-    Dm = convert(Complex{Float},F.den[1])
+    CT = Complex{float(promote_type(T,typeof(θ)))}
+    Nm = convert(CT,F.num[1])
+    Dm = convert(CT,F.den[1])
     Nord = length(F.num) - 1
     Dord = length(F.den) - 1
     if(Nord>0)

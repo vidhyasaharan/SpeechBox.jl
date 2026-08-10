@@ -15,26 +15,27 @@ const DOUBL_C = 0.35
 const A_FACT = 0.0
 const N_CANDS = 20
 
-struct RAPT_candidates
+struct RAPT_candidates{T<:AbstractFloat}
     num_cands::Int
-    cands::Vector{Float}
-    Φ::Vector{Float}
+    cands::Vector{T}
+    Φ::Vector{T}
     index::Int
-    time::Float
-    fs::Float
+    time::T
+    fs::T
 end
 
-function RAPT_candidates(num_cands::Int, cands::Vector{<:Real}, Φ::Vector{<:Real}, index::Int, time::Real, fs::Real)
-    cands_f = convert(Vector{Float}, cands)
-    Φ_f = convert(Vector{Float}, Φ)
-    time_f = convert(Float, time)
-    fs_f = convert(Float, fs)
+function RAPT_candidates(num_cands::Int, cands::AbstractVector{<:Real}, Φ::AbstractVector{<:Real}, index::Int, time::Real, fs::Real)
+    T = float(promote_type(eltype(cands), eltype(Φ), typeof(time), typeof(fs)))
+    cands_f = convert(Vector{T}, cands)
+    Φ_f = convert(Vector{T}, Φ)
+    time_f = convert(T, time)
+    fs_f = convert(T, fs)
     return RAPT_candidates(num_cands, cands_f, Φ_f, index, time_f, fs_f)
 end
 
-struct RAPT_timefreq
-    pd::timefreq
-    candarray::Vector{RAPT_candidates}
+struct RAPT_timefreq{T<:AbstractFloat, S<:Union{T,Complex{T}}}
+    pd::timefreq{T,S}
+    candarray::Vector{RAPT_candidates{T}}
 end
 
 function RAPT_timefreq(s::speech_waveform; win_dur::Real = nacf_win_size, win_step::Real = frame_step)
@@ -51,7 +52,7 @@ function cand_tuples(rtf::RAPT_timefreq)
         ntuples += cand.num_cands
     end
     ptuples = Vector{Tuple{Int, Int}}(undef,ntuples)
-    util = Vector{Float}(undef,ntuples)
+    util = Vector{Float64}(undef,ntuples)
     # ptuples = Vector{Tuple{Int, Float}}(undef,ntuples)
     i::Int = 1
     for indx ∈ eachindex(rtf.candarray)
@@ -106,7 +107,7 @@ end
 
 
 # Estimate pitch candidates from signal at given sample index
-function RAPT_pitch_candidates(s::speech_waveform, indx::Int; win_dur::Real = nacf_win_size, ncands::Int = N_CANDS)
+function RAPT_pitch_candidates(s::speech_waveform{T}, indx::Int; win_dur::Real = nacf_win_size, ncands::Int = N_CANDS) where {T<:AbstractFloat}
     fs = s.fs
     win_size = time2nsamples(win_dur,fs)
     min_lag = time2nsamples(1/F0max,fs)
@@ -116,7 +117,7 @@ function RAPT_pitch_candidates(s::speech_waveform, indx::Int; win_dur::Real = na
     inds, mags = findpeaks_sorted(cf)
     thr = CAND_TR*mags[1]
     num_cands = min(sum(mags.>thr), ncands)
-    cands = Vector{Float}(undef,num_cands)
+    cands = Vector{T}(undef,num_cands)
     for i ∈ eachindex(cands)
         cands[i] = fs/(min_lag - 1 + inds[i])
     end
@@ -124,13 +125,13 @@ function RAPT_pitch_candidates(s::speech_waveform, indx::Int; win_dur::Real = na
 end
 
 #Estimate pitch candidates of a signal at every window step (win_step)
-function RAPT_pitch_candidates(s::speech_waveform; win_dur::Real = nacf_win_size, win_step::Real = frame_step, ncands::Int = N_CANDS)
+function RAPT_pitch_candidates(s::speech_waveform{T}; win_dur::Real = nacf_win_size, win_step::Real = frame_step, ncands::Int = N_CANDS) where {T<:AbstractFloat}
     fs = s.fs
     win_size = time2nsamples(win_dur,fs)
     win_shift = time2nsamples(win_step,fs)
     max_lag = time2nsamples(1/F0min,fs)
     nframes = number_signal_frames(s,win_size+max_lag-1,win_shift)
-    cand_array = Vector{RAPT_candidates}(undef,nframes)
+    cand_array = Vector{RAPT_candidates{T}}(undef,nframes)
     for i ∈ eachindex(cand_array)
         indx = (i-1)*win_shift + 1
         cand_array[i] = RAPT_pitch_candidates(s, indx; win_dur, ncands)
@@ -139,7 +140,7 @@ function RAPT_pitch_candidates(s::speech_waveform; win_dur::Real = nacf_win_size
 end
 
 
-function RAPT_maxcands(ca::Vector{RAPT_candidates})
+function RAPT_maxcands(ca::Vector{<:RAPT_candidates})
     maxcands::Int = 0
     for array in ca
         maxcands = max(array.num_cands, maxcands)
@@ -148,13 +149,13 @@ function RAPT_maxcands(ca::Vector{RAPT_candidates})
 end
 
 
-function RAPT_cands_local_costs(carray::Vector{RAPT_candidates})
+function RAPT_cands_local_costs(carray::Vector{<:RAPT_candidates})
     fs = carray[1].fs
     β = LAG_WT/(fs/F0min)
 
     narrays = length(carray)
     ncands = RAPT_maxcands(carray)
-    lcosts = Matrix{Float}(undef,ncands+1,narrays)
+    lcosts = Matrix{Float64}(undef,ncands+1,narrays)
     fill!(lcosts,Inf)
 
     for i ∈ 1:narrays

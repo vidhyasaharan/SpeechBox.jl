@@ -125,7 +125,7 @@ end
     SpeechBox.normaliseWeights!(p)
     # c = SpeechBox.pdist2cdist(p)
     c = SpeechBox.Categorical(p)
-    @test typeof(c) == SpeechBox.Categorical
+    @test c isa SpeechBox.Categorical{Float}
     for i ∈ eachindex(p,c.pdist,c.cdist)
         @test c.pdist[i] ≈ p[i]
         @test c.cdist[i] ≈ sum(p[1:i])
@@ -137,7 +137,7 @@ end
     μ = randn(Float,ndim)
     Σ = posdefmatrix(ndim)
     g = SpeechBox.Gaussian(μ,Σ)
-    @test typeof(g) == SpeechBox.Gaussian
+    @test g isa SpeechBox.Gaussian{Float}
     @test μ == g.μ
     @test Σ == g.Σ
     @test LinearAlgebra.cholesky(Σ) == g.A

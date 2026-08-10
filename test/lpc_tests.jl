@@ -44,7 +44,7 @@ end
 
     i,m = SpeechBox.findpeaks(lsp.components)
     
-    @test typeof(lsp) == SpeechBox.spectrum{Float}
+    @test lsp isa SpeechBox.spectrum{Float,Float}
     @test lsp.components == lpc_response(comp(),x,fs,SpeechBox.lpc_order(fs); frqs = freqs)
     @test length(lsp.frqs) == length(freqs)
     @test lsp.frqs[i[1]] == f[1]
@@ -53,7 +53,7 @@ end
     frames = framed_signal(signal,0.09,0.01)
     lspec = lpc_response(frames, SpeechBox.lpc_order(signal.fs); frqs = freqs)
 
-    @test typeof(lspec) == SpeechBox.timefreq
+    @test lspec isa SpeechBox.timefreq{Float,Float}
     @test lspec.components == lpc_response(comp(), frames, SpeechBox.lpc_order(signal.fs); frqs = freqs)
     @test size(lspec.components,1) == length(freqs)
     @test size(lspec.components,2) == frames.num_signal_frames

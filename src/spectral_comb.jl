@@ -12,35 +12,36 @@ function generate_logfrq_pitch_comb(;γ::Real = 1.8, K::Int = 5,  frq_per_octave
     β = sum(h)/length(h)
     h = h .- β
     zindx = argmin(abs.(q))
-    return convert(Vector{Float},h), zindx
+    return convert(Vector{Float64},h), zindx
 end
 
 #Function to generate pitch estimates for one frame by convolving with comb filter in log freq domain
-function xcorr_spectral_comb(x::Vector{Float},fs::Number)
+function xcorr_spectral_comb(x::AbstractVector{T},fs::Number) where {T<:AbstractFloat}
     frq_per_octave = 200
     # γ = 1.8
     # K = 5
     frqs = logfreq_array(fmin = 10, fmax = fs/2, frq_per_octave = frq_per_octave)
     pd = periodogram(x,fs,frqs)
     h,z = generate_logfrq_pitch_comb(;frq_per_octave)
-    y = xcorr(log.(pd.components),h,z)
+    y = xcorr(log.(pd.components),convert(Vector{T},h),z)
     return y, frqs
 end
 
 
 #Function to generate a sequence of pitch estimates, one per frame, using a comb filter in the log freq domain
-function xcorr_spectral_comb(frames::framed_signal)
+function xcorr_spectral_comb(frames::framed_signal{T}) where {T<:AbstractFloat}
     frq_per_octave = 200
     fs = frames.signal.fs
     frqs = logfreq_array(fmin = 10, fmax = fs/2, frq_per_octave = frq_per_octave)
     h,z = generate_logfrq_pitch_comb(;frq_per_octave)
+    hT = convert(Vector{T},h)
     pd = periodogram(comp(), frames,frqs)
     @views for i ∈ eachindex(pd)
         pd[i] = log(pd[i])
     end
-    y = Matrix{Float}(undef,size(pd))
+    y = Matrix{T}(undef,size(pd))
     @views for i ∈ axes(y,2)
-        xcorr!(y[:,i],pd[:,i],h,z)
+        xcorr!(y[:,i],pd[:,i],hT,z)
     end
     return y, frqs
 end

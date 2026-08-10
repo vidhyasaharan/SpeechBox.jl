@@ -1,10 +1,10 @@
 #Generate 2D data from 4 spherical (σ=0.25) gaussian clusters centered at [-1,1], [1,-1], [-1,1] and [1,1]
 function generate_4_clusters(npts_per_cluster; σ = 0.25)
-    c = convert(Matrix{Float},[1 1 -1 -1; 1 -1 1 -1])
+    c = convert(Matrix{Float64},[1 1 -1 -1; 1 -1 1 -1])
     # σ = 0.25
-    data = Matrix{Float}(undef,2,4*npts_per_cluster)
+    data = Matrix{Float64}(undef,2,4*npts_per_cluster)
     for i ∈ axes(c,2)
-        rpts = randn(Float,(2,npts_per_cluster))
+        rpts = randn(Float64,(2,npts_per_cluster))
         sindx = (i-1)*npts_per_cluster+1
         eindx = i*npts_per_cluster
         data[:,sindx:eindx] = σ*rpts .+ c[:,i]
@@ -13,9 +13,9 @@ function generate_4_clusters(npts_per_cluster; σ = 0.25)
 end
 
 #Generate 2D data arranged in a circle (default radius, r =0.5) around centres at [-1,1], [1,-1], [-1,1] and [1,1]
-function generate_4_circle_clusters(npts_per_cluster::Int = 8; r::Float = 0.5)
-    c = convert(Matrix{Float},[1 1 -1 -1; 1 -1 1 -1])
-    data = Matrix{Float}(undef,2,4*npts_per_cluster)
+function generate_4_circle_clusters(npts_per_cluster::Int = 8; r::Real = 0.5)
+    c = convert(Matrix{Float64},[1 1 -1 -1; 1 -1 1 -1])
+    data = Matrix{Float64}(undef,2,4*npts_per_cluster)
     for i ∈ axes(c,2)
         sindx = (i-1)*npts_per_cluster+1
         eindx = i*npts_per_cluster
@@ -29,7 +29,7 @@ end
 function generate_circle_cluster(npts::Int = 8)
     Δθ = 2π/npts
     θ = 0:Δθ:2π-Δθ
-    x = Matrix{Float}(undef,2,npts)
+    x = Matrix{Float64}(undef,2,npts)
     for i ∈ eachindex(θ)
         x[1,i] = cos(θ[i])
         x[2,i] = sin(θ[i])
@@ -106,8 +106,8 @@ function running_meancov!(m::AbstractVector{T}, C::AbstractMatrix{T}, x::Abstrac
 end
 
 function running_meancov(x::AbstractMatrix{T}) where T<:AbstractFloat
-    m = Vector{Float}(undef,size(x,1))
-    C = Matrix{Float}(undef,size(x,1),size(x,1))
+    m = Vector{T}(undef,size(x,1))
+    C = Matrix{T}(undef,size(x,1),size(x,1))
     running_meancov!(m,C,x)
     return m, C
 end
@@ -177,13 +177,13 @@ function pairwise!(dm::Distance, d::AbstractMatrix{<:AbstractFloat}, x::Abstract
 end
 
 function pairwise(dm::Distance, x::AbstractVector{T}, y::AbstractMatrix{T}) where {T}
-    d = Vector{Float}(undef,size(y,2))
+    d = Vector{float(T)}(undef,size(y,2))
     pairwise!(dm,d,x,y)
     return d
 end
 
 function pairwise(dm::Distance, x::AbstractMatrix{T}, y::AbstractMatrix{T}) where {T}
-    d = Matrix{Float}(undef,size(x,2),size(y,2))
+    d = Matrix{float(T)}(undef,size(x,2),size(y,2))
     pairwise!(dm,d,x,y)
     return d
 end
@@ -193,7 +193,7 @@ end
 
 #get cumulative distribution (discrete) from scaled/unnormalised probability distribution (discrete)
 function pdist2cdist(pdist::AbstractVector{T}) where {T}
-    cdist = Vector{Float}(undef,length(pdist))
+    cdist = Vector{float(T)}(undef,length(pdist))
     cdist[1] = pdist[1]
     @views for i ∈ 2:length(pdist)
         cdist[i] = cdist[i-1] + pdist[i]

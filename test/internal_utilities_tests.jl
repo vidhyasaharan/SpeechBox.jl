@@ -172,7 +172,7 @@ end
 
     s = SpeechBox.speech_waveform(xx,fs)
     rs = SpeechBox.resample(s,2*fs)
-    @test typeof(rs) == SpeechBox.speech_waveform
+    @test rs isa SpeechBox.speech_waveform{Float}
     @test abs(length(rs.x) - length(s.x)*2) <= 1
     @test rs.fs == s.fs*2
 

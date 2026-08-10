@@ -4,7 +4,7 @@
 
 Fills each column of matrix `A` with a frame of array `x`. Frame size is given by number of rows of `A` and frame shift is determined such that the final frame is as close as possible to end of `x`.
 """
-function enframe!(y::AbstractMatrix{Float}, x::AbstractVector{Float})
+function enframe!(y::AbstractMatrix{T}, x::AbstractVector{T}) where {T<:AbstractFloat}
     frame_size = size(y,1)
     num_frames = size(y,2)
     len = length(x)
@@ -23,9 +23,9 @@ end
 
 Generate a matrix with each column storing one frame of length `frame_size` from signal in array `x`, with consecutive frames separated by `frame_shift` samples.
 """
-function enframe(x::AbstractVector{Float}, frame_size::Int, frame_shift::Int)
+function enframe(x::AbstractVector{T}, frame_size::Int, frame_shift::Int) where {T<:AbstractFloat}
     num_frames = number_signal_frames(x, frame_size, frame_shift)
-    y = Matrix{Float}(undef,frame_size,num_frames)
+    y = Matrix{T}(undef,frame_size,num_frames)
     enframe!(y, x)
     return y
 end
@@ -35,7 +35,7 @@ end
 
 Generate a matrix with each column storing one frame of duration `frame_dur` in seconds from signal in array `x` with sampling rate `fs`, with consecutive frames separated by `frame_shift_dur` in seconds.
 """
-function enframe(x::AbstractVector{Float}, fs::Real, frame_dur::Real, frame_shift_dur::Real)
+function enframe(x::AbstractVector{<:AbstractFloat}, fs::Real, frame_dur::Real, frame_shift_dur::Real)
     frame_size = time2nsamples(frame_dur,fs)
     frame_shift = time2nsamples(frame_shift_dur,fs)
     return enframe(x,frame_size, frame_shift)
@@ -68,7 +68,7 @@ extract_frame(x::framed_signal,i::Int) = collect(view_frame(x, i))
 Create of view of frame number `i` from the the framed\\_signal object `x` (Frames involving zero padding of the signal will be arrays not views).
 
 """
-function view_frame(x::framed_signal,i::Int)
+function view_frame(x::framed_signal{T},i::Int) where {T<:AbstractFloat}
     frame_length = x.frame_length
     frame_shift = x.frame_shift
     sindx = (i-1)*frame_shift + 1 #Identify start index of desired frame
@@ -76,7 +76,7 @@ function view_frame(x::framed_signal,i::Int)
     if(i<=x.num_signal_frames) #Checking to see end of frame is within bounds of defined signal
         frame = @view x.signal.x[sindx:eindx]
     else #Zero padding to return full frame if signal ends midway through the frame
-        frame = zeros(Float,frame_length)
+        frame = zeros(T,frame_length)
         lindx = length(x.signal.x)
         sig_len = lindx - sindx + 1
         frame[1:sig_len] = @view x.signal.x[sindx:lindx]
@@ -95,17 +95,17 @@ end
 
 Compute the number of frames without zero padding or extension of array `x` or speech waveform `s` given `frame_size` and `frame_shift` in number of samples or `frame_dur` and `frame_shift_dur` in seconds
 """
-number_signal_frames(x::AbstractVector{Float}, frame_size::Int, frame_shift::Int) = 1+ Int(floor((length(x)-frame_size)/frame_shift))
+number_signal_frames(x::AbstractVector{<:AbstractFloat}, frame_size::Int, frame_shift::Int) = 1+ Int(floor((length(x)-frame_size)/frame_shift))
 
 number_signal_frames(s::speech_waveform, frame_size::Int, frame_shift::Int) = number_signal_frames(s.x, frame_size, frame_shift)
 
-function number_signal_frames(x::AbstractVector{Float}, fs::Real, frame_dur::Float, frame_shift_dur::Float)
+function number_signal_frames(x::AbstractVector{<:AbstractFloat}, fs::Real, frame_dur::Real, frame_shift_dur::Real)
     frame_size = time2nsamples(frame_dur, fs)
     frame_shift = time2nsamples(frame_shift_dur, fs)
     return number_signal_frames(x, frame_size, frame_shift)
 end
 
-function number_signal_frames(s::speech_waveform, frame_dur::Float, frame_shift_dur::Float)
+function number_signal_frames(s::speech_waveform, frame_dur::Real, frame_shift_dur::Real)
     frame_size = time2nsamples(frame_dur,s.fs)
     frame_shift = time2nsamples(frame_shift_dur,s.fs)
     return number_signal_frames(s, frame_size, frame_shift)
@@ -118,9 +118,9 @@ end
 Estimate energy in each frame of `sig_frames` as sum of squares of samples (optionally return normalised energy such that max is 1 if `normalised = true`)
 
 """
-function frame_energy(sig_frames::framed_signal; normalised = false)
+function frame_energy(sig_frames::framed_signal{T}; normalised = false) where {T<:AbstractFloat}
     numframes = sig_frames.num_frames
-    energy = zeros(Float,numframes) #Initialise array of estimated energy values (one per frames)
+    energy = zeros(T,numframes) #Initialise array of estimated energy values (one per frames)
     for i=1:numframes
         frame = extract_frame(sig_frames,i) #extract frame from framed signal object
         energy[i] = sum(abs2,frame) #Estimate energy as sum of squares

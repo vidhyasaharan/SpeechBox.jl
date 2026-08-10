@@ -18,6 +18,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Authenticate git access to the private TimeFrequencyAnalysis repo
+        # The docs environment resolves TimeFrequencyAnalysis from its GitHub url via
+        # [sources]; see the matching step in CI.yml. Skipped when the secret is not set.
+        shell: bash
+        env:
+          TFA_READ_TOKEN: ${{ secrets.TFA_READ_TOKEN }}
+        run: |
+          if [ -n "$TFA_READ_TOKEN" ]; then
+            git config --global url."https://x-access-token:${TFA_READ_TOKEN}@github.com/unsw-edu-au/TimeFrequencyAnalysis.jl".insteadOf "https://github.com/unsw-edu-au/TimeFrequencyAnalysis.jl"
+          fi
       - uses: julia-actions/setup-julia@v2
         with:
           version: '1'

@@ -7,7 +7,7 @@ modelling utilities.
 
 The time-frequency core (waveform containers, framing, windows, spectral analyses and their
 supporting utilities) lives in
-[TimeFrequencyAnalysis.jl](https://github.com/unsw-edu-au/TimeFrequencyAnalysis.jl) and is
+[TimeFrequencyAnalysis.jl](https://github.com/vidhyasaharan/TimeFrequencyAnalysis.jl) and is
 re-exported here, so `using SpeechBox` provides the complete API.
 """
 module SpeechBox

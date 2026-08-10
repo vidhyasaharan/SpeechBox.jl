@@ -6,7 +6,7 @@ Speech-specific signal conditioning provided by SpeechBox:
 
 Generic signal utilities — window functions, resampling, frequency grids and synthetic
 signal generators — are provided (and documented) by
-[TimeFrequencyAnalysis.jl](https://unsw-edu-au.github.io/TimeFrequencyAnalysis.jl/dev/)
+[TimeFrequencyAnalysis.jl](https://vidhyasaharan.github.io/TimeFrequencyAnalysis.jl/dev/)
 and re-exported by SpeechBox.
 
 ## Pre-Emphasis

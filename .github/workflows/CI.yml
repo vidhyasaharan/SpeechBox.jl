@@ -35,23 +35,11 @@ jobs:
             os: windows-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Authenticate git access to the private TimeFrequencyAnalysis repo
-        # The default GITHUB_TOKEN is scoped to this repository only, so resolving the
-        # [sources] url needs a token with read access to TimeFrequencyAnalysis.jl
-        # (repository secret TFA_READ_TOKEN). Skipped when the secret is not set (e.g.
-        # if the repository becomes public).
-        shell: bash
-        env:
-          TFA_READ_TOKEN: ${{ secrets.TFA_READ_TOKEN }}
-        run: |
-          if [ -n "$TFA_READ_TOKEN" ]; then
-            git config --global url."https://x-access-token:${TFA_READ_TOKEN}@github.com/unsw-edu-au/TimeFrequencyAnalysis.jl".insteadOf "https://github.com/unsw-edu-au/TimeFrequencyAnalysis.jl"
-          fi
       - uses: julia-actions/setup-julia@v2
         with:
           version: ${{ matrix.version }}
       - uses: julia-actions/cache@v2
       - uses: julia-actions/julia-buildpkg@v1
         with:
-          git_cli: 'true' # buildpkg overrides JULIA_PKG_USE_CLI_GIT with this input; CLI git honours the url rewrite above (libgit2 does not)
+          git_cli: 'true' # buildpkg overrides JULIA_PKG_USE_CLI_GIT with this input; keep CLI git so the [sources] url resolves reliably
       - uses: julia-actions/julia-runtest@v1

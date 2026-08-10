@@ -1,7 +1,7 @@
 # Migration plan: SpeechBox.jl → TimeFrequencyAnalysis.jl
 
 **Goal.** Move the generic time-frequency core of SpeechBox.jl into a new standalone package,
-[TimeFrequencyAnalysis.jl](https://github.com/unsw-edu-au/TimeFrequencyAnalysis.jl) (TFA), so it can be shared by
+[TimeFrequencyAnalysis.jl](https://github.com/vidhyasaharan/TimeFrequencyAnalysis.jl) (TFA), so it can be shared by
 SpeechBox and future packages. SpeechBox becomes a speech-analysis layer that depends on TFA and re-exports its API,
 so **existing SpeechBox user code keeps working unchanged**.
 
@@ -98,7 +98,7 @@ These were tested with throwaway packages before committing to the design:
    Consumers must add TFA first:
 
    ```julia
-   pkg> add https://github.com/unsw-edu-au/TimeFrequencyAnalysis.jl.git
+   pkg> add https://github.com/vidhyasaharan/TimeFrequencyAnalysis.jl.git
    pkg> add https://github.com/unsw-edu-au/SpeechBox.jl.git
    ```
 
@@ -132,3 +132,4 @@ change.
 |---|---|---|
 | 2026-08-10 | Pre-migration | SpeechBox fixed first: CI matrix, dead `timefreq` constructor, specgram frequency axis, `A_FACT`, and the `Float` alias replaced by parametric types generic over `AbstractFloat` (so the core moves over already generic). |
 | 2026-08-10 | Stage 1 | **Done.** TFA v0.1.0 populated (8 source files, full docstrings, 97,531-test suite on synthetic fixtures, Documenter site with 6 pages, all building clean). SpeechBox v0.4.0 switched to the TFA dependency with `@reexport` + `speech_waveform` alias; suite green (5,108 tests) against the dev'ed TFA; docs build clean; benchmarks unchanged. Remember: **push TFA `main` before pushing SpeechBox** — SpeechBox CI resolves TFA from its GitHub url. |
+| 2026-08-10 | Post-stage 1 | **TFA repo moved** to [github.com/vidhyasaharan/TimeFrequencyAnalysis.jl](https://github.com/vidhyasaharan/TimeFrequencyAnalysis.jl) (public; the old `unsw-edu-au` url is dead — no redirect). Both `[sources]` urls, the README/docs install instructions and links, and this plan updated; the `TFA_READ_TOKEN` auth steps deleted from CI.yml and Documentation.yml (public repo needs no token). SpeechBox itself stays at `unsw-edu-au/SpeechBox.jl`. **Flaky tests fixed:** the SpeechBox suite was unseeded, and two statistical GMM assertions (GMM_tests.jl:109 — exact match between two independent k-means runs; :185 — posterior argmax of sampled points) failed on ~7% of runs, including the first post-migration CI run on master. `test/setup.jl` now does `Random.seed!(2026)` (seed verified across the stochastic test files); `white_noise`/`ar_process` stay entropy-seeded by design, and the lpc tests that use them assert loose tolerances only. |

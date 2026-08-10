@@ -26,13 +26,18 @@ No behaviour changes ride along with a move. Every commit in both repositories l
 | Types | `waveform` (renamed from `speech_waveform`), `framed_signal`, `spectrum`, `timefreq`, `comp` | `pitch_timefreq`, `RAPT_*`, `GMM`, `Gaussian`, `Categorical`, `filter_coefs`(→ TFA in stage 2) |
 | Analyses | `dft`, `magspec`, `specgram`, `periodogram`; correlations in stage 2 | `melfcc`, `vad`, `lpc`, `pitch` (spectral comb + RAPT), distortion measures |
 | Utilities | framing, windows, frequency grids, `frqindex`, `time2nsamples`, signal generators, element-wise ops (`log`, `amp2db`, …) | `preemphasis`, peak finding (`findpeaks` family), stats/clustering layer |
-| Dependencies | DSP, FFTW, LinearAlgebra, Random | TFA, Reexport, DSP, FFTW, LinearAlgebra, RecipesBase |
+| Dependencies | DSP, FFTW, LinearAlgebra, Random; RecipesBase as a stage-2 *weak* dependency | TFA, Reexport, DSP, FFTW, LinearAlgebra, RecipesBase |
 
 Back-compat: SpeechBox defines `const speech_waveform = waveform` and re-exports it, plus
 `@reexport using TimeFrequencyAnalysis`, so the public SpeechBox API is a superset of what it was.
 
 The stats/clustering layer (kmeans, GMM, statistics utilities) is out of scope for this migration; it may become a
 third package later.
+
+Makie plotting support is also out of scope: stage 2 ships the existing Plots-ecosystem recipes as a RecipesBase
+package extension, and a future Makie extension is a post-migration todo outlined in TFA's
+`dev docs/makie-plot-extension.md` (assessed 2026-08-10: Plots.jl is in maintenance mode but stable and still the
+pragmatic default for TFA's users; Makie is the actively developed ecosystem, worth adding later at low cost).
 
 ---
 
@@ -75,8 +80,13 @@ spectral analyses, and their supporting utilities.
 - `correlations.jl` (`xcorr(!)`, `acorr(!)`, `acf`, `nacf`) → TFA. RAPT keeps using `nacf` via the re-export.
 - `dsp_utilities.jl` (`filter_coefs`, `freq2θ`, `freq2z`, `H`, `Hmag`, `filter_resp`, `filter_magresp`) → TFA;
   SpeechBox's LPC imports what it needs.
-- Plot recipes for `waveform`/`spectrum`/`timefreq` + `generate_ticks` → TFA (TFA gains the RecipesBase dependency);
-  SpeechBox keeps the pitch-overlay recipes and imports `generate_ticks`.
+- Plot recipes for `waveform`/`spectrum`/`timefreq` → TFA as a **package extension**
+  (`ext/TimeFrequencyAnalysisRecipesBaseExt.jl` with RecipesBase in `[weakdeps]`), so TFA's hard dependency list is
+  unchanged; the recipes activate whenever Plots (or anything else that loads RecipesBase) is in the session.
+  `generate_ticks` stays in TFA `src/` as a documented utility — SpeechBox's pitch-overlay recipes import it, and
+  code inside an extension is not reachable from other packages. SpeechBox keeps the pitch-overlay recipes (and its
+  RecipesBase dependency). Makie support is deliberately *not* part of this stage — see the todo in TFA's
+  `dev docs/makie-plot-extension.md`.
 - TFA version → 0.2.0; SpeechBox compat bump.
 
 ### Stage 3 — documentation polish, CI hardening, registration
@@ -133,3 +143,4 @@ change.
 | 2026-08-10 | Pre-migration | SpeechBox fixed first: CI matrix, dead `timefreq` constructor, specgram frequency axis, `A_FACT`, and the `Float` alias replaced by parametric types generic over `AbstractFloat` (so the core moves over already generic). |
 | 2026-08-10 | Stage 1 | **Done.** TFA v0.1.0 populated (8 source files, full docstrings, 97,531-test suite on synthetic fixtures, Documenter site with 6 pages, all building clean). SpeechBox v0.4.0 switched to the TFA dependency with `@reexport` + `speech_waveform` alias; suite green (5,108 tests) against the dev'ed TFA; docs build clean; benchmarks unchanged. Remember: **push TFA `main` before pushing SpeechBox** — SpeechBox CI resolves TFA from its GitHub url. |
 | 2026-08-10 | Post-stage 1 | **TFA repo moved** to [github.com/vidhyasaharan/TimeFrequencyAnalysis.jl](https://github.com/vidhyasaharan/TimeFrequencyAnalysis.jl) (public; the old `unsw-edu-au` url is dead — no redirect). Both `[sources]` urls, the README/docs install instructions and links, and this plan updated; the `TFA_READ_TOKEN` auth steps deleted from CI.yml and Documentation.yml (public repo needs no token). SpeechBox itself stays at `unsw-edu-au/SpeechBox.jl`. **Flaky tests fixed:** the SpeechBox suite was unseeded, and two statistical GMM assertions (GMM_tests.jl:109 — exact match between two independent k-means runs; :185 — posterior argmax of sampled points) failed on ~7% of runs, including the first post-migration CI run on master. `test/setup.jl` now does `Random.seed!(2026)` (seed verified across the stochastic test files); `white_noise`/`ar_process` stay entropy-seeded by design, and the lpc tests that use them assert loose tolerances only. |
+| 2026-08-10 | Planning | Stage 2 plotting approach amended after an ecosystem check: the recipes move as a **RecipesBase package extension** (weak dependency; TFA hard deps unchanged) instead of a hard RecipesBase dep, and `generate_ticks` stays in TFA `src/` so SpeechBox can import it. Makie support assessed and **deferred beyond the migration** — design notes in TFA `dev docs/makie-plot-extension.md`. Basis (Aug 2026): Plots.jl v1.41.6 is in maintenance mode (~15 commits in 6 months, v2 branch unreleased), Makie 0.24.13 is actively developed but still 0.x, and package extensions are the ecosystem norm for plotting support (SignalAnalysis.jl, DimensionalData.jl). |

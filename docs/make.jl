@@ -21,5 +21,5 @@ makedocs(
 )
 
 deploydocs(
-    repo = "github.com/unsw-edu-au/SpeechBox.jl.git",
+    repo = "github.com/vidhyasaharan/SpeechBox.jl.git",
 )

@@ -11,7 +11,6 @@ makedocs(
         "Home" => "index.md",
         "Contents" => [
             "vad.md",
-            "correlations.md",
             "lpc.md",
             "pitch.md",
             "mfcc.md",

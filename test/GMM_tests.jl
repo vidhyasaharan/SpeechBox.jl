@@ -1,5 +1,5 @@
 function posdefmatrix(ndim::Int)
-    a = randn(Float,ndim,ndim)
+    a = randn(Float64,ndim,ndim)
     A = a*a' + LinearAlgebra.I(ndim)
     return A
 end
@@ -13,10 +13,10 @@ end
 
 @testset "normaliseWts" begin
     nmix = 10
-    w = rand(Float,nmix)
+    w = rand(Float64,nmix)
     ŵ = copy(w)
     SpeechBox.normaliseWeights!(w)
-    @test sum(w) ≈ one(Float)
+    @test sum(w) ≈ one(Float64)
     for i ∈ eachindex(w,ŵ)
         @test w[i]/sum(w) ≈ ŵ[i]/sum(ŵ)
     end
@@ -27,7 +27,7 @@ end
     ndim = 3
     w = rand(nmix)
     SpeechBox.normaliseWeights!(w)
-    μ = [randn(Float,ndim) for i ∈ 1:nmix]
+    μ = [randn(Float64,ndim) for i ∈ 1:nmix]
     Σ = [posdefmatrix(ndim) for i ∈ 1:nmix]
 
     @test SpeechBox.isconsistentComponents(w,μ,Σ) == true
@@ -40,7 +40,7 @@ end
 
     @test SpeechBox.isconsistentDimensions(μ,Σ) == true
     μ̄ = copy(μ)
-    μ̄[nmix] = randn(Float,ndim-1)
+    μ̄[nmix] = randn(Float64,ndim-1)
     Σ̄ = copy(Σ)
     Σ̄[1] = posdefmatrix(ndim+1)
     @test SpeechBox.isconsistentDimensions(μ̄,Σ) == false
@@ -61,16 +61,16 @@ end
     nmix = 5
     w = rand(nmix)
     SpeechBox.normaliseWeights!(w)
-    μ = [randn(Float,ndim) for i ∈ 1:nmix]
+    μ = [randn(Float64,ndim) for i ∈ 1:nmix]
     Σ = [posdefmatrix(ndim) for i ∈ 1:nmix]
 
     G = SpeechBox.GMM(w,μ,Σ)
 
-    @test typeof(G.w) == Vector{Float}
-    @test typeof(G.μ) == Vector{Vector{Float}}
-    @test typeof(G.Σ) == Vector{Matrix{Float}}
-    @test typeof(G.P) == Vector{Matrix{Float}}
-    @test typeof(G.Z) == Vector{Float}
+    @test typeof(G.w) == Vector{Float64}
+    @test typeof(G.μ) == Vector{Vector{Float64}}
+    @test typeof(G.Σ) == Vector{Matrix{Float64}}
+    @test typeof(G.P) == Vector{Matrix{Float64}}
+    @test typeof(G.Z) == Vector{Float64}
 
     @test length(G.w) == nmix
     @test G.w == w
@@ -87,11 +87,11 @@ end
     means = randn(ndim,nmix)
     G = SpeechBox.GMM(means)
 
-    @test typeof(G.w) == Vector{Float}
-    @test typeof(G.μ) == Vector{Vector{Float}}
-    @test typeof(G.Σ) == Vector{Matrix{Float}}
-    @test typeof(G.P) == Vector{Matrix{Float}}
-    @test typeof(G.Z) == Vector{Float}
+    @test typeof(G.w) == Vector{Float64}
+    @test typeof(G.μ) == Vector{Vector{Float64}}
+    @test typeof(G.Σ) == Vector{Matrix{Float64}}
+    @test typeof(G.P) == Vector{Matrix{Float64}}
+    @test typeof(G.Z) == Vector{Float64}
 
     @test G.w == (1/nmix)*ones(nmix)
     for i = 1:nmix
@@ -114,18 +114,18 @@ end
 
 @testset "logsumexp" begin
     nprbs = 10
-    probs = rand(Float,nprbs)
+    probs = rand(Float64,nprbs)
     lprobs = log.(probs)
     @test SpeechBox.logsumexp(lprobs) ≈ log(sum(probs))
 end
 
 @testset "Categorical" begin
     ncat = 10
-    p = rand(Float,ncat)
+    p = rand(Float64,ncat)
     SpeechBox.normaliseWeights!(p)
     # c = SpeechBox.pdist2cdist(p)
     c = SpeechBox.Categorical(p)
-    @test c isa SpeechBox.Categorical{Float}
+    @test c isa SpeechBox.Categorical{Float64}
     for i ∈ eachindex(p,c.pdist,c.cdist)
         @test c.pdist[i] ≈ p[i]
         @test c.cdist[i] ≈ sum(p[1:i])
@@ -134,10 +134,10 @@ end
 
 @testset "Gaussian" begin
     ndim = 5
-    μ = randn(Float,ndim)
+    μ = randn(Float64,ndim)
     Σ = posdefmatrix(ndim)
     g = SpeechBox.Gaussian(μ,Σ)
-    @test g isa SpeechBox.Gaussian{Float}
+    @test g isa SpeechBox.Gaussian{Float64}
     @test μ == g.μ
     @test Σ == g.Σ
     @test LinearAlgebra.cholesky(Σ) == g.A

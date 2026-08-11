@@ -10,4 +10,4 @@ lpc
 lpc_response
 ```
 
-The autocorrelation functions [`acorr`](@ref) and [`acorr!`](@ref) used in LPC analysis are documented on the [Correlations](correlations.md) page.
+The autocorrelation (`acorr`) and filter-response (`filter_coefs`, `filter_magresp`) routines used in LPC analysis are provided and documented by [TimeFrequencyAnalysis.jl](https://vidhyasaharan.github.io/TimeFrequencyAnalysis.jl/dev/).

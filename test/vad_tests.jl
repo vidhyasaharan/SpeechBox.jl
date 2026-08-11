@@ -8,7 +8,7 @@
     vi = vad(energy_threshold(), sig_frames,threshold = en_thr)
 
 
-    energy = zeros(Float,sig_frames.num_frames)
+    energy = zeros(Float64,sig_frames.num_frames)
     for i=1:sig_frames.num_frames
         frame = extract_frame(sig_frames,i)
         energy[i] = sum(abs2,frame)

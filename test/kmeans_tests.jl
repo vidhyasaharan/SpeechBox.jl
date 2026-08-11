@@ -1,7 +1,7 @@
 @testset "mindist2cntrs" begin
     npts_per_cluster = 4
     r = 0.25
-    c = convert(Matrix{Float},[1 1 -1 -1; 1 -1 1 -1])
+    c = convert(Matrix{Float64},[1 1 -1 -1; 1 -1 1 -1])
     x = SpeechBox.generate_4_circle_clusters(npts_per_cluster; r)
     md = SpeechBox.mindist2cntrs(c,x)
     for i ∈ eachindex(md)
@@ -13,7 +13,7 @@ end
 @testset "closest_centre" begin
     npts_per_cluster = 4
     r = 0.25
-    c = convert(Matrix{Float},[1 1 -1 -1; 1 -1 1 -1])
+    c = convert(Matrix{Float64},[1 1 -1 -1; 1 -1 1 -1])
     x = SpeechBox.generate_4_circle_clusters(npts_per_cluster; r)
     cc = SpeechBox.closest_centre(c,x)
     for i ∈ axes(c,2)
@@ -25,11 +25,11 @@ end
 
 
 @testset "max_centre_shift" begin
-    c = convert(Matrix{Float},[1 1 -1 -1; 1 -1 1 -1])
+    c = convert(Matrix{Float64},[1 1 -1 -1; 1 -1 1 -1])
     ncntrs = size(c,2)
     r = rand(ncntrs)
     θ = rand(ncntrs)*2π
-    shift = Matrix{Float}(undef,2,ncntrs)
+    shift = Matrix{Float64}(undef,2,ncntrs)
     for i ∈ axes(c,2)
         shift[1,i] = r[i]*cos(θ[i])
         shift[2,i] = r[i]*sin(θ[i])

@@ -1,11 +1,11 @@
 @testset "pitch_timefreq" begin
     #Half a second of the test recording keeps this fast
-    s = speech_waveform(signal.x[1:8000], signal.fs)
+    s = speech_waveform(sig.x[1:8000], sig.fs)
     frames = framed_signal(s, 0.02, 0.01)
     p = pitch(spectral_comb(), frames)
     ptf = SpeechBox.pitch_timefreq(p, frames)
 
-    @test ptf isa SpeechBox.pitch_timefreq{Float,Float}
+    @test ptf isa SpeechBox.pitch_timefreq{Float64,Float64}
     @test length(ptf.pitch) == length(p)
     @test length(ptf.pindx) == length(p)
     @test ptf.msp isa timefreq

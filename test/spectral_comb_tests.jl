@@ -4,7 +4,7 @@
     frq_per_octave = 100
     h,z = SpeechBox.generate_logfrq_pitch_comb(;γ, K, frq_per_octave)
     @test typeof(z) == Int
-    @test typeof(h) == Vector{Float}
+    @test typeof(h) == Vector{Float64}
     pi,pm = SpeechBox.findpeaks(h)
     @test length(pm) == K
     @test pi[1] == z
@@ -26,13 +26,13 @@ end
     for f₀ in f₀_list
         x = filt(ar, SpeechBox.impulse_train(f₀, dur, fs))
         y, frqs = SpeechBox.xcorr_spectral_comb(x, fs)
-        @test typeof(y) == Vector{Float}
+        @test typeof(y) == Vector{Float64}
         @test length(y) == length(frqs)
         @test (abs(frqs[argmax(y)]-f₀)/f₀) < allowed_error
 
         frames = framed_signal(x, fs, 0.10, 0.01)
         y, frqs = SpeechBox.xcorr_spectral_comb(frames)
-        @test typeof(y) == Matrix{Float}
+        @test typeof(y) == Matrix{Float64}
         @test size(y,1) == length(frqs)
         @test size(y,2) == frames.num_signal_frames
         for i=1:size(y,2)

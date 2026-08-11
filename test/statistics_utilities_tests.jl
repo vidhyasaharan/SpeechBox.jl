@@ -1,14 +1,14 @@
 @testset "running_mean" begin
     ndim = 20
     npts = 10000
-    x = randn(Float,ndim,npts)
+    x = randn(Float64,ndim,npts)
     @test mean(x,dims=2) ≈ SpeechBox.running_mean(x)
 end
 
 @testset "running_meanvar" begin
     ndim = 20
     npts = 10000
-    x = randn(Float,ndim,npts)
+    x = randn(Float64,ndim,npts)
     m,v = SpeechBox.running_meanvar(x)
     @test mean(x,dims=2) ≈ m
     @test var(x,dims=2) ≈ v
@@ -28,8 +28,8 @@ end
 @testset "update_running_mean!" begin
     ndim = 20
     npts = 10000
-    x = randn(Float,ndim,npts)
-    m = zeros(Float,ndim)
+    x = randn(Float64,ndim,npts)
+    m = zeros(Float64,ndim)
     for i ∈ axes(x,2)
         SpeechBox.update_running_mean!(m,x[:,i],i)
     end
@@ -38,14 +38,14 @@ end
 
 @testset "distance computations" begin
     ndim = 10
-    a = rand(Float,ndim)
-    b = rand(Float,ndim)
+    a = rand(Float64,ndim)
+    b = rand(Float64,ndim)
     @test (a-b)⋅(a-b) ≈ SpeechBox.sqL2dist(a,b)
     @test sqrt(sum(abs2,a-b)) ≈ SpeechBox.L2dist(a,b)
 
-    A = randn(Float,ndim,ndim)
-    x = randn(Float,ndim)
-    y = randn(Float,ndim)
+    A = randn(Float64,ndim,ndim)
+    x = randn(Float64,ndim)
+    y = randn(Float64,ndim)
     d = (x-y)'*A*(x-y)
     @test SpeechBox.sqmahal(x,y,A) ≈ d
 end

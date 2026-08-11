@@ -1,7 +1,7 @@
 name = "SpeechBox"
 uuid = "5977877c-68b9-11e9-19cb-f954a5ed1fbc"
 authors = ["Vidhyasaharan Sethu <v.sethu@unsw.edu.au>"]
-version = "0.4.0"
+version = "0.5.0"
 
 [deps]
 DSP = "717857b8-e6f2-59f4-9121-6e50c889abd2"
@@ -20,5 +20,5 @@ FFTW = "1.8"
 LinearAlgebra = "1"
 RecipesBase = "1"
 Reexport = "1"
-TimeFrequencyAnalysis = "0.1"
+TimeFrequencyAnalysis = "0.2"
 julia = "1.12"

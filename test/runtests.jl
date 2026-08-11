@@ -6,9 +6,6 @@ include("setup.jl")
         include("internal_utilities_tests.jl")
         include("statistics_utilities_tests.jl")
     end
-    @testset "correlation" begin
-        include("correlation_tests.jl")
-    end
     @testset "structs" begin
         include("pitch_objects_tests.jl")
     end
